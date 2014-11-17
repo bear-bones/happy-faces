@@ -1,0 +1,35 @@
+{
+  "name" : "happy-faces-reporting",
+  "description" : "Happy Faces Meals and Title XX reporting software",
+  "keywords" : [ "childcare", "reporting", "meals", "title xx" ],
+
+  "version": "0.1.0",
+  "authors": [
+    "James White <james@thewhites.co>"
+  ],
+
+  "license": "proprietary",
+  "private": true,
+
+  "main": "index.html",
+  "moduleType": [
+    "es6",
+    "globals",
+    "node"
+  ],
+
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+
+  "dependencies": {
+    "polymer": "Polymer/polymer#~0.4.2",
+    "core-elements": "Polymer/core-elements#~0.4.2",
+    "paper-elements": "Polymer/paper-elements#~0.4.2",
+    "sortable-table": "~0.10.0"
+  }
+}

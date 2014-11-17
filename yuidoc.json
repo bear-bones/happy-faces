@@ -1,0 +1,9 @@
+{
+    "name" : "happy-faces-reporting-docs",
+    "version" : "0.1.0",
+    "options" : {
+        "linkNatives" : true,
+        "outdir" : "doc",
+        "paths" : [ "./js/" ]
+    }
+}

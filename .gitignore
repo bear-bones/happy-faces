@@ -1,0 +1,9 @@
+.*
+npm-debug.log
+bower_components/*
+build/*
+css/*
+doc/*
+lib/*
+license/*
+node_modules/*
