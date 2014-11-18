@@ -1,0 +1,4 @@
+common.mssql = {};
+
+
+require('./mssqlerror');
