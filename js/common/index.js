@@ -1,6 +1,6 @@
 common = {};
 
 
-require('co');
-require('mssql');
-require('websql');
+require('./async');
+require('./mssql');
+require('./websql');
