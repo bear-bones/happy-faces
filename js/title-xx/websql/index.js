@@ -4,12 +4,13 @@ var children = require('./children.js'),
 
 
 
-children.init();
-config.init();
-punches.init();
+function init() {
+    return Promise.all([children.init(), config.init(), punches.init()]);
+}
 
 
 
+module.exports.init = init;
 module.exports.children = children;
 module.exports.config = config;
 module.exports.punches = punches;

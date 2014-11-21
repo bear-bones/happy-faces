@@ -13,13 +13,12 @@ var config = (function () {
                 .setItem('websql-config', JSON.stringify(config));
         }
         return config;
-    })(),
-    db;
+    })();
 
 
 
 function connect() {
-    db = window.openDatabase(
+    module.exports.db = window.openDatabase(
         config.name, config.version, config.desc, config.size
     );
 }
@@ -27,6 +26,6 @@ function connect() {
 
 
 module.exports.config = config;
-module.exports.db = db;
+module.exports.db = null;
 module.exports.connect = connect;
 module.exports.WebSqlError = require('./websqlerror.js');

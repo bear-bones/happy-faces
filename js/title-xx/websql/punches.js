@@ -1,5 +1,5 @@
 function init() {
-    var create = 'CREATE TABLE punches  (punch_id INTEGER, child_id INTEGER, time_in, TIMESTAMP, time_out TIMESTAMP)';
+    var create = 'CREATE TABLE IF NOT EXISTS punches (punch_id INTEGER, child_id INTEGER, time_in, TIMESTAMP, time_out TIMESTAMP)';
     return new Promise(function (resolve, reject) {
         common.websql.db.transaction(function (t) {
             t.executeSql(

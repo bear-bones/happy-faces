@@ -1,5 +1,5 @@
 function init() {
-    var create = 'CREATE TABLE children  (child_id INTEGER, name TEXT, age INTEGER, claim_num INTEGER, line_num INTEGER, fee BOOLEAN, auth_unit VARCHAR(8), auth_amount DECIMAL)';
+    var create = 'CREATE TABLE IF NOT EXISTS children (child_id INTEGER, name TEXT, age INTEGER, claim_num INTEGER, line_num INTEGER, fee BOOLEAN, auth_unit VARCHAR(8), auth_amount DECIMAL)';
     return new Promise(function (resolve, reject) {
         common.websql.db.transaction(function (t) {
             t.executeSql(
@@ -19,7 +19,7 @@ function create(fields) {
                 || key === 'auth_unit' || key === 'auth_amount';
         }),
         values = keys.map(function (key) {return fields[key]}),
-        placeholders = new Array(length);
+        placeholders = new Array(values.length);
     placeholders.fill('?');
 
     if (!('child_id' in keys))
@@ -28,7 +28,7 @@ function create(fields) {
     return new Promise(function (resolve, reject) {
         common.websql.db.transaction(function (t) {
             t.executeSql(
-                'INSERT INTO children (' + keys.join(', ') + ') VALUES ('
+                'INSERT OR REPLACE INTO children (' + keys.join(', ') + ') VALUES ('
                     + placeholders.join(', ') + ')',
                 values, function () {resolve()},
                 function (t, error) {reject(error)}
@@ -39,15 +39,27 @@ function create(fields) {
 
 
 
-function read() {
+function read(child_id) {
+    var sql = 'SELECT * FROM children',
+        values = [];
+
+    if (child_id !== undefined) {
+        sql += ' WHERE child_id = ?';
+        values.push(child_id);
+    }
+
     return new Promise(function (resolve, reject) {
         common.websql.db.transaction(function (t) {
-            t.executeSql('SELECT * FROM children', [], function (t, results) {
+            t.executeSql(sql, values, function (t, results) {
                 var i = 0,
                     length = results.rows.length,
                     children = new Array(length);
-                for (; i < length; ++i) children[i] = results.rows.item(i);
-                resolve(children);
+                if (child_id === undefined) {
+                    for (; i < length; ++i) children[i] = results.rows.item(i);
+                    resolve(children);
+                } else {
+                    resolve(results.rows.length ? results.rows.item(0) : null);
+                }
             }, function (t, error) {reject(error)});
         });
     });
