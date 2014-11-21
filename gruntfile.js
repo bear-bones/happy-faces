@@ -15,11 +15,17 @@ module.exports = function (grunt) {
 
         copy : {
             'meals' : {
-                expand : true, filter : 'isFile',
                 files  : [{
+                    expand : true, filter : 'isFile', flatten : true,
+                    src : ['lib/directx/*', 'lib/nw/*', 'lib/resourcer/*'],
+                    dest : 'build/meals/'
+                }, {
+                    expand : true, filter : 'isFile', flatten : true,
+                    src : ['lib/nw/locales/*'], dest : 'build/meals/locales'
+                }, {
+                    expand : true, filter : 'isFile',
                     src : [
-                        'meals.html', 'lib/**/*', '!**/*.txt',
-                        'css/**', 'img/**',
+                        'meals.html', 'css/**', 'img/**',
                         'js/common/**', 'js/meals/**',
                         'license/*', 'node_modules/log/**'
                     ], dest : 'build/meals/'
@@ -30,9 +36,16 @@ module.exports = function (grunt) {
             },
             'title-xx' : {
                 files  : [{
+                    expand : true, filter : 'isFile', flatten : true,
+                    src : ['lib/directx/*', 'lib/nw/*', 'lib/resourcer/*'],
+                    dest : 'build/title-xx/'
+                }, {
+                    expand : true, filter : 'isFile', flatten : true,
+                    src : ['lib/nw/locales/*'], dest : 'build/title-xx/locales'
+                }, {
+                    expand : true, filter : 'isFile',
                     src : [
-                        'title-xx.html', 'lib/**/*', '!**/*.txt',
-                        'css/**', 'img/**',
+                        'title-xx.html', 'css/**', 'img/**',
                         'js/common/**', 'js/title-xx/**',
                         'license/*', 'node_modules/log/**'
                     ], dest : 'build/title-xx/'
@@ -141,4 +154,14 @@ module.exports = function (grunt) {
             );
         }
     );
+
+    grunt.registerTask('run', 'Run the application', function() {
+        var path = require('path'),
+            dir = path.join('build', this.target),
+            exe = this.target === 'meals' ? 'Meals.exe' : 'TitleXX.exe';
+
+        console.log(path.join(dir, exe));
+
+        process.spawn(path.join(dir, exe), {cwd : dir});
+    });
 };

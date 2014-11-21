@@ -1,0 +1,27 @@
+{
+    "name" : "happy-faces-meals",
+    "description" : "Happy Faces Meals reporting software",
+    "keywords" : [ "childcare", "reporting", "meals"],
+
+    "version" : "0.1.0",
+    "author" : {
+        "name" : "James White",
+        "email" : "james@thewhites.co"
+    },
+
+    "private" : true,
+    "license" : "proprietary",
+    "repository" : "",
+
+    "main" : "meals.html",
+
+    "chromium" : "--harmony",
+    "js-flags" : "--harmony",
+
+    "dependencies" : {
+        "log" : "*",
+        "mssql" : "*",
+        "tedious" : "*",
+        "xlsx" : "*"
+    }
+}

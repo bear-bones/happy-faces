@@ -1,0 +1,27 @@
+{
+    "name" : "happy-faces-title-xx",
+    "description" : "Happy Faces Title XX reporting software",
+    "keywords" : [ "childcare", "reporting", "title xx"],
+
+    "version" : "0.1.0",
+    "author" : {
+        "name" : "James White",
+        "email" : "james@thewhites.co"
+    },
+
+    "private" : true,
+    "license" : "proprietary",
+    "repository" : "",
+
+    "main" : "title-xx.html",
+
+    "chromium" : "--harmony",
+    "js-flags" : "--harmony",
+
+    "dependencies" : {
+        "log" : "*",
+        "mssql" : "*",
+        "tedious" : "*",
+        "xlsx" : "*"
+    }
+}

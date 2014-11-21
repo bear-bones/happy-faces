@@ -1,0 +1,22 @@
+<html>
+<head>
+<title>
+test test test
+</title>
+</head>
+<body>
+<script>
+try {
+    global.common = window.common = require('./js/common');
+    global.title_xx = window.title_xx = require('./js/title-xx');
+
+    title_xx.main();
+} catch (error) {
+    console.error(error);
+}
+
+
+process.on('uncaughtException', function (error) {console.error(error)});
+</script>
+</body>
+</html>
