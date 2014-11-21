@@ -1,5 +1,2 @@
-title_xx.mssql = {};
-
-
-require('./children');
-require('./punches');
+module.exports.children = require('./children');
+module.exports.punches = require('./punches');

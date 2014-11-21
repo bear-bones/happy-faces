@@ -1,7 +1,11 @@
-common.websql.WebSqlError = function WebSqlError(message) {
+function WebSqlError(message) {
     this.name = 'WebSqlError';
     this.message = message;
-};
+}
 
-common.websql.WebSqlError.prototype = new Error();
-common.websql.WebSqlError.prototype.constructor = common.websql.WebSqlError;
+WebSqlError.prototype = new Error();
+WebSqlError.prototype.constructor = WebSqlError;
+
+
+
+module.exports = WebSqlError;

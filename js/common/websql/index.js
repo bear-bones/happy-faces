@@ -1,32 +1,32 @@
-common.websql = {
-    config : (function () {
-        var serial = localStorage.getItem('websql-config'), config;
+var config = (function () {
+        var serial = window.localStorage.getItem('websql-config'), config;
         if (serial) {
-            config = serial ? JSON.parse(serial)
+            config = JSON.parse(serial);
         } else {
             config = {
                 name : 'happy-faces',
                 version : '1.0',
-                desc : 'Happy Faces Title XX storage'
+                desc : 'Happy Faces Title XX storage',
                 size : 10 * 1024 * 1024  // 10MB
             };
-            localStorage.setItem('websql-config', JSON.serialize(config));
+            window.localStorage
+                .setItem('websql-config', JSON.stringify(config));
         }
         return config;
-    })()
-};
+    })(),
+    db;
 
 
 
-common.websql.connect = function connect() {
-    common.websql.db = openDatabase(
-        common.websql.config.name,
-        common.websql.config.version,
-        common.websql.config.desc,
-        common.websql.config.size
+function connect() {
+    db = window.openDatabase(
+        config.name, config.version, config.desc, config.size
     );
-};
+}
 
 
 
-require('./websqlerror.js');
+module.exports.config = config;
+module.exports.db = db;
+module.exports.connect = connect;
+module.exports.WebSqlError = require('./websqlerror.js');

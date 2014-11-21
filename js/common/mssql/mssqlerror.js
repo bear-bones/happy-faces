@@ -1,7 +1,9 @@
-common.mssql.MsSqlError = function MsSqlError(message) {
+function MsSqlError(message) {
     this.name = 'MsSqlError';
     this.message = message;
-};
+}
 
-common.mssql.MsSqlError.prototype = new Error();
-common.mssql.MsSqlError.prototype.constructor = common.mssql.MsSqlError;
+MsSqlError.prototype = new Error();
+MsSqlError.prototype.constructor = MsSqlError;
+
+module.exports = MsSqlError;

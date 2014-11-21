@@ -1,5 +1,4 @@
-common.mssql = {
-    config : {
+var config = {
         user : 'CCM-ADMIN',
         password : 'c#99jKlw,llAS',
         server : 'LOCALHOST\\CCMSERVER',
@@ -8,20 +7,21 @@ common.mssql = {
             requestTimeout : 1000000
         }
     },
-    db : require('mssql')
-};
+    db = require('mssql');
 
 
 
-common.mssql.connect = function connect() {
+function connect() {
     return new Promise(function (resolve, reject) {
-        common.mssql.db.connect(common.mssql.config, function (error) {
-            if (error) reject(error);
-            else resolve();
+        db.connect(config, function (error) {
+            error ? reject(error) : resolve();
         });
     });
 };
 
 
 
-require('./mssqlerror');
+module.exports.config = config;
+module.exports.db = db;
+module.exports.connect = connect;
+module.exports.MsSqlError = require('./mssqlerror');
