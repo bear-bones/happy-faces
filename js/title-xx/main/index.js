@@ -64,21 +64,24 @@ function main() {
         console.log('1st punch: ', punches[0]);
 
 
-        try { for (var i = children.length - 1; i >= 0; --i) {
-            var child = children[i], fields = {
-                    child_id : child.childkey,
-                    name : child.last + ', ' + child.first + ' ' + child.middle,
-                    age : get_age(child.dob)
-                };
-            if (!(yield title_xx.websql.children.read(child.childkey)))
-                yield title_xx.websql.children.create(fields);
-            else
-                yield title_xx.websql.children.update(fields);
-        } } catch (error) {
+        console.log('Saving child information to reporting database...');
+        try {
+            for (var i = children.length - 1; i >= 0; --i) {
+                var child = children[i], fields = {
+                        child_id : child.childkey,
+                        name : child.last + ', ' + child.first + ' ' + child.middle,
+                        age : get_age(child.dob)
+                    },
+                    exists = yield title_xx.websql.children.read(child.childkey);
+                if (!exists) yield title_xx.websql.children.create(fields);
+                else yield title_xx.websql.children.update(fields);
+            }
+        } catch (error) {
             console.error(error);
             console.error('Error saving child information into reporting database');
             return;
         }
+        console.log('Child information saved.');
     });
 }
 

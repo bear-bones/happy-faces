@@ -13,7 +13,9 @@ function init() {
 
 
 function create(fields) {
-    var keys = Object.keys(fields).filter(function (key) {
+    var child_id = false,
+        keys = Object.keys(fields).filter(function (key) {
+            if (key === 'child_id') child_id = true;
             return key === 'child_id' || key === 'name' || key === 'age'
                 || key === 'claim_num' || key === 'line_num' || key === 'fee'
                 || key === 'auth_unit' || key === 'auth_amount';
@@ -22,15 +24,14 @@ function create(fields) {
         placeholders = new Array(values.length);
     placeholders.fill('?');
 
-    if (!('child_id' in keys))
-        return new common.websql.WebSqlError('Id field required');
+    if (!child_id) return new common.websql.WebSqlError('Id field required');
 
     return new Promise(function (resolve, reject) {
         common.websql.db.transaction(function (t) {
             t.executeSql(
-                'INSERT OR REPLACE INTO children (' + keys.join(', ') + ') VALUES ('
+                'INSERT INTO children (' + keys.join(', ') + ') VALUES ('
                     + placeholders.join(', ') + ')',
-                values, function () {resolve()},
+                values, function (t, result) {resolve(result)},
                 function (t, error) {reject(error)}
             );
         });
