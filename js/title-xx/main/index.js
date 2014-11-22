@@ -54,7 +54,8 @@ function main() {
 
         console.log('Loading punch information from ChildCare Manager (this will take a long time)...');
         try {
-            punches = yield title_xx.mssql.punches.read();
+            punches
+                = yield title_xx.mssql.punches.read(title_xx.config.last_load);
         } catch (error) {
             console.error(error);
             console.error('Error reading punch information');
@@ -82,6 +83,35 @@ function main() {
             return;
         }
         console.log('Child information saved.');
+
+
+        console.log('Saving punch information to reporting database...');
+        try {
+            for (var i = punches.length - 1; i >= 0; --i) {
+                var punch = punches[i];
+                yield title_xx.websql.punches.create({
+                    punch_id : punch.pkChildTime, child_id : punch.fkChild,
+                    time_in : punch.dtTimeIn, time_out : punch.dtTimeOut
+                });
+            }
+        } catch (error) {
+            console.error(error);
+            console.error('Error saving punch information into reporting database');
+            return;
+        }
+        console.log('Punch information saved.');
+
+
+        try {
+            common.websql.db.transaction(function (t) {
+                t.executeSql(
+                    'SELECT COUNT(*) FROM punches', [],
+                    function (t, results) {console.log(results.rows.item(0))}
+                );
+            });
+        } catch (error) {
+            console.error(error);
+        }
     });
 }
 
