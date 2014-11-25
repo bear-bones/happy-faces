@@ -39,7 +39,7 @@ function main() {
 
 
         // TODO: progress screen instead of console.log
-        console.log('Loading child information from ChildCare Manager...');
+        console.log('Loading child information from ChildCare Manager');
 
         var children, punches;
         try {
@@ -52,7 +52,7 @@ function main() {
         console.log('Loaded ' + children.length + ' children.');
         console.log('1st child: ', children[0]);
 
-        console.log('Loading punch information from ChildCare Manager (this will take a long time)...');
+        console.log('Loading punch information from ChildCare Manager...');
         try {
             punches
                 = yield title_xx.mssql.punches.read(title_xx.config.last_load);
@@ -67,16 +67,19 @@ function main() {
 
         console.log('Saving child information to reporting database...');
         try {
-            for (var i = children.length - 1; i >= 0; --i) {
-                var child = children[i], fields = {
-                        child_id : child.childkey,
-                        name : child.last + ', ' + child.first + ' ' + child.middle,
-                        age : get_age(child.dob)
-                    },
-                    exists = yield title_xx.websql.children.read(child.childkey);
-                if (!exists) yield title_xx.websql.children.create(fields);
-                else yield title_xx.websql.children.update(fields);
-            }
+            var fields = children.map(function (child) {return {
+                    child_id : child.childkey,
+                    name : child.last + ', ' + child.first + ' ' + child.middle,
+                    age : get_age(child.dob)
+                }}),
+                exists = yield title_xx.websql.children.exists(fields);
+            yield title_xx.websql.children.create_all(
+                fields.filter(function (_, key) {return !exists[key]})
+            );
+            yield title_xx.websql.children.update_all(
+                fields.filter(function (_, key) {return exists[key]})
+            );
+            yield title_xx.websql.children.delete_except(fields);
         } catch (error) {
             console.error(error);
             console.error('Error saving child information into reporting database');
@@ -87,31 +90,18 @@ function main() {
 
         console.log('Saving punch information to reporting database...');
         try {
-            for (var i = punches.length - 1; i >= 0; --i) {
-                var punch = punches[i];
-                yield title_xx.websql.punches.create({
-                    punch_id : punch.pkChildTime, child_id : punch.fkChild,
-                    time_in : punch.dtTimeIn, time_out : punch.dtTimeOut
-                });
-            }
+            yield title_xx.websql.punches.create_all(
+                punches.map(function (value, key) {return {
+                    punch_id : value.pkChildTime, child_id : value.fkChild,
+                    time_in : value.dtTimeIn, time_out : value.dtTimeOut
+                }})
+            );
         } catch (error) {
             console.error(error);
             console.error('Error saving punch information into reporting database');
             return;
         }
         console.log('Punch information saved.');
-
-
-        try {
-            common.websql.db.transaction(function (t) {
-                t.executeSql(
-                    'SELECT COUNT(*) FROM punches', [],
-                    function (t, results) {console.log(results.rows.item(0))}
-                );
-            });
-        } catch (error) {
-            console.error(error);
-        }
     });
 }
 

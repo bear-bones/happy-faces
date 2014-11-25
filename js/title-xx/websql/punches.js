@@ -1,5 +1,5 @@
 function init() {
-    var create = 'CREATE TABLE IF NOT EXISTS punches (punch_id INTEGER, child_id INTEGER, time_in, TIMESTAMP, time_out TIMESTAMP)';
+    var create = 'CREATE TABLE IF NOT EXISTS punches (punch_id INTEGER, child_id INTEGER, time_in TIMESTAMP, time_out TIMESTAMP)';
     return new Promise(function (resolve, reject) {
         common.websql.db.transaction(function (t) {
             t.executeSql(
@@ -12,26 +12,26 @@ function init() {
 
 
 
-function create(fields) {
-    var keys = Object.keys(fields).filter(function (key) {
-            return key === 'punch_id' || key === 'child_id' || key === 'time_in'
-                || key === 'time_out';
-        }),
-        values = keys.map(function (key) {return fields[key]}),
-        placeholders = new Array(length);
-    placeholders.fill('?');
-
-    if (!('punch_id' in keys && 'child_id' in keys))
-        return new common.websql.WebSqlError('Id fields required');
+function create_all(rows) {
+    var i = 0, length = rows.length;
 
     return new Promise(function (resolve, reject) {
         common.websql.db.transaction(function (t) {
-            t.executeSql(
-                'INSERT INTO punches (' + keys.join(', ') + ') VALUES ('
-                    + placeholders.join(', ') + ')',
-                values, function () {resolve()},
-                function (t, error) {reject(error)}
-            );
+            var count = length;
+            if (!count) resolve();
+            for (; i < length; ++i) {
+                fields = rows[i];
+                var keys = Object.keys(fields),
+                    values = keys.map(function (key) {return fields[key]}),
+                    placeholders = new Array(values.length);
+                placeholders.fill('?');
+                t.executeSql(
+                    'INSERT OR IGNORE INTO punches (' + keys.join(', ') + ') VALUES ('
+                        + placeholders.join(', ') + ')',
+                    values, function () {if (! --count) resolve()},
+                    function (t, error) {reject(error)}
+                );
+            }
         });
     });
 }
@@ -63,5 +63,5 @@ function read(child_id) {
 
 
 module.exports.init = init;
-module.exports.create = create;
+module.exports.create_all = create_all;
 module.exports.read = read;
