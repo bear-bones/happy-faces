@@ -1,5 +1,5 @@
 function init() {
-    var create = 'CREATE TABLE IF NOT EXISTS children (child_id INTEGER, name TEXT, age INTEGER, claim_num INTEGER, line_num INTEGER, fee BOOLEAN, auth_unit VARCHAR(8), auth_amount DECIMAL)';
+    var create = 'CREATE TABLE IF NOT EXISTS children (child_id INTEGER PRIMARY KEY, name TEXT, age INTEGER, claim_num INTEGER, line_num INTEGER, fee BOOLEAN, auth_unit VARCHAR(8), auth_amount DECIMAL)';
     return new Promise(function (resolve, reject) {
         common.websql.db.transaction(function (t) {
             t.executeSql(
@@ -20,9 +20,9 @@ function exists(rows) {
                 rows.forEach(function (fields) {
                     var child_id = fields.child_id;
                     t.executeSql(
-                        'SELECT COUNT(*) FROM children WHERE child_id = ?',
-                        [child_id], function (count) {
-                            result[child_id] = count === 1;
+                        'SELECT COUNT(*) AS count FROM children WHERE child_id = ?',
+                        [child_id], function (t, results) {
+                            result[child_id] = results.rows.item(0).count === 1;
                             if (! --length) resolve(rows.map(
                                 function (r) {return result[r.child_id]}
                             ));
@@ -32,8 +32,9 @@ function exists(rows) {
             } else {
                 t.executeSql(
                     'SELECT COUNT(*) FROM children WHERE child_id = ?',
-                    [rows.child_id], function (count) {resolve(count === 1)},
-                    function(t, error) {reject(error)}
+                    [rows.child_id], function (t, results) {
+                        resolve(results.rows.item(0).count === 1)
+                    }, function(t, error) {reject(error)}
                 );
             }
         });

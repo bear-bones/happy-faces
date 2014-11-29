@@ -1,10 +1,13 @@
 function init() {
-    var create = 'CREATE TABLE IF NOT EXISTS punches (punch_id INTEGER, child_id INTEGER, time_in INTEGER, time_out INTEGER)';
+    var create = 'CREATE TABLE IF NOT EXISTS punches (punch_id INTEGER PRIMARY KEY, child_id INTEGER REFERENCES children(child_id) ON DELETE CASCADE, time_in INTEGER, time_out INTEGER)',
+        index = 'CREATE INDEX IF NOT EXISTS punch_key ON punches (child_id, time_in)';
     return new Promise(function (resolve, reject) {
         common.websql.db.transaction(function (t) {
             t.executeSql(
-                create, [], function (t) {resolve()},
-                function (t, error) {reject(error)}
+                create, [], function (t) {t.executeSql(
+                    index, [], function (t) {resolve()},
+                    function (t, error) {reject(error)}
+                )}, function (t, error) {reject(error)}
             );
         });
     });
@@ -47,7 +50,7 @@ function read(child_id, time) {
         values.push(child_id);
 
         if (time !== undefined) {
-            sql == ' AND time_in >= ?';
+            sql += ' AND time_in >= ?';
             values.push(time);
         }
     }
