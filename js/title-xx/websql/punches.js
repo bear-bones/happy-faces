@@ -1,5 +1,5 @@
 function init() {
-    var create = 'CREATE TABLE IF NOT EXISTS punches (punch_id INTEGER, child_id INTEGER, time_in TIMESTAMP, time_out TIMESTAMP)';
+    var create = 'CREATE TABLE IF NOT EXISTS punches (punch_id INTEGER, child_id INTEGER, time_in INTEGER, time_out INTEGER)';
     return new Promise(function (resolve, reject) {
         common.websql.db.transaction(function (t) {
             t.executeSql(
@@ -38,13 +38,18 @@ function create_all(rows) {
 
 
 
-function read(child_id) {
+function read(child_id, time) {
     var sql = 'SELECT * FROM punches',
         values = [];
 
     if (child_id !== undefined) {
         sql += ' WHERE child_id = ?';
         values.push(child_id);
+
+        if (time !== undefined) {
+            sql == ' AND time_in >= ?';
+            values.push(time);
+        }
     }
 
     return new Promise(function (resolve, reject) {
