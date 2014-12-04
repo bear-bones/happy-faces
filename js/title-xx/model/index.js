@@ -184,6 +184,10 @@ function* process_data(row_id) {
             break;
         }
     }
+
+
+    title_xx.model.data
+        = data.filter(function (child) {return child.punches.length});
 }
 
 

@@ -1,10 +1,13 @@
 function init() {
-    var create = 'CREATE TABLE IF NOT EXISTS children (child_id INTEGER PRIMARY KEY, name TEXT, age INTEGER, claim_num INTEGER, line_num INTEGER, fee BOOLEAN, auth_unit VARCHAR(8), auth_amount DECIMAL)';
+    var create = 'CREATE TABLE IF NOT EXISTS children (child_id INTEGER PRIMARY KEY, name TEXT, age INTEGER, claim_num INTEGER, line_num INTEGER, fee BOOLEAN, auth_unit VARCHAR(8), auth_amount DECIMAL)',
+        index = 'CREATE INDEX IF NOT EXISTS child_key ON children (claim_num, line_num)';
     return new Promise(function (resolve, reject) {
         common.websql.db.transaction(function (t) {
             t.executeSql(
-                create, [], function (t) {resolve()},
-                function (t, error) {reject(error)}
+                create, [], function (t) {t.executeSql(
+                    index, [], function (t) {resolve()},
+                    function (t, error) {reject(error)}
+                )}, function (t, error) {reject(error)}
             );
         });
     });
@@ -97,7 +100,7 @@ function create(fields) {
 
 
 function read(child_id) {
-    var sql = 'SELECT * FROM children',
+    var sql = 'SELECT * FROM children ORDER BY claim_num, line_num',
         values = [];
 
     if (child_id !== undefined) {

@@ -29,6 +29,7 @@ function main() {
 
 
         // TODO: listen for events
+        title_xx.excel.generate('C:/Users/James/Desktop/test.xlsx');
     });
 }
 
