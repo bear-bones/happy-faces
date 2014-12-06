@@ -21,6 +21,7 @@
     "dependencies" : {
         "log" : "*",
         "mssql" : "*",
+        "node-static" : "*",
         "tedious" : "*",
         "xlsx" : "*"
     },

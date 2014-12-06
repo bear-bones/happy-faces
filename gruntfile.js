@@ -25,8 +25,8 @@ module.exports = function (grunt) {
                 }, {
                     expand : true, filter : 'isFile',
                     src : [
-                        'meals.html', 'css/**', 'img/**',
-                        'js/common/**', 'js/meals/**',
+                        'meals.html', 'components/**', 'css/**', 
+                        'img/**', 'js/common/**', 'js/meals/**',
                         'license/*', 'node_modules/log/**'
                     ], dest : 'build/meals/'
                 }, {
@@ -45,8 +45,8 @@ module.exports = function (grunt) {
                 }, {
                     expand : true, filter : 'isFile',
                     src : [
-                        'title-xx.html', 'css/**', 'img/**',
-                        'js/common/**', 'js/title-xx/**',
+                        'title-xx.html', 'bower_components/**', 'css/**',
+                        'img/**', 'js/common/**', 'js/title-xx/**',
                         'license/*', 'node_modules/log/**'
                     ], dest : 'build/title-xx/'
                 }, {

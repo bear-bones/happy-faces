@@ -1,22 +1,81 @@
 <html>
 <head>
-<title>
-test test test
-</title>
+    <title>Happy Faces Title XX Report Generator</title>
+
+
+    <link href="app://happy-faces/bower_components/polymer/polymer.html" rel="import" />
+
+    <link href="app://happy-faces/bower_components/core-header-panel/core-header-panel.html" rel="import" />
+    <link href="app://happy-faces/bower_components/core-toolbar/core-toolbar.html" rel="import" />
+
+    <link href="app://happy-faces/bower_components/core-icon/core-icon.html" rel="import" />
+    <link href="app://happy-faces/bower_components/core-icons/core-icons.html" rel="import" />
+    <link href="app://happy-faces/bower_components/core-icons/editor-icons.html" rel="import" />
+    <link href="app://happy-faces/bower_components/paper-button/paper-button.html" rel="import" />
+    <link href="app://happy-faces/bower_components/paper-icon-button/paper-icon-button.html" rel="import" />
+
+    <link href="app://happy-faces/bower_components/paper-dialog/paper-dialog.html" rel="import" />
+    <link href="app://happy-faces/bower_components/paper-dialog/paper-dialog-transition.html" rel="import" />
+    <link href="app://happy-faces/bower_components/paper-progress/paper-progress.html" rel="import" />
+
+    <link href="app://happy-faces/bower_components/sortable-table/sortable-table.html" rel="import" />
+
+
+    <link rel="stylesheet" type="text/css" href="app://happy-faces/css/common.css" />
+    <link rel="stylesheet" type="text/css" href="app://happy-faces/css/title-xx.css" />
 </head>
-<body>
-<script>
-try {
-    global.common = window.common = require('./js/common');
-    global.title_xx = window.title_xx = require('./js/title-xx');
-
-    title_xx.main();
-} catch (error) {
-    console.error(error);
-}
 
 
-process.on('uncaughtException', function (error) {console.error(error)});
-</script>
+
+<body unresolved fullbleed layout vertical>
+    <paper-dialog backdrop autoclosedisabled id="status-dialog">
+        <p class="active">
+            Doing stuff...
+            <paper-progress></paper-progress>
+        </p>
+    </paper-dialog>
+
+
+    <paper-dialog backdrop autoclosedisabled id="config-dialog">
+    </paper-dialog>
+
+
+    <paper-dialog backdrop autoclosedisabled id="file-dialog">
+    </paper-dialog>
+
+
+    <core-header-panel flex>
+        <core-toolbar>
+            <input type="month" value="2014-12" />
+            <paper-icon-button icon="forward" title="Update report month"></paper-icon-button>
+
+            <div flex class="toolbar-flex">
+                <paper-button raised class="excel-button">
+                    <core-icon icon="description"></core-icon>&nbsp;Create Excel Report
+                </paper-button>
+            </div>
+
+            <paper-icon-button icon="settings" title="Update application settings"></paper-icon-button>
+        </core-toolbar>
+
+        <sortable-table id="child-grid">
+        </sortable-table>
+    </core-header-panel>
+
+
+    <script>
+/*
+    try {
+        global.common = window.common = require('./js/common');
+        global.title_xx = window.title_xx = require('./js/title-xx');
+
+        title_xx.main();
+    } catch (error) {
+        console.error(error);
+    }
+
+    process.on('uncaughtException', function (error) {console.error(error)});
+ */
+    </script>
 </body>
 </html>

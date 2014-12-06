@@ -1,23 +1,12 @@
 {
-  "name" : "happy-faces-reporting",
-  "description" : "Happy Faces Meals and Title XX reporting software",
-  "keywords" : [ "childcare", "reporting", "meals", "title xx" ],
-
+  "name": "happy-faces",
   "version": "0.1.0",
+  "homepage": "https://github.com/bear-bones/happy-faces",
   "authors": [
     "James White <james@thewhites.co>"
   ],
-
-  "license": "proprietary",
+  "license": "MIT",
   "private": true,
-
-  "main": "index.html",
-  "moduleType": [
-    "es6",
-    "globals",
-    "node"
-  ],
-
   "ignore": [
     "**/.*",
     "node_modules",
@@ -25,11 +14,9 @@
     "test",
     "tests"
   ],
-
   "dependencies": {
-    "polymer": "*",
-    "core-elements": "*",
-    "paper-elements": "*",
-    "sortable-table": "*"
+    "polymer": "Polymer/polymer#~0.5.1",
+    "core-elements": "Polymer/core-elements#~0.5.1",
+    "paper-elements": "Polymer/paper-elements#~0.5.1"
   }
 }
