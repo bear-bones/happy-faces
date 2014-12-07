@@ -16,18 +16,18 @@ module.exports = function (grunt) {
         copy : {
             'meals' : {
                 files  : [{
-                    expand : true, filter : 'isFile', flatten : true,
-                    src : ['lib/directx/*', 'lib/nw/*', 'lib/resourcer/*'],
-                    dest : 'build/meals/'
-                }, {
-                    expand : true, filter : 'isFile', flatten : true,
-                    src : ['lib/nw/locales/*'], dest : 'build/meals/locales'
-                }, {
+//                    expand : true, filter : 'isFile', flatten : true,
+//                    src : ['lib/directx/*', 'lib/nw/*', 'lib/resourcer/*'],
+//                    dest : 'build/meals/'
+//                }, {
+//                    expand : true, filter : 'isFile', flatten : true,
+//                    src : ['lib/nw/locales/*'], dest : 'build/meals/locales'
+//                }, {
                     expand : true, filter : 'isFile',
                     src : [
-                        'meals.html', 'components/**', 'css/**', 
-                        'img/**', 'js/common/**', 'js/meals/**',
-                        'license/*', 'node_modules/log/**'
+                        'meals.html', 'css/**', 'img/**', 'js/common/**',
+                        'js/meals/**'//, 'license/*', 'bower_components/**',
+                        //'node_modules/log/**'
                     ], dest : 'build/meals/'
                 }, {
                     src : ['meals-package.json'],
@@ -36,18 +36,18 @@ module.exports = function (grunt) {
             },
             'title-xx' : {
                 files  : [{
-                    expand : true, filter : 'isFile', flatten : true,
-                    src : ['lib/directx/*', 'lib/nw/*', 'lib/resourcer/*'],
-                    dest : 'build/title-xx/'
-                }, {
-                    expand : true, filter : 'isFile', flatten : true,
-                    src : ['lib/nw/locales/*'], dest : 'build/title-xx/locales'
-                }, {
+//                    expand : true, filter : 'isFile', flatten : true,
+//                    src : ['lib/directx/*', 'lib/nw/*', 'lib/resourcer/*'],
+//                    dest : 'build/title-xx/'
+//                }, {
+//                    expand : true, filter : 'isFile', flatten : true,
+//                    src : ['lib/nw/locales/*'], dest : 'build/title-xx/locales'
+//                }, {
                     expand : true, filter : 'isFile',
                     src : [
-                        'title-xx.html', 'bower_components/**', 'css/**',
-                        'img/**', 'js/common/**', 'js/title-xx/**',
-                        'license/*', 'node_modules/log/**'
+                        'title-xx.html', 'css/**', 'img/**', 'js/common/**',
+                        'js/title-xx/**'//, 'license/*', 'bower_components/**',
+                        //'node_modules/log/**'
                     ], dest : 'build/title-xx/'
                 }, {
                     src : ['title-xx-package.json'],
@@ -148,9 +148,9 @@ module.exports = function (grunt) {
     grunt.registerMultiTask(
         'build', 'Build one or both of the report programs', function () {
             grunt.task.run(
-                'time', 'clean:' + this.target, 'yuidoc',
-                'sass:' + this.target, 'copy:' + this.target,
-                'exe:' + this.target
+                'time', //'clean:' + this.target, 'yuidoc',
+                'sass:' + this.target, 'copy:' + this.target//,
+                //'exe:' + this.target
             );
         }
     );
