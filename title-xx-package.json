@@ -15,6 +15,11 @@
 
     "main" : "title-xx.html",
 
+    "window" : {
+        "width" : 1024,
+        "height" : 768
+    },
+
     "chromium" : "--harmony",
     "js-flags" : "--harmony",
 

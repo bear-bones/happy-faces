@@ -103,11 +103,16 @@ function* write_local() {
     console.log('Saving punch information to reporting database...');
     try {
         yield title_xx.websql.punches.create_all(
-            title_xx.model.punches.map(function (value, key) {return {
-                punch_id : value.pkChildTime, child_id : value.fkChild,
-                time_in : value.dtTimeIn && value.dtTimeIn.getTime(),
-                time_out : value.dtTimeOut && value.dtTimeOut.getTime()
-            }})
+            title_xx.model.punches
+                .filter(function (value) {
+                    var i = value.dtTimeIn, o = value.dtTimeOut;
+                    return i && o && i.getTime() <= o.getTime();
+                })
+                .map(function (value, key) {return {
+                    punch_id : value.pkChildTime, child_id : value.fkChild,
+                    time_in : value.dtTimeIn && value.dtTimeIn.getTime(),
+                    time_out : value.dtTimeOut && value.dtTimeOut.getTime()
+                }})
         );
     } catch (error) {
         console.error(error);
@@ -144,11 +149,19 @@ function* process_data(row_id) {
     try {
         for (var i = 0, length = data.length; i < length; ++i) {
             var child = data[i];
+
+            // testing
+            child.auth_amount = 100;
+            child.auth_unit = Math.random() > 0.8 ? 'days' : 'hours';
+            child.fee = Math.random() > 0.9 ? 'yes' : 'no';
+            // testing
+
             child.punches = yield title_xx.websql.punches.read(
                 child.child_id, title_xx.model.config.title_xx_year_start
             );
             child.time = new Array(12);
             child.time.fill(0);
+            child.actual = 0;
 
             if (child.auth_unit === 'days') {
                 time = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
@@ -160,34 +173,59 @@ function* process_data(row_id) {
                         time[month][day] = true;
                         ++child.time[month];
                     }
+                    ++child.actual;
                 }
             } else {
                 for (var j = 0, len = child.punches.length; j < len; ++j) {
-                    var punch = child.punches[j];
-                    child.time[(new Date(punch.time_in)).getMonth()]
-                        += (punch.time_out - punch.time_in) / 3600000;
+                    var punch = child.punches[j],
+                        time = (punch.time_out - punch.time_in) / 3600000;
+                    child.time[(new Date(punch.time_in)).getMonth()] += time;
+                    child.actual += time;
                 }
             }
+
+
+            child.actual = Math.round(child.actual * 100) / 100;
+            child.remaining
+                = Math.round((child.auth_amount - child.actual) * 100) / 100;
+            child.sign = child.remaining >= 0.0 ? 'pos' : 'neg';
         }
     } catch (error) {
         console.error(error);
         throw new title_xx.model.ModelError('Error loading punch information per child');
     }
+
+    // real
+//    title_xx.model.data = data
+//        // only children with punches
+//        .filter(function (child) {return child.punches.length})
+//        // sort by least time remaining first (assume 1 day <=> 8 hours)
+//        .sort(function (a, b) {
+//            return a.auth_unit === b.auth_unit ? a.remaining - b.remaining
+//                : a.auth_unit === 'days' ? a.remaining - (b.remaining / 8)
+//                : (a.remaining / 8) - b.remaining;
+//        });
+
+
+    // testing
+    data = data.filter(function (child) {return child.punches.length})
+    data.forEach(function (child, i) {
+        child.claim_num = Math.ceil(i / 9);
+        child.line_num = i%9 + 1;
+    });
+    title_xx.model.data = data.sort(function (a, b) {
+        return a.auth_unit === b.auth_unit ? a.remaining - b.remaining
+            : a.auth_unit === 'days' ? a.remaining - (b.remaining / 8)
+            : (a.remaining / 8) - b.remaining;
+    });
+
+
     console.log('All children processed.');
-    for (var i = 0, length = data.length; i < length; ++i) {
-        if (data[i].punches.length > 0) {
-            data[i].punches = data[i].punches.map(function (punch) {
-                return (new Date(punch.time_in)).toString() + ' '
-                    + (new Date(punch.time_out)).toString();
-            });
-            console.log('1st child with punches: ', data[i]);
-            break;
-        }
-    }
+    console.log('1st child with punches: ', title_xx.model.data[0]);
 
 
-    title_xx.model.data
-        = data.filter(function (child) {return child.punches.length});
+    global.window.document.getElementById('child-grid').data
+        = title_xx.model.data;
 }
 
 

@@ -1,0 +1,21 @@
+sortable-table
+    margin: 0.5em
+
+    &::shadow
+        .sortable-table
+            th
+                cursor: pointer
+                font-family: roboto
+                text-align: center
+                &.column-0  // edit column is not sortable
+                    cursor: default
+            td
+                font-family: roboto
+            .edit-button
+                padding: 0
+                &::shadow core-icon
+                    width: 20px
+                    height: 20px
+            .neg
+                color: #f44285
+                font-weight: bold

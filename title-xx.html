@@ -3,6 +3,9 @@
     <title>Happy Faces Title XX Report Generator</title>
 
 
+    <meta charset="utf-8" />
+
+
     <link href="app://happy-faces/bower_components/polymer/polymer.html" rel="import" />
 
     <link href="app://happy-faces/bower_components/core-header-panel/core-header-panel.html" rel="import" />
@@ -21,8 +24,9 @@
     <link href="app://happy-faces/bower_components/sortable-table/sortable-table.html" rel="import" />
 
 
-    <link rel="stylesheet" type="text/css" href="app://happy-faces/css/common.css" />
-    <link rel="stylesheet" type="text/css" href="app://happy-faces/css/title-xx.css" />
+    <link rel="stylesheet" href="app://happy-faces/css/common.css" />
+    <link rel="stylesheet" href="app://happy-faces/css/title-xx.css" />
+    <link rel="stylesheet" href="app://happy-faces/bower_components/sortable-table/css/bootstrap.css">
 </head>
 
 
@@ -58,13 +62,34 @@
             <paper-icon-button icon="settings" title="Update application settings"></paper-icon-button>
         </core-toolbar>
 
-        <sortable-table id="child-grid">
+        <sortable-table class="bootstrap" id="child-grid" data="{{data}}" rowTemplate="template" disableColumnMove sortColumn="remaining">
+            <sortable-column name="edit" sortable="false">Edit</sortable-column>
+            <sortable-column name="name">Name</sortable-column>
+            <sortable-column name="age">Age</sortable-column>
+            <sortable-column name="claim" formula="function (row) {return row.claim_num*1000 + row.line_num}">Claim</sortable-column>
+            <sortable-column name="line" formula="function (row) {return row.line_num*1000 + row.claim_num}">Order</sortable-column>
+            <sortable-column name="fee">Fee</sortable-column>
+            <sortable-column name="auth_amount">Authorized</sortable-column>
+            <sortable-column name="actual">Actual</sortable-column>
+            <sortable-column name="remaining">Difference</sortable-column>
+
+            <template id="template">
+                <td style="text-align: center"><paper-icon-button icon="create" title="Edit {{record.row.name}}" id="{{record.row.child_id}}" class="edit-button"></paper-icon-button></td>
+                <td>{{record.row.name}}</td>
+                <td style="text-align: center">{{record.row.age}}</td>
+                <td style="text-align: center">{{record.row.claim_num}}</td>
+                <td style="text-align: center">{{record.row.line_num}}</td>
+                <td style="text-align: center">{{record.row.fee}}</td>
+                <td style="text-align: right">{{record.row.auth_amount}} {{record.row.auth_unit}}</td>
+                <td style="text-align: right">{{record.row.actual}}</td>
+                <td style="text-align: right" class="{{record.row.sign}}">{{record.row.remaining}}</td>
+            </template>
         </sortable-table>
     </core-header-panel>
 
 
+    
     <script>
-/*
     try {
         global.common = window.common = require('./js/common');
         global.title_xx = window.title_xx = require('./js/title-xx');
@@ -75,7 +100,6 @@
     }
 
     process.on('uncaughtException', function (error) {console.error(error)});
- */
     </script>
 </body>
 </html>
