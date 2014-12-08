@@ -1,53 +1,90 @@
 function main() {
     co(function* coroutine() {
         var model = title_xx.model,
-            view = title_xx.view;
-
-
-        // TODO: start logging
-
-
-        view.init(false);
-        view.status_dialog.open([{
-            processing_message : 'Loading children from CCM database',
-            complete_message : 'done!', indeterminate : true
-        }, {
-            processing_message : 'Loading punches from CCM database',
-            complete_message : 'done!', indeterminate : true
-        }, {
-            processing_message : 'Updating children in reporting database',
-            complete_message : 'done!', indeterminate : true
-        }, {
-            processing_message : 'Saving new punches into database',
-            complete_message : 'done!', indeterminate : true
-        }, {
-            processing_message : 'Processing punches by child',
-            complete_message : 'done!'
-        }, {
-            processing_message : 'Building table of children',
-            complete_message : 'done!', indeterminate : true
-        }]);
-
+            view = title_xx.view,
+            date = new Date();
+        date = new Date(date.getFullYear(), date.getMonth(), 0);
 
 
         try {
-            yield* model.init(view);
-            view.status_dialog.next();
-            yield* model.read_ccm();
-            yield* model.write_local();
-            yield* model.process_data();
+            // TODO: start logging
+            view.init(false, date);
+            yield* model.init(date);
         } catch (error) {
-            if (error instanceof model.ModelError) {
-                // view.show_error(error);
+            if (error instanceof view.view_error) {
+                console.error(error);
+            } else if (error instanceof model.model_error) {
+                yield view.show_error(error);
             } else {
                 console.error(error);
-                // view.show_error('Error retrieving and processing information from Chilcare Manager');
+                yield view.show_error('Error initializing Title XX reporting app');
             }
+            // app.quit();
             return;
         }
 
 
-        // TODO: listen for events
+        try {
+            yield* model.load();
+        } catch (error) {
+            if (error instanceof model.model_error) {
+                yield view.show_error(error);
+            } else {
+                console.error(error);
+                yield view.show_error('Error retrieving and processing information from Chilcare Manager');
+            }
+            // app.quit();
+            return;
+        }
+
+
+        view.on('click', function (type, parameter) {
+            console.log(type);
+            parameter && console.log(parameter);
+
+            switch (type) {
+            // udpate report date. recalculates punches and redraws grid
+            case 'date':
+                model.date(parameter);
+                break;
+
+            // generate excel report. prompts for output file, then generates
+            case 'excel':
+                model.excel.begin();
+                break;
+            case 'excel:file':
+                model.excel.create(parameter);
+                break;
+            case 'excel:cancel':
+                model.excel.cancel();
+                break;
+
+            // update configuration. pops up config edit screen and saves new
+            // config values when done
+            case 'config':
+                model.config.begin();
+                break;
+            case 'config:save':
+                model.config.save(parameter);
+                break;
+            case 'config:cancel':
+                model.config.cancel();
+                break;
+
+            // update 
+            case 'edit':
+                model.edit.begin(parameter);
+                break;
+            case 'edit:save':
+                model.edit.save(parameter);
+                break;
+            case 'edit:cancel':
+                model.edit.cancel();
+                break;
+            }
+        });
+        view.enabled = true;
+
         //title_xx.excel.generate('C:/Users/James/Desktop/test.xlsx');
     });
 }

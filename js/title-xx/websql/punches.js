@@ -41,7 +41,7 @@ function create_all(rows) {
 
 
 
-function read(child_id, time) {
+function read(child_id, time_in, time_out) {
     var sql = 'SELECT * FROM punches',
         values = [];
 
@@ -49,9 +49,14 @@ function read(child_id, time) {
         sql += ' WHERE child_id = ?';
         values.push(child_id);
 
-        if (time !== undefined) {
+        if (time_in !== undefined) {
             sql += ' AND time_in >= ?';
-            values.push(time);
+            values.push(time_in);
+        }
+
+        if (time_out !== undefined) {
+            sql += ' AND time_out <= ?';
+            values.push(time_out);
         }
     }
 

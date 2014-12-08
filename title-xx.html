@@ -21,6 +21,8 @@
     <link href="app://happy-faces/bower_components/paper-dialog/paper-dialog-transition.html" rel="import" />
     <link href="app://happy-faces/bower_components/paper-progress/paper-progress.html" rel="import" />
 
+    <link href="app://happy-faces/bower_components/paper-input/paper-input-decorator.html" rel="import" />
+
     <link href="app://happy-faces/bower_components/sortable-table/sortable-table.html" rel="import" />
 
 
@@ -32,55 +34,18 @@
 
 
 <body unresolved fullbleed layout vertical>
-    <!--<paper-dialog backdrop autoclosedisabled id="status-dialog" class="status-dialog">
-        <div class="inactive status-line">
-            <div class="processing-message">Doing stuff</div>
-            <div class="complete-message">done!</div>
-            <paper-progress class="complete" value="100"></paper-progress>
-        </div>
-        <div class="active status-line">
-            Doing stuff&hellip;<br />
-            <paper-progress value="10"></paper-progress>
-        </div>
-        <div class="inactive status-line">
-            Doing stuff&hellip;<br />
-            <paper-progress></paper-progress>
-        </div>
-        <div class="inactive status-line">
-            Doing stuff&hellip;<br />
-            <paper-progress></paper-progress>
-        </div>
-        <div class="inactive status-line">
-            Doing stuff&hellip;<br />
-            <paper-progress></paper-progress>
-        </div>
-        <div class="inactive status-line">
-            Doing stuff&hellip;<br />
-            <paper-progress></paper-progress>
-        </div>
-    </paper-dialog>-->
-
-
-    <paper-dialog backdrop autoclosedisabled id="config-dialog">
-    </paper-dialog>
-
-
-    <paper-dialog backdrop autoclosedisabled id="file-dialog">
-    </paper-dialog>
-
-
     <core-header-panel flex>
         <core-toolbar>
-            <input type="month" value="2014-12" />
-            <paper-icon-button icon="forward" title="Update report month"></paper-icon-button>
+            <input type="month" value="2014-12" id="report-month-field" />
+            <paper-icon-button icon="forward" title="Update report month" id="date-button"></paper-icon-button>
 
             <div flex class="toolbar-flex">
-                <paper-button raised class="excel-button">
+                <paper-button raised class="excel-button" id="excel-button">
                     <core-icon icon="description"></core-icon>&nbsp;Create Excel Report
                 </paper-button>
             </div>
 
-            <paper-icon-button icon="settings" title="Update application settings"></paper-icon-button>
+            <paper-icon-button icon="settings" title="Update application settings" id="config-button"></paper-icon-button>
         </core-toolbar>
 
         <sortable-table class="bootstrap" id="child-grid" data="{{data}}" rowTemplate="template" disableColumnMove sortColumn="remaining">
@@ -92,7 +57,7 @@
             <sortable-column name="fee">Fee</sortable-column>
             <sortable-column name="auth_amount">Authorized</sortable-column>
             <sortable-column name="actual">Actual</sortable-column>
-            <sortable-column name="remaining">Difference</sortable-column>
+            <sortable-column name="diff" formula="function (row) {return (row.auth_unit === 'days' ? 8 : 1) * row.remaining}">Difference</sortable-column>
 
             <template id="template">
                 <td style="text-align: center"><paper-icon-button icon="create" title="Edit {{record.row.name}}" id="{{record.row.child_id}}" class="edit-button"></paper-icon-button></td>
@@ -116,6 +81,7 @@
     );
 
     try {
+        global.app = window.app = require('nw.gui').App;
         global.common = window.common = require('./js/common');
         global.title_xx = window.title_xx = require('./js/title-xx');
 
