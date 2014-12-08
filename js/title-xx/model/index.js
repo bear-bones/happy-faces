@@ -11,7 +11,9 @@ function get_age(dob) {
 
 
 
-function* init() {
+function* init(view) {
+    this.view = view;
+
     try {
         yield common.mssql.connect();
         yield common.websql.connect();
@@ -56,7 +58,7 @@ function* read_ccm() {
         console.error(error);
         throw new title_xx.ModelError('Error reading child information');
     }
-    console.log('Loaded ' + children.length + ' children.');
+    title_xx.view.status_dialog.next('loaded ' + children.length + ' children.');
     console.log('1st child: ', children[0]);
 
 
@@ -68,7 +70,7 @@ function* read_ccm() {
         console.error(error);
         throw new title_xx.ModelError('Error reading punch information');
     }
-    console.log('Loaded ' + punches.length + ' punches.');
+    title_xx.view.status_dialog.next('loaded ' + punches.length + ' punches.');
     console.log('1st punch: ', punches[0]);
 
 
@@ -97,7 +99,7 @@ function* write_local() {
         console.error(error);
         throw new title_xx.model.ModelError('Error saving child information into reporting database');
     }
-    console.log('Child information saved.');
+    title_xx.view.status_dialog.next('child information saved.');
 
 
     console.log('Saving punch information to reporting database...');
@@ -118,7 +120,7 @@ function* write_local() {
         console.error(error);
         throw new title_xx.model.ModelError('Error saving punch information into reporting database');
     }
-    console.log('Punch information saved.');
+    title_xx.view.status_dialog.next('punch information saved.');
 }
 
 
@@ -147,6 +149,7 @@ function* process_data(row_id) {
 
     console.log('Processing child punches...');
     try {
+        var ticks = 0, step = data.length / 100;
         for (var i = 0, length = data.length; i < length; ++i) {
             var child = data[i];
 
@@ -189,6 +192,8 @@ function* process_data(row_id) {
             child.remaining
                 = Math.round((child.auth_amount - child.actual) * 100) / 100;
             child.sign = child.remaining >= 0.0 ? 'pos' : 'neg';
+
+            if (step*ticks < i) title_xx.view.status_dialog.tick(++ticks);
         }
     } catch (error) {
         console.error(error);
@@ -220,12 +225,15 @@ function* process_data(row_id) {
     });
 
 
-    console.log('All children processed.');
+    title_xx.view.status_dialog.next('all children processed.');
     console.log('1st child with punches: ', title_xx.model.data[0]);
 
 
-    global.window.document.getElementById('child-grid').data
-        = title_xx.model.data;
+    setImmediate(function () {
+        window.document.getElementById('child-grid').data
+            = title_xx.model.data;
+        title_xx.view.status_dialog.close();
+    });
 }
 
 

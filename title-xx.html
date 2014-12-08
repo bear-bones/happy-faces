@@ -32,12 +32,33 @@
 
 
 <body unresolved fullbleed layout vertical>
-    <paper-dialog backdrop autoclosedisabled id="status-dialog">
-        <p class="active">
-            Doing stuff...
+    <!--<paper-dialog backdrop autoclosedisabled id="status-dialog" class="status-dialog">
+        <div class="inactive status-line">
+            <div class="processing-message">Doing stuff</div>
+            <div class="complete-message">done!</div>
+            <paper-progress class="complete" value="100"></paper-progress>
+        </div>
+        <div class="active status-line">
+            Doing stuff&hellip;<br />
+            <paper-progress value="10"></paper-progress>
+        </div>
+        <div class="inactive status-line">
+            Doing stuff&hellip;<br />
             <paper-progress></paper-progress>
-        </p>
-    </paper-dialog>
+        </div>
+        <div class="inactive status-line">
+            Doing stuff&hellip;<br />
+            <paper-progress></paper-progress>
+        </div>
+        <div class="inactive status-line">
+            Doing stuff&hellip;<br />
+            <paper-progress></paper-progress>
+        </div>
+        <div class="inactive status-line">
+            Doing stuff&hellip;<br />
+            <paper-progress></paper-progress>
+        </div>
+    </paper-dialog>-->
 
 
     <paper-dialog backdrop autoclosedisabled id="config-dialog">
@@ -90,6 +111,10 @@
 
     
     <script>
+    window.addEventListener(
+        'polymer-ready', function () {window.polymer_ready = true}
+    );
+
     try {
         global.common = window.common = require('./js/common');
         global.title_xx = window.title_xx = require('./js/title-xx');
