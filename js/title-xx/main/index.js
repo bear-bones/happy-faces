@@ -39,8 +39,8 @@ function main() {
 
 
         view.on('click', function (type, parameter) {
-            console.log(type);
-            parameter && console.log(parameter);
+            console.log('type: ', type);
+            parameter && console.log('parameter: ', parameter);
 
             switch (type) {
             // udpate report date. recalculates punches and redraws grid

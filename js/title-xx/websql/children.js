@@ -115,7 +115,13 @@ function read(child_id) {
                     length = results.rows.length,
                     children = new Array(length);
                 if (child_id === undefined) {
-                    for (; i < length; ++i) children[i] = results.rows.item(i);
+                    for (; i < length; ++i) {
+                        var item = results.rows.item(i);
+                        children[i] = {};
+                        Object.keys(item).forEach(function (key) {
+                            children[i][key] = item[key];
+                        });
+                    }
                     resolve(children);
                 } else {
                     resolve(results.rows.length ? results.rows.item(0) : null);
@@ -139,6 +145,7 @@ function update_all(rows) {
                     keys = Object.keys(fields)
                         .filter(function (key) {return key !== 'child_id'}),
                     values = keys.map(function (key) {return fields[key]});
+                if (fields.child_id == 102004111) console.log(fields);
                 values.push(fields.child_id);
                 t.executeSql(
                     'UPDATE children SET ' + keys.join(' = ?, ')

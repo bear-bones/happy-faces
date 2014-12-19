@@ -85,13 +85,21 @@ function* read_ccm() {
 function* write_local() {
     try {
         var exists = yield title_xx.websql.children.exists(title_xx.model.data);
-        yield title_xx.websql.children.create_all(
-            title_xx.model.data.filter(function (_, key) {return !exists[key]})
-        );
+        var new_data = title_xx.model.data
+            .filter(function (_, key) {return !exists[key]});
+        new_data.forEach(function (data) {
+            data.claim_num = 0;
+            data.line_num = 0;
+            data.fee = 'no';
+            data.auth_amount = 0;
+            data.auth_unit = 'hours';
+        });
+        yield title_xx.websql.children.create_all(new_data);
         yield title_xx.websql.children.update_all(
             title_xx.model.data.filter(function (_, key) {return exists[key]})
         );
         yield title_xx.websql.children.delete_except(title_xx.model.data);
+        title_xx.model.data = yield title_xx.websql.children.read();
     } catch (error) {
         console.error(error);
         throw new title_xx.model.model_error('Error saving child information into reporting database');
@@ -133,9 +141,11 @@ function* process_data(initial) {
                 days = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
 
             // testing
+            /*
             child.auth_amount = 100;
             child.auth_unit = Math.random() > 0.8 ? 'days' : 'hours';
             child.fee = Math.random() > 0.9 ? 'yes' : 'no';
+             */
             // testing
 
             child.punches = yield title_xx.websql.punches.read(
@@ -180,29 +190,14 @@ function* process_data(initial) {
         throw new title_xx.model.model_error('Error loading punch information per child');
     }
 
-    // real
-//    title_xx.model.data = data
-//        // only children with punches
-//        .filter(function (child) {return child.punches.length})
-//        // sort by least time remaining first (assume 1 day <=> 8 hours)
-//        .sort(function (a, b) {
-//            return a.auth_unit === b.auth_unit ? a.remaining - b.remaining
-//                : a.auth_unit === 'days' ? a.remaining - (b.remaining / 8)
-//                : (a.remaining / 8) - b.remaining;
-//        });
 
-
+    title_xx.model.data
+        = data.filter(function (child) {return child.punches.length});
     // testing
-    data = data.filter(function (child) {return child.punches.length})
-    data.forEach(function (child, i) {
-        child.claim_num = Math.ceil(i / 9);
-        child.line_num = i%9 + 1;
-    });
-    title_xx.model.data = data.sort(function (a, b) {
-        return a.auth_unit === b.auth_unit ? a.remaining - b.remaining
-            : a.auth_unit === 'days' ? a.remaining - (b.remaining / 8)
-            : (a.remaining / 8) - b.remaining;
-    });
+//    data.forEach(function (child, i) {
+//        child.claim_num = Math.ceil(i / 9);
+//        child.line_num = i%9 + 1;
+//    });
 
 
     // grid processing freezes the rendering thread. run it at the start of the

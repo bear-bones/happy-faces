@@ -2,16 +2,26 @@ function begin(child_id) {
     var data = title_xx.model.data, length = data.length,
         error = new title_xx.model.model_error('Child not found');
 
-    for (var i = 0; i < length && data[i].child_id === child_id; ++i);
-    if (i >= length) throw console.error(error), error;
+    this.current_child = null;
+    for (var i = 0; i < length; ++i) {
+        if (data[i].child_id === +child_id) {
+            this.current_child = data[i];
+            break;
+        }
+    }
+    if (!this.current_child) throw console.error(error), error;
 
-    title_xx.view.edit_dialog.open(this.current_child = data[i]);
+    title_xx.view.edit_dialog.open(this.current_child);
 }
 
 
 
 function save(child) {
     var self = this;
+
+    if (Object.keys(child).length === 0)
+        return title_xx.view.edit_dialog.close();
+
     co(function* () {
         // save child to database
         // this will throw if it fails and the rest of the method will not run
@@ -25,9 +35,11 @@ function save(child) {
 
         // recalculate time units remaining
         child = self.current_child;
-        child.remaining = Math.round((child.auth_amount - (
-            child.auth_unit === 'days' ? child.total_days : child.total_time
-        )) * 100) / 100;
+        child.actual
+            = child.auth_unit === 'days' ? child.total_days : child.total_time;
+        child.remaining
+            = Math.round((child.auth_amount - child.actual) * 100) / 100;
+        child.sign = child.remaining < 0 ? 'neg' : 'pos';
 
         title_xx.view.edit_dialog.close();
     });

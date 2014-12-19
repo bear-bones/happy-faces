@@ -23,6 +23,12 @@
 
     <link href="app://happy-faces/bower_components/paper-input/paper-input-decorator.html" rel="import" />
 
+    <link href="app://happy-faces/bower_components/paper-toggle-button/paper-toggle-button.html" rel="import" />
+    <link href="app://happy-faces/bower_components/core-label/core-label.html" rel="import" />
+    <link href="app://happy-faces/bower_components/paper-checkbox/paper-checkbox.html" rel="import" />
+
+    <link href="app://happy-faces/bower_components/paper-toast/paper-toast.html" rel="import" />
+
     <link href="app://happy-faces/bower_components/sortable-table/sortable-table.html" rel="import" />
 
 
@@ -48,12 +54,12 @@
             <paper-icon-button icon="settings" title="Update application settings" id="config-button"></paper-icon-button>
         </core-toolbar>
 
-        <sortable-table class="bootstrap" id="child-grid" data="{{data}}" rowTemplate="template" disableColumnMove sortColumn="remaining">
+        <sortable-table class="bootstrap" id="child-grid" data="{{data}}" rowTemplate="template" disableColumnMove sortColumn="diff">
             <sortable-column name="edit" sortable="false">Edit</sortable-column>
             <sortable-column name="name">Name</sortable-column>
             <sortable-column name="age">Age</sortable-column>
-            <sortable-column name="claim" formula="function (row) {return row.claim_num*1000 + row.line_num}">Claim</sortable-column>
-            <sortable-column name="line" formula="function (row) {return row.line_num*1000 + row.claim_num}">Order</sortable-column>
+            <sortable-column name="claim" formula="function (row) {return row.claim_num*1000 + row.line_num*1}">Claim</sortable-column>
+            <sortable-column name="line" formula="function (row) {return row.claim_num*1000 + row.line_num*1}">Order</sortable-column>
             <sortable-column name="fee">Fee</sortable-column>
             <sortable-column name="auth_amount">Authorized</sortable-column>
             <sortable-column name="actual">Actual</sortable-column>
@@ -72,6 +78,8 @@
             </template>
         </sortable-table>
     </core-header-panel>
+
+    <paper-toast id="error-toast" text="Cannot save; there are invalid fields."></paper-toast>
 
 
     

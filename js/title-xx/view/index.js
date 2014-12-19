@@ -16,6 +16,7 @@ View.prototype.init = function init(enabled, date) {
     this.generate_xlsx_button = document.getElementById('generate-xlsx-button');
     this.config_button = document.getElementById('config-button');
     this.grid = document.getElementById('child-grid');
+    this.toast = document.getElementById('error-toast');
 
 
     if (window.polymer_ready) {
@@ -95,7 +96,9 @@ function on_edit_click(event) {
     if (!title_xx.view.enabled) return;
 
     var node = event && event.path && event.path.length && event.path.item(0);
-    if (!node || node.className !== 'edit-button') return;
+    if (!node || node.className !== 'edit-button'
+        || node.parentNode.nodeName !== 'TD'
+    ) return;
 
     title_xx.view.emit('click', 'edit', node.id);
 }
@@ -105,3 +108,4 @@ function on_edit_click(event) {
 module.exports = new View();
 module.exports.status_dialog = require('./statusdialog.js');
 module.exports.config_dialog = require('./configdialog.js');
+module.exports.edit_dialog = require('./editdialog.js');

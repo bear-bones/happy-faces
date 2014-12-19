@@ -4,6 +4,7 @@ function open() {
 
 
     title_xx.view.config_dialog.result = {};
+    title_xx.view.config_dialog.invalid = {};
 
     
     this.paper_dialog = document.createElement('paper-dialog');
@@ -33,6 +34,7 @@ function open() {
     input = fee_amount.firstChild;
     input.decorator = fee_amount;
     input.setAttribute('type', 'number');
+    input.setAttribute('step', 'any');
     input.setAttribute('value', title_xx.config.fee_amount);
     input.setAttribute('id', 'fee_amount');
     input.setAttribute('min', 0);
@@ -92,6 +94,7 @@ function open() {
         input = hourly_rate.firstChild;
         input.decorator = hourly_rate;
         input.setAttribute('type', 'number');
+        input.setAttribute('step', 'any');
         input.setAttribute('value', title_xx.config[rate + '_hourly_rate']);
         input.setAttribute('id', rate + '_hourly_rate');
         input.setAttribute('min', 0);
@@ -103,6 +106,7 @@ function open() {
         input = daily_rate.firstChild;
         input.decorator = daily_rate;
         input.setAttribute('type', 'number');
+        input.setAttribute('step', 'any');
         input.setAttribute('value', title_xx.config[rate + '_daily_rate']);
         input.setAttribute('id', rate + '_daily_rate');
         input.setAttribute('min', 0);
@@ -138,6 +142,10 @@ function open() {
     this.paper_dialog.appendChild(bottom);
 
 
+    this.toast = title_xx.view.toast.cloneNode(true);
+    this.paper_dialog.appendChild(this.toast);
+
+
     document.body.appendChild(this.paper_dialog);
 
 
@@ -171,8 +179,11 @@ function close() {
 
 
 function on_other_change(event) {
-    var target = event.target, id = target.getAttribute('id'),
-        value = target.value, message = '';
+    var target = event.target,
+        id = target.getAttribute('id'),
+        value = target.value,
+        message = '',
+        self = title_xx.view.config_dialog;
 
     if (value === '') message = 'Field is required.';
     else title_xx.view.config_dialog.result[id] =
@@ -181,15 +192,25 @@ function on_other_change(event) {
     target.setCustomValidity(message);
     target.decorator.error = message;
     target.decorator.isInvalid = !target.validity.valid;
+
+    if (target.validity.valid) {
+        if (id in self.invalid) delete self.invalid[id];
+    } else {
+        self.invalid[id] = true;
+    }
 }
 
 
 
 function on_min_change(event) {
-    var target = event.target, was_valid = target.validity.valid,
-        index = target.index + 1, value = target.value,
+    var target = event.target,
+        id = target.getAttribute('id'),
+        value = target.value,
+        index = target.index + 1,
+        was_valid = target.validity.valid,
         prev = target.prev, next = target.next,
-        message = '';
+        message = '',
+        self = title_xx.view.config_dialog;
 
     // same range min and max can be equal; different range cannot
     if (prev && +prev.value >= +value)
@@ -197,12 +218,18 @@ function on_min_change(event) {
     else if (next && +next.value < +value)
         message = 'Rate ' + index + ' minimum must be less than or equal to the maximum.';
     else if (value === '') message = 'Field is required.';
-    else title_xx.view.config_dialog.result[target.getAttribute('id')] = +value;
+    else title_xx.view.config_dialog.result[id] = +value;
 
 
     target.setCustomValidity(message);
     target.decorator.error = message;
     target.decorator.isInvalid = !target.validity.valid;
+
+    if (target.validity.valid) {
+        if (id in self.invalid) delete self.invalid[id];
+    } else {
+        self.invalid[id] = true;
+    }
 
     if (!was_valid && !message) {
         prev && prev.onchange({target:prev});
@@ -213,10 +240,14 @@ function on_min_change(event) {
 
 
 function on_max_change(event) {
-    var target = event.target, was_valid = target.validity.valid,
-        index = target.index + 1, value = target.value,
+    var target = event.target,
+        id = target.getAttribute('id'),
+        value = target.value,
+        index = target.index + 1,
+        was_valid = target.validity.valid,
         prev = target.prev, next = target.next,
-        message = '';
+        message = '',
+        self = title_xx.view.config_dialog;
 
     // same range min and max can be equal; different range cannot
     if (prev && +prev.value > +value)
@@ -224,11 +255,17 @@ function on_max_change(event) {
     else if (next && +next.value <= +value)
         message = 'Rate ' + index + ' maximum must be less than the rate ' + (index + 1) + ' minimum.';
     else if (value === '') message = 'Field is required.';
-    else title_xx.view.config_dialog.result[target.getAttribute('id')] = +value;
+    else title_xx.view.config_dialog.result[id] = +value;
 
     target.setCustomValidity(message);
     target.decorator.error = message;
     target.decorator.isInvalid = !target.validity.valid;
+
+    if (target.validity.valid) {
+        if (id in self.invalid) delete self.invalid[id];
+    } else {
+        self.invalid[id] = true;
+    }
 
     if (!was_valid && !message) {
         prev && prev.onchange({target:prev});
@@ -239,16 +276,23 @@ function on_max_change(event) {
 
 
 function on_save_click() {
-    if (!title_xx.view.enabled) return;
-    title_xx.view.emit(
-        'click', 'config:save', title_xx.view.config_dialog.result
-    );
+    var view = title_xx.view,
+        self = view.config_dialog;
+
+    if (!view.enabled) return;
+
+    console.log(self.invalid);
+    if (Object.keys(self.invalid).length > 0) return self.toast.show();
+    else self.toast.dismiss();
+
+    title_xx.view.emit('click', 'config:save', self.result);
 }
 
 
 
 function on_cancel_click() {
     if (!title_xx.view.enabled) return;
+    title_xx.view.config_dialog.toast.dismiss();
     title_xx.view.emit('click', 'config:cancel');
 }
 
