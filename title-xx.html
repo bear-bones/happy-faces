@@ -80,6 +80,13 @@
     </core-header-panel>
 
     <paper-toast id="error-toast" text="Cannot save; there are invalid fields."></paper-toast>
+    <!-- Unneeded, because the OS file chooser already asks this question
+    <paper-toast id="file-error-toast" text="File exists.">
+        <span id="toast-overwrite">Overwrite</span>
+        <span id="toast-cancel">Cancel</span>
+    </paper-toast>-->
+
+    <input style="display: none" id="file" type="file">
 
 
     

@@ -7,7 +7,7 @@ function* init(report_date) {
         yield common.mssql.connect();
         yield common.websql.connect();
     } catch (error) {
-        console.error(error);
+        log.error(error);
         if (error instanceof common.mssql.MsSqlError) {
             throw new model_error('Error connecting to ChildCare Manager database');
         } else if (error instanceof common.websql.WebSqlError) {
@@ -20,7 +20,7 @@ function* init(report_date) {
     try {
         yield title_xx.websql.init();
     } catch (error) {
-        console.error(error);
+        log.error(error);
         throw new model_error('Error setting up reporting database');
     }
 
@@ -30,7 +30,7 @@ function* init(report_date) {
         Object.keys(config)
             .forEach(function (key) {title_xx.config[key] = config[key]});
     } catch (error) {
-        console.error(error);
+        log.error(error);
         throw new title_xx.model.model_error('Error loading app configuration');
     }
 }

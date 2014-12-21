@@ -2,14 +2,14 @@ var XLSX = require('xlsx');
 
 
 
-function Worksheet(cols) {
+function worksheet(cols) {
     this.rows = 0;
     this.cols = cols;
     this['!merges'] = [];
 }
 
 
-Worksheet.prototype.export = function () {
+worksheet.prototype.export = function () {
     var result = {};
     Object.keys(this).forEach(function (key) {
         if (key !== 'rows' && key !== 'cols') result[key] = this[key];
@@ -21,4 +21,4 @@ Worksheet.prototype.export = function () {
 
 
 
-module.exports = Worksheet;
+module.exports = worksheet;

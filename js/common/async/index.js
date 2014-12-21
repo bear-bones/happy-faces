@@ -4,15 +4,15 @@
  */
 window.promise = global.promise = function promise(async) {
     return function () {
-        var parameters = Array.from(arguments);
+        var parameters = [].slice.call(arguments);
         return new Promise(function (resolve, reject) {
             parameters.push(function () {
-                var parameters = Array.from(arguments),
+                var parameters = [].slice.call(arguments),
                     error = parameters.shift();
                 if (error) reject(error);
-                else resolve.call(this, parameters);
+                else resolve.apply(this, parameters);
             });
-            async.call(this, parameters);
+            async.apply(this, parameters);
         });
     }
 };

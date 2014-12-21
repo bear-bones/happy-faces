@@ -1,5 +1,5 @@
 function begin() {
-    title_xx.view.file_dialog.open();
+    title_xx.view.select_file();
 }
 
 
@@ -11,37 +11,45 @@ function create(file) {
     file = path.join(head, path.basename(file, '.xlsx') + '.xlsx');
 
     co(function* () {
-        try {
-            yield promise(fs.mkdir)(head);
-        } catch (error) {
-            console.error(error);
-            return // view.show_error('Error accessing destination directory');
-        }
+        var model = title_xx.model;
 
         title_xx.view.status_dialog.open([{
             processing_message : 'Generating Excel spreadsheet',
-            complete_message : 'done!', indefinite : true
+            complete_message : 'done!', indeterminate : true
         }]);
         title_xx.view.status_dialog.next();
 
         try {
-            yield title_xx.excel.generate(file, this.data, this.config);
+            var exists = yield new Promise(function (resolve, reject) {
+                fs.exists(head, resolve);
+            });
+            if (!exists) yield promise(fs.mkdir)(head);
         } catch (error) {
-            console.error(error);
-            return // title_xx.view.show_error('Error accessing destination directory');
-        } finally {
+            log.error(error);
+            return view.show_error('Error accessing destination directory.');
+        }
+
+        try {
+            yield new Promise(function (resolve, reject) {
+                setImmediate(function () { try {
+                    title_xx.excel.generate(
+                        file, model.data, title_xx.config, model.report_date
+                    );
+                    resolve();
+                } catch (error) {
+                    reject(error);
+                }});
+            });
             title_xx.view.status_dialog.close();
+        } catch (error) {
+            title_xx.view.status_dialog.close();
+            log.error(error);
+            return title_xx.view.show_error('Error generating excel file.');
         }
     });
-}
-
-
-function cancel() {
-    title_xx.view.file_dialog.close();
 }
 
 
 
 module.exports.begin = begin;
 module.exports.create = create;
-module.exports.cancel = cancel;

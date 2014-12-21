@@ -2,25 +2,34 @@ function main() {
     co(function* coroutine() {
         var model = title_xx.model,
             view = title_xx.view,
-            date = new Date();
+            date = new Date(),
+
+            fs = require('fs'),
+            path = require('path'),
+            Log = require('log'), log;
+
         date = new Date(date.getFullYear(), date.getMonth(), 0);
 
 
         try {
-            // TODO: start logging
+            window.log = global.log = log = new Log(
+                'debug', fs.createWriteStream(
+                    path.join(process.env.APPDATA, 'title-xx.log')
+                )
+            );
+            window.log = global.log = log = new Log('info', fs.createWriteStream(
             view.init(false, date);
             yield* model.init(date);
         } catch (error) {
             if (error instanceof view.view_error) {
-                console.error(error);
+                log.error(error);
             } else if (error instanceof model.model_error) {
-                yield view.show_error(error);
+                view.show_error(error);
             } else {
-                console.error(error);
-                yield view.show_error('Error initializing Title XX reporting app');
+                log.error(error);
+                view.show_error('Error initializing Title XX reporting app');
             }
-            // app.quit();
-            return;
+            return setTimeout(function () {app.quit()}, 2000);
         }
 
 
@@ -28,19 +37,18 @@ function main() {
             yield* model.load();
         } catch (error) {
             if (error instanceof model.model_error) {
-                yield view.show_error(error);
+                view.show_error(error);
             } else {
-                console.error(error);
-                yield view.show_error('Error retrieving and processing information from Chilcare Manager');
+                log.error(error);
+                view.show_error('Error retrieving and processing information from Childcare Manager');
             }
-            // app.quit();
-            return;
+            return setTimeout(function () {app.quit()}, 2000);
         }
 
 
         view.on('click', function (type, parameter) {
-            console.log('type: ', type);
-            parameter && console.log('parameter: ', parameter);
+            log.debug('type: ', type);
+            parameter && log.debug('parameter: ', parameter);
 
             switch (type) {
             // udpate report date. recalculates punches and redraws grid
@@ -54,9 +62,6 @@ function main() {
                 break;
             case 'excel:file':
                 model.excel.create(parameter);
-                break;
-            case 'excel:cancel':
-                model.excel.cancel();
                 break;
 
             // update configuration. pops up config edit screen and saves new

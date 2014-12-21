@@ -7,7 +7,7 @@ function init() {
                 t.executeSql(insert, [], function () {
                     resolve();
                 }, function (t, error) {reject(error)});
-            }, function (t, error) {console.error('config table create error');reject(error)});
+            }, function (t, error) {reject(error)});
         });
     });
 }

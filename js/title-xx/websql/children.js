@@ -90,7 +90,7 @@ function create(fields) {
             t.executeSql(
                 'INSERT INTO children (' + keys.join(', ') + ') VALUES ('
                     + placeholders.join(', ') + ')',
-                values, function (t, result) {if(result)console.log(result);resolve(result)},
+                values, function (t, result) {resolve(result)},
                 function (t, error) {reject(error)}
             );
         });
@@ -145,7 +145,6 @@ function update_all(rows) {
                     keys = Object.keys(fields)
                         .filter(function (key) {return key !== 'child_id'}),
                     values = keys.map(function (key) {return fields[key]});
-                if (fields.child_id == 102004111) console.log(fields);
                 values.push(fields.child_id);
                 t.executeSql(
                     'UPDATE children SET ' + keys.join(' = ?, ')

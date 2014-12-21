@@ -1,10 +1,11 @@
 function get_age(dob) {
     if (!dob) return null;
-    var now = new Date(),
-        y1 = now.getFullYear(), y2 = dob.getFullYear(),
-        m1 = now.getMonth(), m2 = dob.getMonth(),
-        d1 = now.getDay(), d2 = dob.getDay();
-    return y1 - y2 - (m1 < m2 || (m1 === m2 && d1 < d2));
+    var now = new Date();
+    // difference in years times 12, plus difference in months, minus one if
+    // we haven't hit birthday day yet in this month
+    return (now.getFullYear() - dob.getFullYear()) * 12
+        + (now.getMonth() - dob.getMonth())
+        - (now.getDay() < dob.getDay());
 }
 
 
@@ -51,7 +52,7 @@ function* read_ccm() {
     try {
         children = yield title_xx.mssql.children.read();
     } catch (error) {
-        console.error(error);
+        log.error(error);
         throw new title_xx.model_error('Error reading child information');
     }
     title_xx.model.data = children.map(function (child) {return {
@@ -64,7 +65,7 @@ function* read_ccm() {
     try {
         punches = yield title_xx.mssql.punches.read(title_xx.config.last_load);
     } catch (error) {
-        console.error(error);
+        log.error(error);
         throw new title_xx.model_error('Error reading punch information');
     }
     title_xx.model.punches = punches
@@ -101,7 +102,7 @@ function* write_local() {
         yield title_xx.websql.children.delete_except(title_xx.model.data);
         title_xx.model.data = yield title_xx.websql.children.read();
     } catch (error) {
-        console.error(error);
+        log.error(error);
         throw new title_xx.model.model_error('Error saving child information into reporting database');
     }
     title_xx.view.status_dialog.next();
@@ -109,7 +110,7 @@ function* write_local() {
     try {
         yield title_xx.websql.punches.create_all(title_xx.model.punches);
     } catch (error) {
-        console.error(error);
+        log.error(error);
         throw new title_xx.model.model_error('Error saving punch information into reporting database');
     }
     title_xx.view.status_dialog.next();
@@ -128,10 +129,6 @@ function* process_data(initial) {
     else
         date.setMonth(12 - title_xx.config.title_xx_year_start, 1);
     date = date.getTime();
-
-
-    console.log(new Date(date));
-    console.log(new Date(report_date));
 
 
     try {
@@ -186,7 +183,7 @@ function* process_data(initial) {
             if (step*ticks < i) title_xx.view.status_dialog.tick(++ticks);
         }
     } catch (error) {
-        console.error(error);
+        log.error(error);
         throw new title_xx.model.model_error('Error loading punch information per child');
     }
 

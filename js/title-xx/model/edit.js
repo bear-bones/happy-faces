@@ -9,7 +9,7 @@ function begin(child_id) {
             break;
         }
     }
-    if (!this.current_child) throw console.error(error), error;
+    if (!this.current_child) throw log.error(error), error;
 
     title_xx.view.edit_dialog.open(this.current_child);
 }

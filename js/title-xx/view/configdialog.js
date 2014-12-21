@@ -143,6 +143,7 @@ function open() {
 
 
     this.toast = title_xx.view.toast.cloneNode(true);
+    this.toast.setAttribute('text', 'Cannot save; there are invalid fields.');
     this.paper_dialog.appendChild(this.toast);
 
 
@@ -281,7 +282,6 @@ function on_save_click() {
 
     if (!view.enabled) return;
 
-    console.log(self.invalid);
     if (Object.keys(self.invalid).length > 0) return self.toast.show();
     else self.toast.dismiss();
 
