@@ -3,7 +3,9 @@ function read() {
         var request = new common.mssql.db.Request(), children = [];
         request.stream = true;
         request.query(
-            'SELECT children.childkey, first, last, middle, dob ' +
+            'SELECT children.childkey, children.first, children.last, ' +
+                   'children.middle, children.dob, custchild.chfield2, ' +
+                   'custchild.chfield3, custchild.chfield4 ' +
                 'FROM children INNER JOIN custchild ' +
                 'ON children.childkey = custchild.childkey ' +
                 "WHERE custchild.chfield1 = 'TXX'"

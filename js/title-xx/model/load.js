@@ -10,38 +10,48 @@ function get_age(dob) {
 
 
 
-module.exports = function* load() {
-    title_xx.view.status_dialog.open([{
-        processing_message : 'Loading children from CCM database',
-        complete_message : 'done!', indeterminate : true
-    }, {
-        processing_message : 'Loading punches from CCM database',
-        complete_message : 'done!', indeterminate : true
-    }, {
-        processing_message : 'Updating children in reporting database',
-        complete_message : 'child information saved.', indeterminate : true
-    }, {
-        processing_message : 'Saving new punches into database',
-        complete_message : 'punch information saved.', indeterminate : true
-    }, {
+module.exports = function* load(skip_mssql) {
+    var statuses = [];
+    if (!skip_mssql) {
+        statuses.push({
+            processing_message : 'Loading children from CCM database',
+            complete_message : 'done!', indeterminate : true
+        });
+        statuses.push({
+            processing_message : 'Loading punches from CCM database',
+            complete_message : 'done!', indeterminate : true
+        });
+        statuses.push({
+            processing_message : 'Updating children in reporting database',
+            complete_message : 'child information saved.', indeterminate : true
+        });
+        statuses.push({
+            processing_message : 'Saving new punches into database',
+            complete_message : 'punch information saved.', indeterminate : true
+        });
+    }
+    statuses.push({
         processing_message : 'Processing punches by child',
         complete_message : 'all punches processed.'
-    }, {
+    });
+    statuses.push({
         processing_message : 'Building child data table',
         complete_message : 'done!', indeterminate : true
-    }]);
+    });
+    title_xx.view.status_dialog.open(statuses);
     title_xx.view.status_dialog.next();
 
-    var error;
     try {
-        yield* read_ccm();
-        yield* write_local();
+        if (!skip_mssql) {
+            yield* read_ccm();
+            yield* write_local();
+        }
+        yield* read_local();
         yield* process_data(true);
-    } catch (_error) {
-        error = _error;
+    } catch (error) {
         title_xx.view.status_dialog.close();
+        throw error;
     }
-    if (error) throw error;
 }
 
 
@@ -53,6 +63,7 @@ function* read_ccm() {
         children = yield title_xx.mssql.children.read();
     } catch (error) {
         log.error(error);
+        log.debug(error.stack);
         throw new title_xx.model_error('Error reading child information');
     }
     title_xx.model.data = children.map(function (child) {return {
@@ -66,6 +77,7 @@ function* read_ccm() {
         punches = yield title_xx.mssql.punches.read(title_xx.config.last_load);
     } catch (error) {
         log.error(error);
+        log.debug(error.stack);
         throw new title_xx.model_error('Error reading punch information');
     }
     title_xx.model.punches = punches
@@ -100,9 +112,9 @@ function* write_local() {
             title_xx.model.data.filter(function (_, key) {return exists[key]})
         );
         yield title_xx.websql.children.delete_except(title_xx.model.data);
-        title_xx.model.data = yield title_xx.websql.children.read();
     } catch (error) {
         log.error(error);
+        log.debug(error.stack);
         throw new title_xx.model.model_error('Error saving child information into reporting database');
     }
     title_xx.view.status_dialog.next();
@@ -111,9 +123,22 @@ function* write_local() {
         yield title_xx.websql.punches.create_all(title_xx.model.punches);
     } catch (error) {
         log.error(error);
+        log.debug(error.stack);
         throw new title_xx.model.model_error('Error saving punch information into reporting database');
     }
     title_xx.view.status_dialog.next();
+}
+
+
+
+function* read_local() {
+    try {
+        title_xx.model.data = yield title_xx.websql.children.read();
+    } catch (error) {
+        log.error(error);
+        log.debug(error.stack);
+        throw new title_xx.model.model_error('Error reading child information from reporting database');
+    }
 }
 
 
@@ -145,6 +170,7 @@ function* process_data(initial) {
              */
             // testing
 
+            child.age_yrs = Math.floor(child.age / 12);
             child.punches = yield title_xx.websql.punches.read(
                 child.child_id, date, report_date
             );
@@ -184,6 +210,7 @@ function* process_data(initial) {
         }
     } catch (error) {
         log.error(error);
+        log.debug(error.stack);
         throw new title_xx.model.model_error('Error loading punch information per child');
     }
 

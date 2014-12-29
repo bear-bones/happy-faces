@@ -26,6 +26,7 @@ function create(file) {
             if (!exists) yield promise(fs.mkdir)(head);
         } catch (error) {
             log.error(error);
+            log.debug(error.stack);
             return view.show_error('Error accessing destination directory.');
         }
 
@@ -40,10 +41,12 @@ function create(file) {
                     reject(error);
                 }});
             });
+            require('child_process').exec('explorer ' + head, function () {});
             title_xx.view.status_dialog.close();
         } catch (error) {
             title_xx.view.status_dialog.close();
             log.error(error);
+            log.debug(error.stack);
             return title_xx.view.show_error('Error generating excel file.');
         }
     });

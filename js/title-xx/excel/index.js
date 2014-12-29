@@ -53,6 +53,7 @@ function generate(file_name, children, config, report_date) {
         }, file_name);
     } catch (error) {
         log.error(error);
+        log.debug(error.stack);
         throw new Error('Error generating spreadsheet');
     }
     log.debug('Spreadsheet generated.');

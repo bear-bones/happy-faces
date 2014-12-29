@@ -6,7 +6,9 @@ function main() {
 
             fs = require('fs'),
             path = require('path'),
-            Log = require('log'), log;
+            Log = require('log'), log,
+    
+            skip_mssql = false;
 
         date = new Date(date.getFullYear(), date.getMonth(), 0);
 
@@ -17,32 +19,36 @@ function main() {
                     path.join(process.env.APPDATA, 'title-xx.log')
                 )
             );
-            window.log = global.log = log = new Log('info', fs.createWriteStream(
             view.init(false, date);
             yield* model.init(date);
         } catch (error) {
             if (error instanceof view.view_error) {
                 log.error(error);
+                log.debug(error.stack);
+                //return setTimeout(function () {app.quit()}, 2000);
             } else if (error instanceof model.model_error) {
-                view.show_error(error);
+                view.show_error('Could not connect to Childcare Manager. Data may be out of date.');
+                skip_mssql = true;
             } else {
                 log.error(error);
+                log.debug(error.stack);
                 view.show_error('Error initializing Title XX reporting app');
+                //return setTimeout(function () {app.quit()}, 2000);
             }
-            return setTimeout(function () {app.quit()}, 2000);
         }
 
 
-        try {
-            yield* model.load();
+         try {
+            yield* model.load(skip_mssql);
         } catch (error) {
             if (error instanceof model.model_error) {
                 view.show_error(error);
             } else {
                 log.error(error);
+                log.debug(error.stack);
                 view.show_error('Error retrieving and processing information from Childcare Manager');
             }
-            return setTimeout(function () {app.quit()}, 2000);
+            //return setTimeout(function () {app.quit()}, 2000);
         }
 
 
@@ -89,8 +95,6 @@ function main() {
             }
         });
         view.enabled = true;
-
-        //title_xx.excel.generate('C:/Users/James/Desktop/test.xlsx');
     });
 }
 

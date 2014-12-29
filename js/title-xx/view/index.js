@@ -38,21 +38,7 @@ View.prototype.init = function init(enabled, date) {
         this.file.addEventListener('change', function () {
             if (self.file.value)
                 self.emit('click', 'excel:file', self.file.value);
-            /* Unneeded, because the OS file chooser already handles this
-            fs.exists(this.file.value, function (exists) {
-                if (exists) this.file_toast.show();
-                else self.emit('click', 'excel:file', self.file.value);
-            }); */
         });
-        //document.getElementById('toast-overwrite')
-        //    .addEventListener('click', function () {
-        //        self.emit('click', 'excel:file', self.file.value);
-        //        self.file_toast.dismiss();
-        //    });
-        //document.getElementById('toast-cancel')
-        //    .addEventListener('click', function () {
-        //        self.file_toast.dismiss();
-        //    });
         document.body.addEventListener('click', on_edit_click);
     } else {
         window.addEventListener('polymer-ready', function () {
@@ -67,21 +53,7 @@ View.prototype.init = function init(enabled, date) {
             this.file.addEventListener('change', function () {
                 if (self.file.value)
                     self.emit('click', 'excel:file', self.file.value);
-                /* Unneeded, because the OS file chooser already handles this
-                require('fs').exists(self.file.value, function (exists) {
-                    if (exists) self.file_toast.show();
-                    else self.emit('click', 'excel:file', self.file.value);
-                }); */
             });
-            //document.getElementById('toast-overwrite')
-            //    .addEventListener('click', function () {
-            //        self.emit('click', 'excel:file', self.file.value);
-            //        self.file_toast.dismiss();
-            //    });
-            //document.getElementById('toast-cancel')
-            //    .addEventListener('click', function () {
-            //        self.file_toast.dismiss();
-            //    });
             document.body.addEventListener('click', on_edit_click);
         });
     }

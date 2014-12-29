@@ -1,9 +1,11 @@
 var config = {
         user : 'CCM-ADMIN',
-        password : 'c#99jKlw,llAS',
+        //password : 'c#99jKlw,llAS',
+        password : 'c#99jKlw,llASaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         server : 'LOCALHOST\\CCMSERVER',
         database : 'HappyFaces',
         options : {
+            connectTimeout : 1000,
             requestTimeout : 1000000
         }
     },
