@@ -27,7 +27,7 @@ function open(child) {
 
     var top = div.cloneNode(true);
     top.setAttribute('class', 'line bold');
-    top.textContent = child.name + ', age ' + child.age;
+    top.textContent = child.name + ', age ' + child.display.age;
     this.paper_dialog.appendChild(top);
 
     var line = div.cloneNode(true);

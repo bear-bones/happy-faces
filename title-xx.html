@@ -54,38 +54,36 @@
             <paper-icon-button icon="settings" title="Update application settings" id="config-button"></paper-icon-button>
         </core-toolbar>
 
-        <sortable-table class="bootstrap" id="child-grid" data="{{data}}" rowTemplate="template" disableColumnMove sortColumn="diff">
+        <sortable-table class="bootstrap" id="child-grid" data="{{data}}" rowTemplate="template" disableColumnMove sortColumn="name">
             <sortable-column name="edit" sortable="false">Edit</sortable-column>
             <sortable-column name="name">Name</sortable-column>
             <sortable-column name="age">Age</sortable-column>
-            <sortable-column name="claim" formula="function (row) {return row.claim_num*1000 + row.line_num*1}">Claim</sortable-column>
-            <sortable-column name="line" formula="function (row) {return row.claim_num*1000 + row.line_num*1}">Order</sortable-column>
             <sortable-column name="fee">Fee</sortable-column>
-            <sortable-column name="auth_amount">Authorized</sortable-column>
-            <sortable-column name="actual">Actual</sortable-column>
-            <sortable-column name="diff" formula="function (row) {return (row.auth_unit === 'days' ? 8 : 1) * row.remaining}">Difference</sortable-column>
+            <sortable-column name="auth_hours">Auth Hr</sortable-column>
+            <sortable-column name="display_hours">Hr Used</sortable-column>
+            <sortable-column name="rem_hours">Rem Hr</sortable-column>
+            <sortable-column name="auth_days">Auth Dy</sortable-column>
+            <sortable-column name="display_days">Dy Used</sortable-column>
+            <sortable-column name="rem_days">Rem Dy</sortable-column>
 
             <template id="template">
                 <td style="text-align: center"><paper-icon-button icon="create" title="Edit {{record.row.name}}" id="{{record.row.child_id}}" class="edit-button"></paper-icon-button></td>
                 <td>{{record.row.name}}</td>
-                <td style="text-align: center">{{record.row.age_yrs}}</td>
-                <td style="text-align: center">{{record.row.claim_num}}</td>
-                <td style="text-align: center">{{record.row.line_num}}</td>
+                <td style="text-align: center">{{record.row.display.age}}</td>
                 <td style="text-align: center">{{record.row.fee}}</td>
-                <td style="text-align: right">{{record.row.auth_amount}} {{record.row.auth_unit}}</td>
-                <td style="text-align: right">{{record.row.actual}}</td>
-                <td style="text-align: right" class="{{record.row.sign}}">{{record.row.remaining}}</td>
+                <td style="text-align: right">{{record.row.display.auth_hours}}</td>
+                <td style="text-align: right">{{record.row.display.total_hours}}</td>
+                <td style="text-align: right" class="{{record.row.display.hours_sign}}">{{record.row.display.rem_hours}}</td>
+                <td style="text-align: right">{{record.row.display.auth_days}}</td>
+                <td style="text-align: right">{{record.row.display.total_days}}</td>
+                <td style="text-align: right" class="{{record.row.display.days_sign}}">{{record.row.display.rem_days}}</td>
             </template>
         </sortable-table>
     </core-header-panel>
 
     <paper-toast id="error-toast" text="Cannot save; there are invalid fields."></paper-toast>
-    <!-- Unneeded, because the OS file chooser already asks this question
-    <paper-toast id="file-error-toast" text="File exists.">
-        <span id="toast-overwrite">Overwrite</span>
-        <span id="toast-cancel">Cancel</span>
-    </paper-toast>-->
 
+    <!-- permanently hidden. we programatically click it when the user clicks the "generate excel" button -->
     <input style="display: none" id="file" type="file">
 
 

@@ -420,11 +420,6 @@ function build_child(ws, report_date, first_day, last_day, child) {
     );
 
 
-    // store data for totals worksheets
-    child.hours += total_time / 1000 / 60 / 60;
-    child.days += total_days;
-
-
     ws.rows += 5;
 }
 

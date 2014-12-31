@@ -20,5 +20,8 @@ module.exports = function update(new_date) {
     }]);
     title_xx.view.status_dialog.next();
 
-    co(title_xx.model.load.process_data);
+    co(function* () {
+        yield* title_xx.model.load.read_local();
+        yield* title_xx.model.load.process_data();
+    });
 };

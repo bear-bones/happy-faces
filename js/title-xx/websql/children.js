@@ -1,6 +1,15 @@
+var KEYS = {
+    child_id : 1, client_id : 1, name : 1, age : 1, claim_num : 1, line_num : 1,
+    fee : 1, auth_num : 1, auth_hours : 1, auth_days : 1, alt_hours : 1,
+    alt_days : 1, auth_rage_start : 1, auth_range_end : 1, alt_range_start : 1,
+    alt_range_end : 1
+};
+
+
+
 function init() {
-    var create = 'CREATE TABLE IF NOT EXISTS children (child_id INTEGER PRIMARY KEY, name TEXT, age INTEGER, claim_num INTEGER, line_num INTEGER, fee BOOLEAN, auth_unit VARCHAR(8), auth_amount DECIMAL)',
-        index = 'CREATE INDEX IF NOT EXISTS child_key ON children (claim_num, line_num)';
+    var create = 'CREATE TABLE IF NOT EXISTS children (child_id INTEGER PRIMARY KEY, client_id INTEGER, name TEXT, age INTEGER, claim_num INTEGER, line_num INTEGER, fee BOOLEAN, auth_num INTEGER, auth_hours DECIMAL, auth_days INTEGER, alt_hours INTEGER, alt_days INTEGER, auth_range_start INTEGER, auth_range_end INTEGER, alt_range_start INTEGER, alt_range_end INTEGER)',
+        index = 'CREATE INDEX IF NOT EXISTS child_key ON children (name)';
     return new Promise(function (resolve, reject) {
         common.websql.db.transaction(function (t) {
             t.executeSql(
@@ -48,7 +57,6 @@ function exists(rows) {
 
 function create_all(rows) {
     var i = 0, length = rows.length;
-
     return new Promise(function (resolve, reject) {
         var count = length;
         if (!count) resolve();
@@ -73,18 +81,12 @@ function create_all(rows) {
 
 
 function create(fields) {
-    var keys = Object.keys(fields).filter(function (key) {
-            return key === 'child_id' || key === 'name' || key === 'age'
-                || key === 'claim_num' || key === 'line_num' || key === 'fee'
-                || key === 'auth_unit' || key === 'auth_amount';
-        }),
+    var keys = Object.keys(fields).filter(function (key) {return key in KEYS}),
         values = keys.map(function (key) {return fields[key]}),
         placeholders = new Array(values.length);
     placeholders.fill('?');
-
     if (!('child_id' in keys))
         return new common.websql.WebSqlError('Id field required');
-
     return new Promise(function (resolve, reject) {
         common.websql.db.transaction(function (t) {
             t.executeSql(
@@ -100,14 +102,12 @@ function create(fields) {
 
 
 function read(child_id) {
-    var sql = 'SELECT * FROM children ORDER BY claim_num, line_num',
+    var sql = 'SELECT * FROM children ORDER BY name',
         values = [];
-
     if (child_id !== undefined) {
         sql += ' WHERE child_id = ?';
         values.push(child_id);
     }
-
     return new Promise(function (resolve, reject) {
         common.websql.db.transaction(function (t) {
             t.executeSql(sql, values, function (t, results) {
@@ -116,11 +116,9 @@ function read(child_id) {
                     children = new Array(length);
                 if (child_id === undefined) {
                     for (; i < length; ++i) {
-                        var item = results.rows.item(i);
-                        children[i] = {};
-                        Object.keys(item).forEach(function (key) {
-                            children[i][key] = item[key];
-                        });
+                        var item = results.rows.item(i); children[i] = {};
+                        Object.keys(item)
+                            .forEach(function (k) {children[i][k] = item[k]});
                     }
                     resolve(children);
                 } else {
@@ -135,7 +133,6 @@ function read(child_id) {
 
 function update_all(rows) {
     var i = 0, length = rows.length;
-
     return new Promise(function (resolve, reject) {
         var count = length;
         if (!count) resolve();
@@ -160,20 +157,15 @@ function update_all(rows) {
 
 
 function update(fields) {
-    var keys = Object.keys(fields).filter(function (key) {
-            return key === 'name' || key === 'age' || key === 'claim_num'
-                || key === 'line_num' || key === 'fee' || key === 'auth_unit'
-                || key === 'auth_amount';
-        }),
+    var keys = Object.keys(fields).filter(function (key) {return key in KEYS}),
         values = keys.map(function (key) {return fields[key]}),
         statement = keys.join(' = ?,') + (keys.length ? ' = ?' : '');
-
-    if ('child_id' in fields) values.push(fields.child_id);
-    else return new common.websql.WebSqlError('Id field required');
-
+    if ('child_id' in fields)
+        values.push(fields.child_id);
+    else
+        return new common.websql.WebSqlError('Id field required');
     if (!values.length)
         return new common.websql.WebSqlError('No valid fields given');
-
     return new Promise(function (resolve, reject) {
         common.websql.db.transaction(function (t) {
             t.executeSql(
