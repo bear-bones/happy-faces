@@ -36,18 +36,18 @@ module.exports = function (grunt) {
             },
             'title-xx' : {
                 files  : [{
-//                    expand : true, filter : 'isFile', flatten : true,
-//                    src : ['lib/directx/*', 'lib/nw/*', 'lib/resourcer/*'],
-//                    dest : 'build/title-xx/'
-//                }, {
-//                    expand : true, filter : 'isFile', flatten : true,
-//                    src : ['lib/nw/locales/*'], dest : 'build/title-xx/locales'
-//                }, {
+                    expand : true, filter : 'isFile', flatten : true,
+                    src : ['lib/directx/*', 'lib/nw/*', 'lib/resourcer/*'],
+                    dest : 'build/title-xx/'
+                }, {
+                    expand : true, filter : 'isFile', flatten : true,
+                    src : ['lib/nw/locales/*'], dest : 'build/title-xx/locales'
+                }, {
                     expand : true, filter : 'isFile',
                     src : [
                         'title-xx.html', 'css/**', 'img/**', 'js/common/**',
-                        'js/title-xx/**'//, 'license/*', 'bower_components/**',
-                        //'node_modules/log/**'
+                        'js/title-xx/**', 'license/*', 'bower_components/**',
+                        'node_modules/log/**'
                     ], dest : 'build/title-xx/'
                 }, {
                     src : ['title-xx-package.json'],
@@ -110,7 +110,7 @@ module.exports = function (grunt) {
                 path = require('path'),
                 exec = require('child_process').exec,
                 exe = this.data + '.exe',
-                ico = this.data + '.ico';
+                ico = this.target + '.ico';
 
             process.chdir(path.join(project_root, 'build', this.target));
 
@@ -148,9 +148,9 @@ module.exports = function (grunt) {
     grunt.registerMultiTask(
         'build', 'Build one or both of the report programs', function () {
             grunt.task.run(
-                'time', //'clean:' + this.target, 'yuidoc',
-                'sass:' + this.target, 'copy:' + this.target//,
-                //'exe:' + this.target
+                'time', 'clean:' + this.target, 'yuidoc',
+                'sass:' + this.target, 'copy:' + this.target,
+                'exe:' + this.target
             );
         }
     );

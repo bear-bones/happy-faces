@@ -16,6 +16,7 @@
     "main" : "title-xx.html",
 
     "window" : {
+        "icon" : "img/title-xx.png",
         "width" : 1024,
         "height" : 768
     },
