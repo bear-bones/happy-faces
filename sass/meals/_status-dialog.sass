@@ -1,0 +1,27 @@
+html /deep/ paper-dialog.status-dialog
+    width: 70%
+    &::shadow #scroller
+        width: 100%
+    .status-line
+        padding-top: 1em
+        &:first-child
+            padding-top: 0
+        .processing-message
+            float: left
+            width: 60%
+            &::after
+                content: '\2026'  // ellipsis
+        .complete-message
+            float: left
+            text-align: right
+            width: 40%
+    .inactive
+        opacity: 0.5
+
+    paper-progress
+        padding-top: 0.5em
+        width: 100%
+        &.complete::shadow #activeProgress
+            background-color: #85f442
+        &::shadow #activeProgress
+            background-color: #4285f4

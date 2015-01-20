@@ -13,11 +13,11 @@ View.prototype = new EventEmitter();
 View.prototype.init = function init(enabled, date) {
     var self = this;
 
+    require('./menu.js').init();
+
     this.enabled = enabled;
     this.update_date_button = document.getElementById('update-date-button');
-    this.generate_xlsx_button = document.getElementById('generate-xlsx-button');
     this.config_button = document.getElementById('config-button');
-    this.grid = document.getElementById('child-grid');
     this.toast = document.getElementById('error-toast');
     this.file = document.getElementById('file');
     this.file_toast = document.getElementById('file-error-toast');
@@ -31,8 +31,6 @@ View.prototype.init = function init(enabled, date) {
             = date.getFullYear() + '-' + (date.getMonth() + 1);
         document.getElementById('date-button')
             .addEventListener('click', on_update_date_click);
-        document.getElementById('excel-button')
-            .addEventListener('click', on_create_excel_click);
         document.getElementById('config-button')
             .addEventListener('click', on_config_click);
         this.file.addEventListener('change', function () {
@@ -40,15 +38,12 @@ View.prototype.init = function init(enabled, date) {
                 self.emit('click', 'excel:file', '' + self.file.value);
             self.file.value = '';
         });
-        document.body.addEventListener('click', on_edit_click);
     } else {
         window.addEventListener('polymer-ready', function () {
             document.getElementById('report-month-field').value
                 = date.getFullYear() + '-' + (date.getMonth() + 1);
             document.getElementById('date-button')
                 .addEventListener('click', on_update_date_click);
-            document.getElementById('excel-button')
-                .addEventListener('click', on_create_excel_click);
             document.getElementById('config-button')
                 .addEventListener('click', on_config_click);
             this.file.addEventListener('change', function () {
@@ -56,7 +51,6 @@ View.prototype.init = function init(enabled, date) {
                     self.emit('click', 'excel:file', '' + self.file.value);
                 self.file.value = '';
             });
-            document.body.addEventListener('click', on_edit_click);
         });
     }
 };
@@ -91,43 +85,23 @@ View.prototype.select_file = function select_file() {
 
 
 function on_update_date_click() {
-    if (!title_xx.view.enabled) return;
-    title_xx.view.emit(
+    if (!meals.view.enabled) return;
+    meals.view.emit(
         'click', 'date', document.getElementById('report-month-field').value
     );
 }
 
 
 
-function on_create_excel_click() {
-    if (!title_xx.view.enabled) return;
-    title_xx.view.emit('click', 'excel');
-}
-
-
-
 function on_config_click() {
-    if (!title_xx.view.enabled) return;
-    title_xx.view.emit('click', 'config');
-}
-
-
-
-function on_edit_click(event) {
-    if (!title_xx.view.enabled) return;
-
-    var node = event && event.path && event.path.length && event.path.item(0);
-    if (!node || node.className !== 'edit-button'
-        || node.parentNode.nodeName !== 'TD'
-    ) return;
-
-    title_xx.view.emit('click', 'edit', node.id);
+    if (!meals.view.enabled) return;
+    meals.view.emit('click', 'config');
 }
 
 
 
 module.exports = new View();
 module.exports.view_error = require('./viewerror.js');
+module.exports.menu = require('./menu.js');
 module.exports.status_dialog = require('./statusdialog.js');
 module.exports.config_dialog = require('./configdialog.js');
-module.exports.edit_dialog = require('./editdialog.js');

@@ -22,7 +22,7 @@ function* init(report_date) {
     }
 
     try {
-        yield title_xx.websql.init();
+        yield meals.websql.init();
     } catch (error) {
         log.error(error);
         log.debug(error.stack);
@@ -30,10 +30,10 @@ function* init(report_date) {
     }
 
     try {
-        title_xx.config = {};
-        var config = yield title_xx.websql.config.read();
+        meals.config = {};
+        var config = yield meals.websql.config.read();
         Object.keys(config)
-            .forEach(function (key) {title_xx.config[key] = config[key]});
+            .forEach(function (key) {meals.config[key] = config[key]});
     } catch (error) {
         log.error(error);
         log.debug(error.stack);
@@ -50,5 +50,4 @@ module.exports.load = require('./load.js');
 module.exports.date = require('./date.js');
 module.exports.excel = require('./excel.js');
 module.exports.config = require('./config.js');
-module.exports.edit = require('./edit.js');
 module.exports.model_error = require('./modelerror.js');

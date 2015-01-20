@@ -228,6 +228,13 @@ function* write_local() {
         throw new title_xx.model.model_error('Error saving punch information into reporting database');
     }
     title_xx.view.status_dialog.next();
+
+    try {
+        yield title_xx.websql.config.update({'last_load' : new Date()});
+    } catch (error) {
+        log.error(error);
+        log.debug(error.stack);
+    }
 }
 
 

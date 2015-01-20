@@ -16,18 +16,18 @@ module.exports = function (grunt) {
         copy : {
             'meals' : {
                 files  : [{
-//                    expand : true, filter : 'isFile', flatten : true,
-//                    src : ['lib/directx/*', 'lib/nw/*', 'lib/resourcer/*'],
-//                    dest : 'build/meals/'
-//                }, {
-//                    expand : true, filter : 'isFile', flatten : true,
-//                    src : ['lib/nw/locales/*'], dest : 'build/meals/locales'
-//                }, {
+                    expand : true, filter : 'isFile', flatten : true,
+                    src : ['lib/directx/*', 'lib/nw/*', 'lib/resourcer/*'],
+                    dest : 'build/meals/'
+                }, {
+                    expand : true, filter : 'isFile', flatten : true,
+                    src : ['lib/nw/locales/*'], dest : 'build/meals/locales'
+                }, {
                     expand : true, filter : 'isFile',
                     src : [
                         'meals.html', 'css/**', 'img/**', 'js/common/**',
-                        'js/meals/**'//, 'license/*', 'bower_components/**',
-                        //'node_modules/log/**'
+                        'js/meals/**', 'license/*', 'bower_components/**',
+                        'node_modules/log/**'
                     ], dest : 'build/meals/'
                 }, {
                     src : ['meals-package.json'],

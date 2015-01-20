@@ -1,13 +1,104 @@
 <html>
 <head>
-<title>
-test test test
-</title>
+    <title>Happy Faces Meals Report Generator</title>
+
+
+    <meta charset="utf-8" />
+
+
+    <link href="app://happy-faces/bower_components/polymer/polymer.html" rel="import" />
+
+    <link href="app://happy-faces/bower_components/core-header-panel/core-header-panel.html" rel="import" />
+    <link href="app://happy-faces/bower_components/core-toolbar/core-toolbar.html" rel="import" />
+
+    <link href="app://happy-faces/bower_components/core-icon/core-icon.html" rel="import" />
+    <link href="app://happy-faces/bower_components/core-icons/core-icons.html" rel="import" />
+    <link href="app://happy-faces/bower_components/core-icons/editor-icons.html" rel="import" />
+    <link href="app://happy-faces/bower_components/paper-button/paper-button.html" rel="import" />
+    <link href="app://happy-faces/bower_components/paper-icon-button/paper-icon-button.html" rel="import" />
+
+    <link href="app://happy-faces/bower_components/paper-dialog/paper-dialog.html" rel="import" />
+    <link href="app://happy-faces/bower_components/paper-dialog/paper-dialog-transition.html" rel="import" />
+    <link href="app://happy-faces/bower_components/paper-progress/paper-progress.html" rel="import" />
+
+    <link href="app://happy-faces/bower_components/paper-input/paper-input-decorator.html" rel="import" />
+
+    <link href="app://happy-faces/bower_components/paper-toggle-button/paper-toggle-button.html" rel="import" />
+    <link href="app://happy-faces/bower_components/core-label/core-label.html" rel="import" />
+    <link href="app://happy-faces/bower_components/paper-checkbox/paper-checkbox.html" rel="import" />
+
+    <link href="app://happy-faces/bower_components/paper-toast/paper-toast.html" rel="import" />
+
+    <link href="app://happy-faces/bower_components/sortable-table/sortable-table.html" rel="import" />
+
+
+    <link rel="stylesheet" href="app://happy-faces/css/common.css" />
+    <link rel="stylesheet" href="app://happy-faces/css/meals.css" />
+    <link rel="stylesheet" href="app://happy-faces/bower_components/sortable-table/css/bootstrap.css">
 </head>
-<body>
-<script>
-require('./js/common');
-require('./js/meals');
-</script>
+
+
+
+<body unresolved fullbleed layout vertical>
+    <core-header-panel flex>
+        <core-toolbar>
+            <paper-icon-button icon="menu" title="Show report menu" id="menu-button" core-drawer-toggle></paper-icon-button>
+
+            <div flex class="toolbar-flex"></div>
+
+            <input type="month" value="2014-12" id="report-month-field" />
+            <paper-icon-button icon="forward" title="Update report month" id="date-button"></paper-icon-button>
+
+            <div flex class="toolbar-flex"></div>
+
+            <paper-icon-button icon="settings" title="Update application settings" id="config-button"></paper-icon-button>
+        </core-toolbar>
+
+        <sortable-table class="bootstrap" id="child-grid" data="{{data}}" rowTemplate="template" disableColumnMove sortColumn="name">
+            <sortable-column name="name">Name</sortable-column>
+            <sortable-column name="dob">DoB</sortable-column>
+            <sortable-column name="classification">Classification</sortable-column>
+            <sortable-column name="classroom">Classroom</sortable-column>
+
+            <template id="template">
+                <td>{{record.row.name}}</td>
+                <td style="text-align: right">{{record.row.display.dob}}</td>
+                <td style="text-align: center">{{record.row.classification}}</td>
+                <td>{{record.row.display.classroom}}</td>
+            </template>
+        </sortable-table>
+    </core-header-panel>
+
+    <paper-toast id="error-toast" text="Cannot save; there are invalid fields."></paper-toast>
+
+    <!-- permanently hidden. we programatically click it when the user clicks a report button -->
+    <input style="display: none" id="file" type="file">
+
+
+    
+    <script>
+    window.addEventListener('polymer-ready', function () {window.polymer_ready = true});
+
+    function last_resort(error) {
+        try {
+            global.log.error(error);
+        } catch (e) {
+            console.error(error);
+        }
+    }
+
+    try {
+        global.gui = window.gui = require('nw.gui');
+        global.app = window.app = gui.App;
+        global.common = window.common = require('./js/common');
+        global.meals = window.meals = require('./js/meals');
+
+        meals.main();
+    } catch (error) {
+        last_resort(error);
+    }
+
+    process.on('uncaughtException', last_resort);
+    </script>
 </body>
 </html>

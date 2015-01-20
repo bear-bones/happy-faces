@@ -1,5 +1,7 @@
 function read(last_load, child_id) {
-    last_load = new Date(last_load || 0);
+    var year_ago = new Date(0);
+
+    if (last_load === undefined) last_load = year_ago;
 
     return new Promise(function (resolve, reject) {
         var request = new common.mssql.db.Request(),
@@ -10,7 +12,7 @@ function read(last_load, child_id) {
             request.input('childid', common.mssql.db.INT, child_id);
             request.query('SELECT pkChildTime, fkChild, dtTimeIn, dtTimeOut FROM tblChildTimeCards WHERE dtTimeIn > @lastload AND fkChild = @childid');
         } else {
-            request.query('SELECt pkChildTime, fkChild, dtTimeIn, dtTimeOut FROM tblChildTimeCards WHERE dtTimeIn > @lastload');
+            request.query('SELECT pkChildTime, fkChild, dtTimeIn, dtTimeOut FROM tblChildTimeCards WHERE dtTimeIn > @lastload');
         }
         request.on('row', function (row) {punches.push(row)});
         request.on('done', function () {resolve(punches)});

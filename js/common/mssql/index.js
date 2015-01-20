@@ -1,9 +1,8 @@
 var config = {
         user : 'CCM-ADMIN',
-        //password : 'c#99jKlw,llAS',
-        password : 'c#99jKlw,llASaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        password : 'c#99jKlw,llAS',
         server : 'LOCALHOST\\CCMSERVER',
-        database : 'HappyFaces',
+        database : 'HAPPY FACES CHILD DEVELOPMENT CENTER',
         options : {
             connectTimeout : 1000,
             requestTimeout : 1000000
