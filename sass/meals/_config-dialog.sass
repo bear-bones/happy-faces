@@ -1,29 +1,69 @@
 html /deep/ paper-dialog.config-dialog
-    width: 80%
-    &::shadow #scroller
+  height: 90%
+  min-height: 638px
+  width: 80%
+  /deep/ #scroller
+    width: 100%
+  core-header-panel
+    height: 86%
+    overflow: auto
+    core-toolbar
+      background-color: #3F51B5
+      color: white
+      height: 48px
+      &::shadow #topBar, &::shadow #middleBar, &::shadow #bottomBar
+        height: 48px
+      paper-tabs
+        height: 48px
         width: 100%
-    .line
-        overflow: auto
-        width: 100%
-        &.last
-            margin-top: 1em
-        .fee-amount
-            float: left
-            width: 25%
-            margin-right: 1em
-            padding: 0.25em 0
-        .prepared-by
-            padding: 0.25em 0
-        .rate-header
-            font-family: roboto
-            margin: 1em 0 0 0
-        .rate-field
-            box-sizing: border-box
-            float: left
-            padding: 0.25em 0.5em
-            width: 25%
-            &:last-of-type
-                float: none
-        .config-button
-            color: #009688
-            float: right
+        &::shadow #selectionBar
+          background-color: #00bfa5
+        paper-tab
+          text-transform: uppercase
+          &::shadow #ink
+            color: #00bfa5
+  .line
+    margin: 1em 0 0 0
+    overflow: auto
+    width: 100%
+    &.last
+      height: 40px
+      margin-top: 0
+    .config-button
+      color: #009688
+      float: right
+  #classrooms .line
+    margin-top: 0.5em
+    .rate-field
+      box-sizing: border-box
+      float: left
+      padding: 0.25em 0.5em
+      width: 15%
+      &:first-of-type
+        width: 35%
+      &:last-of-type
+        float: none
+        width: 35%
+  #meals .line
+    .rate-header
+      float: left
+      width: 24%
+      margin-bottom: 0
+    .rate-field
+      box-sizing: border-box
+      float: left
+      padding: 0.25em 0.5em
+      width: 20%
+      &[label$="Rate"]
+        width: 12%
+      &:last-of-type
+        float: none
+      input[type="time"]
+        height: 18px
+  #misc
+    .misc-field
+      margin: 1em 0 0 0
+      padding: 0.25em 0.5em
+      width: 40%
+    .dir-field
+      width: 100%

@@ -75,16 +75,10 @@ module.exports = function (grunt) {
 
         sass : {
             'meals' : {
-                files : {
-                    'css/common.css' : 'sass/common.sass',
-                    'css/meals.css' : 'sass/meals.sass',
-                }
+                files : {'css/meals.css' : 'sass/meals.sass'}
             },
             'title-xx' : {
-                files : {
-                    'css/common.css' : 'sass/common.sass',
-                    'css/title-xx.css' : 'sass/title-xx.sass',
-                }
+                files : {'css/title-xx.css' : 'sass/title-xx.sass'}
             }
         },
 

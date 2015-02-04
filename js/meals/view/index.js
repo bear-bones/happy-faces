@@ -27,8 +27,8 @@ View.prototype.init = function init(enabled, date) {
 
 
     if (window.polymer_ready) {
-        document.getElementById('report-month-field').value
-            = date.getFullYear() + '-' + (date.getMonth() + 1);
+        //document.getElementById('report-month-field').value
+        //    = date.getFullYear() + '-' + (date.getMonth() + 1);
         document.getElementById('date-button')
             .addEventListener('click', on_update_date_click);
         document.getElementById('config-button')
@@ -40,8 +40,8 @@ View.prototype.init = function init(enabled, date) {
         });
     } else {
         window.addEventListener('polymer-ready', function () {
-            document.getElementById('report-month-field').value
-                = date.getFullYear() + '-' + (date.getMonth() + 1);
+            //document.getElementById('report-month-field').value
+            //    = date.getFullYear() + '-' + (date.getMonth() + 1);
             document.getElementById('date-button')
                 .addEventListener('click', on_update_date_click);
             document.getElementById('config-button')

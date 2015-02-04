@@ -214,11 +214,11 @@ function on_min_change(event) {
         self = title_xx.view.config_dialog;
 
     // same range min and max can be equal; different range cannot
-    if (prev && +prev.value >= +value)
+    if (value === '') message = 'Field is required.';
+    else if (prev && +prev.value >= +value)
         message = 'Rate ' + index + ' minimum must be greater than the rate ' + (index - 1) + ' maximum.'
     else if (next && +next.value < +value)
         message = 'Rate ' + index + ' minimum must be less than or equal to the maximum.';
-    else if (value === '') message = 'Field is required.';
     else title_xx.view.config_dialog.result[id] = +value;
 
 
@@ -251,11 +251,11 @@ function on_max_change(event) {
         self = title_xx.view.config_dialog;
 
     // same range min and max can be equal; different range cannot
-    if (prev && +prev.value > +value)
+    if (value === '') message = 'Field is required.';
+    else if (prev && +prev.value > +value)
         message = 'Rate ' + index + ' maximum must be greater or equal to the minimum.';
     else if (next && +next.value <= +value)
         message = 'Rate ' + index + ' maximum must be less than the rate ' + (index + 1) + ' minimum.';
-    else if (value === '') message = 'Field is required.';
     else title_xx.view.config_dialog.result[id] = +value;
 
     target.setCustomValidity(message);

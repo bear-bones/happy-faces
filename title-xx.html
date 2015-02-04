@@ -32,7 +32,6 @@
     <link href="app://happy-faces/bower_components/sortable-table/sortable-table.html" rel="import" />
 
 
-    <link rel="stylesheet" href="app://happy-faces/css/common.css" />
     <link rel="stylesheet" href="app://happy-faces/css/title-xx.css" />
     <link rel="stylesheet" href="app://happy-faces/bower_components/sortable-table/css/bootstrap.css">
 </head>
@@ -93,6 +92,14 @@
         'polymer-ready', function () {window.polymer_ready = true}
     );
 
+    function last_resort(error) {
+        try {
+            global.log.error(error);
+        } catch(_) {
+            console.error(error);
+        }
+    }
+
     try {
         global.app = window.app = require('nw.gui').App;
         global.common = window.common = require('./js/common');
@@ -100,10 +107,10 @@
 
         title_xx.main();
     } catch (error) {
-        console.error(error);
+        last_resort(error);
     }
 
-    process.on('uncaughtException', function (error) {console.error(error)});
+    process.on('uncaughtException', last_resort);
     </script>
 </body>
 </html>

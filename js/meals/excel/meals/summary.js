@@ -14,14 +14,14 @@ function generate() {
     var file_name = meals.excel.file_name,
         date = meals.model.report_date,
 
-        names = [], sheets = {},
+        names = [], sheets = {};
 
     
     sheets['Calendar'] = make_calendar(monday, saturday);
 
     try {
         XLSX.writeFile(
-            {SheetNames : ['Calendar', 'Summary', Sheets : sheets}, file_name);
+            {SheetNames : ['Calendar', 'Summary'], Sheets : sheets}, file_name);
     } catch (error) {
         log.error(error);
         log.debug(error.stack);
