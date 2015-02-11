@@ -25,7 +25,9 @@ function create_all(rows) {
             for (; i < length; ++i) {
                 fields = rows[i];
                 var keys = Object.keys(fields),
-                    values = keys.map(function (key) {return fields[key]}),
+                    values = keys.map(function (key) {
+                        return fields[key] === undefined ? null : fields[key];
+                    }),
                     placeholders = new Array(values.length);
                 placeholders.fill('?');
                 t.executeSql(

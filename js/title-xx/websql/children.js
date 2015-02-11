@@ -1,7 +1,7 @@
 var KEYS = {
     child_id : 1, client_id : 1, name : 1, age : 1, claim_num : 1, line_num : 1,
     fee : 1, auth_num : 1, auth_hours : 1, auth_days : 1, alt_hours : 1,
-    alt_days : 1, auth_rage_start : 1, auth_range_end : 1, alt_range_start : 1,
+    alt_days : 1, auth_range_start : 1, auth_range_end : 1, alt_range_start : 1,
     alt_range_end : 1
 };
 
@@ -82,7 +82,10 @@ function create_all(rows) {
 
 function create(fields) {
     var keys = Object.keys(fields).filter(function (key) {return key in KEYS}),
-        values = keys.map(function (key) {return fields[key]}),
+        // coffeescript: `values = keys.map((key) -> fields[key] ? null),`
+        values = keys.map(function (key) {
+            return fields[key] === undefined ? null : fields[key];
+        }),
         placeholders = new Array(values.length);
     placeholders.fill('?');
     if (!('child_id' in keys))
@@ -158,7 +161,9 @@ function update_all(rows) {
 
 function update(fields) {
     var keys = Object.keys(fields).filter(function (key) {return key in KEYS}),
-        values = keys.map(function (key) {return fields[key]}),
+        values = keys.map(function (key) {
+            return fields[key] === undefined ? null : fields[key];
+        }),
         statement = keys.join(' = ?,') + (keys.length ? ' = ?' : '');
     if ('child_id' in fields)
         values.push(fields.child_id);

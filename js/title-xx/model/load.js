@@ -12,6 +12,11 @@ function hundredths(number) {
     return Math.round(number * 100) / 100;
 }
 
+function mmyyyy(date) {
+    date = new Date(date);
+    return '' + (date.getMonth() + 1) + '/' + (date.getFullYear() % 100);
+}
+
 function joined_date(date) {
     return split_date(date.substr(0, 2), date.substr(2, 2), date.substr(4));
 }
@@ -176,7 +181,7 @@ function* read_ccm() {
             name : child.last + ', ' + child.first + ' ' + (child.middle || ''),
             age : get_age(child.dob)
         };
-        if (child.chfield3 && child.chfield4) update_txx_data(child, result);
+        //if (child.chfield3 && child.chfield4) update_txx_data(child, result);
         return result;
     });
     title_xx.view.status_dialog.next('loaded ' + children.length + ' children.');
@@ -251,92 +256,97 @@ function* read_local() {
 
 
 
-function* process_data(initial) {
-    var data,
+function process_child(child) {
+    var year = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
         report_date = title_xx.model.report_date.getTime(),
-        date = new Date(report_date);
+        from = title_xx.model.report_date.clone();
+    from.setDate(1);
+    from = from.getTime();
 
-
-    if (date.getMonth() >= title_xx.config.title_xx_year_start)
-        date.setMonth(title_xx.config.title_xx_year_start, 1);
-    else
-        date.setMonth(12 - title_xx.config.title_xx_year_start, 1);
-    date = date.getTime();
-
-
-    data = title_xx.model.data.filter(function (child) {
-        if (!child.auth_range_start || !child.auth_range_end) return false;
-        if (child.auth_range_start <= report_date
-            && child.auth_range_end >= report_date
-        ) {
-            child.current = {
-                auth_range_start : child.auth_range_start,
-                auth_range_end : child.auth_range_end,
-                auth_hours : child.auth_hours, auth_days : child.auth_days
-            };
-        } else if (child.alt_range_start <= report_date
-            && child.alt_range_end >= report_date
-        ) {
-            child.current = {
-                auth_range_start : child.alt_range_start,
-                auth_range_end : child.alt_range_end,
-                auth_hours : child.alt_hours, auth_days : child.alt_days
-            };
-            if (!child.alt_hours && !child.alt_days) {
-                child.current.auth_hours = child.auth_hours;
-                child.current.auth_days = child.auth_days;
-            }
+    // process authorized date range
+    if (child.auth_range_start && child.auth_range_start <= report_date &&
+        child.auth_range_end && child.auth_range_end >= report_date
+    ) {
+        child.current = {
+            type : 'auth',
+            auth_range_start : child.auth_range_start,
+            auth_range_end : child.auth_range_end,
+            auth_hours : child.auth_hours, auth_days : child.auth_days
+        };
+    } else if (child.alt_range_start && child.alt_range_start <= report_date &&
+        child.alt_range_end && child.alt_range_end >= report_date
+    ) {
+        child.current = {
+            type : 'alt',
+            auth_range_start : child.alt_range_start,
+            auth_range_end : child.alt_range_end,
+            auth_hours : child.alt_hours, auth_days : child.alt_days
+        };
+        if (!child.alt_hours && !child.alt_days) {
+            child.current.auth_hours = child.auth_hours;
+            child.current.auth_days = child.auth_days;
         }
-        return !!child.current;
+    }
+    if (child.current) from = child.current.auth_range_start;
+
+    child.punches = child.all_punches.filter(function (punch) {
+        return punch.time_in >= from && punch.time_out <= report_date;
     });
+    child.total_days = 0;
+    child.total_hours = 0.0;
+    child.rem_hours = child.current ? child.current.auth_hours : 0;
+    child.rem_days = child.current ? child.current.auth_days : 0;
+    child.days = [];
+    child.hours = [];
+
+    // accumulate hours by month/day
+    for (var j = 0, len = child.punches.length; j < len; ++j) {
+        var punch = child.punches[j],
+            hours = (punch.time_out - punch.time_in) / 3600000,
+            date_in = new Date(punch.time_in),
+            month = date_in.getMonth(), day = '' + date_in.getDate();
+        if (!(day in year[month])) year[month][day] = 0.0;
+        year[month][day] += hours;
+    }
+
+    // count days/hours by child using txx limits and rounding rules:
+    //  - round up to the nearest quarter hour
+    //  - 6+ hours => day
+    year.forEach(function (month) {
+        var days = 0, hours = 0.0;
+        Object.keys(month).forEach(function (day) {
+            var time = month[day],
+                int = Math.trunc(time), frac = time - int;
+            // round up to the nearest quarter hour
+            frac = frac === 0.0 ? 0.0 : frac <= 0.25 ? 0.25
+                : frac <= 0.5 ? 0.5 : frac <= 0.75 ? 0.75 : 1;
+            if (int + frac >= 6.0) ++days; else hours += int + frac;
+        });
+        child.total_days += days; child.total_hours += hours;
+        child.rem_days -= days; child.rem_hours -= hours;
+        child.days.push(days); child.hours.push(hours);
+    });
+
+    if (!child.current) child.rem_hours = child.rem_days = undefined;
+    make_displayable(child);
+
+}
+
+function* process_data(initial) {
+    var data = title_xx.model.data,
+        report_date = title_xx.model.report_date.getTime(),
+        from = title_xx.model.report_date.clone();
+    from.setDate(1);
+    from = from.getTime();
 
 
     try {
         var ticks = 0, step = data.length / 100;
         for (var i = 0, length = data.length; i < length; ++i) {
-            var child = data[i],
-                year = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
-
-            child.punches = yield title_xx.websql.punches.read(
-                child.child_id, child.current.auth_range_start, report_date
-            );
-            child.total_days = 0;
-            child.total_hours = 0.0;
-            child.rem_hours = child.current.auth_hours;
-            child.rem_days = child.current.auth_days;
-            child.days = [];
-            child.hours = [];
-
-            // accumulate hours by month/day
-            for (var j = 0, len = child.punches.length; j < len; ++j) {
-                var punch = child.punches[j],
-                    hours = (punch.time_out - punch.time_in) / 3600000,
-                    date_in = new Date(punch.time_in),
-                    month = date_in.getMonth(), day = '' + date_in.getDate();
-                if (!(day in year[month])) year[month][day] = 0.0;
-                year[month][day] += hours;
-            }
-
-            // count days/hours by child using txx limits and rounding rules:
-            //  - round up to the nearest quarter hour
-            //  - 6+ hours => day
-            year.forEach(function (month) {
-                var days = 0, hours = 0.0;
-                Object.keys(month).forEach(function (day) {
-                    var time = month[day],
-                        int = Math.trunc(time), frac = time - int;
-                    // round up to the nearest quarter hour
-                    frac = frac === 0.0 ? 0.0 : frac <= 0.25 ? 0.25
-                        : frac <= 0.5 ? 0.5 : frac <= 0.75 ? 0.75 : 1;
-                    if (int + frac >= 6.0) ++days; else hours += int + frac;
-                });
-                child.total_days += days; child.total_hours += hours;
-                child.rem_days -= days; child.rem_hours -= hours;
-                child.days.push(days); child.hours.push(hours);
-            });
-
-            make_displayable(child);
-
+            var child = data[i];
+            child.all_punches =
+                yield title_xx.websql.punches.read(child.child_id);
+            process_child(child);
             if (step*ticks < i) title_xx.view.status_dialog.tick(++ticks);
         }
     } catch (error) {
@@ -360,18 +370,30 @@ function* process_data(initial) {
 }
 
 function make_displayable(child) {
+    var current = child.current;
     child.display = {
-        auth_hours : hundredths(child.current.auth_hours),
+        auth_period
+            : current ? mmyyyy(current.auth_range_start) + '-' +
+                        mmyyyy(current.auth_range_end)
+            : child.auth_range_start ? mmyyyy(child.auth_range_start) + '-' +
+                                       mmyyyy(child.auth_range_end)
+            : child.alt_range_start ? mmyyyy(child.alt_range_start) + '-' +
+                                      mmyyyy(child.alt_range_end)
+            : '',
+        period_sign : current ? 'pos' : 'neg',
+        auth_hours : current ? hundredths(current.auth_hours) : '',
         total_hours : hundredths(child.total_hours),
-        rem_hours : hundredths(child.rem_hours),
-        hours_sign : child.rem_hours >= 0.0 ? 'pos' : 'neg',
-        auth_days : hundredths(child.current.auth_days),
+        rem_hours : typeof child.rem_hours === 'number' ?
+                    hundredths(child.rem_hours) : '',
+        hours_sign : !child.rem_hours || child.rem_hours > 0.0 ? 'pos' : 'neg',
+        auth_days : current ? hundredths(current.auth_days) : '',
         total_days : hundredths(child.total_days),
-        rem_days : hundredths(child.rem_days),
-        days_sign : child.rem_days >= 0.0 ? 'pos' : 'neg'
+        rem_days : typeof child.rem_days === 'number' ?
+                   hundredths(child.rem_days) : '',
+        days_sign : !child.rem_days || child.rem_days > 0.0 ? 'pos' : 'neg',
     };
-    if (child.age < 24) child.display.age = child.age + ' mo';
-    else child.display.age = Math.trunc(child.age / 12) + ' yr';
+    if (child.age < 24) child.display.age = child.age + 'mo';
+    else child.display.age = Math.trunc(child.age / 12) + 'yr';
 }
 
 
@@ -379,4 +401,5 @@ function make_displayable(child) {
 module.exports.read_ccm = read_ccm;
 module.exports.write_local = write_local;
 module.exports.read_local = read_local;
+module.exports.process_child = process_child;
 module.exports.process_data = process_data;

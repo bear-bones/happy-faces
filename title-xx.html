@@ -8,6 +8,8 @@
 
     <link href="app://happy-faces/bower_components/polymer/polymer.html" rel="import" />
 
+    <link href="app://happy-faces/bower_components/font-roboto/roboto.html" rel="import" />
+
     <link href="app://happy-faces/bower_components/core-header-panel/core-header-panel.html" rel="import" />
     <link href="app://happy-faces/bower_components/core-toolbar/core-toolbar.html" rel="import" />
 
@@ -54,28 +56,30 @@
         </core-toolbar>
 
         <sortable-table class="bootstrap" id="child-grid" data="{{data}}" rowTemplate="template" disableColumnMove sortColumn="name">
-            <sortable-column name="edit" sortable="false">Edit</sortable-column>
             <sortable-column name="name">Name</sortable-column>
             <sortable-column name="age">Age</sortable-column>
-            <sortable-column name="fee">Fee</sortable-column>
-            <sortable-column name="auth_hours">Auth Hr</sortable-column>
-            <sortable-column name="display_hours">Hr Used</sortable-column>
-            <sortable-column name="rem_hours">Rem Hr</sortable-column>
-            <sortable-column name="auth_days">Auth Dy</sortable-column>
-            <sortable-column name="display_days">Dy Used</sortable-column>
-            <sortable-column name="rem_days">Rem Dy</sortable-column>
+            <sortable-column name="period" formula="function (row) {return (row.current && row.current.auth_range_end) || row.auth_range_end || row.alt_range_end}">Auth Period</sortable-column>
+            <sortable-column name="page" formula="function (row) {return row.claim_num*1000 + row.line_num}">Page</sortable-column>
+            <sortable-column name="line" formula="function (row) {return row.claim_num*1000 + row.line_num}">Line</sortable-column>
+            <sortable-column name="auth_hours">Auth H</sortable-column>
+            <sortable-column name="display_hours">Used H</sortable-column>
+            <sortable-column name="rem_hours">Rem H</sortable-column>
+            <sortable-column name="auth_days">Auth D</sortable-column>
+            <sortable-column name="display_days">Used D</sortable-column>
+            <sortable-column name="rem_days">Rem D</sortable-column>
 
             <template id="template">
-                <td style="text-align: center"><paper-icon-button icon="create" title="Edit {{record.row.name}}" id="{{record.row.child_id}}" class="edit-button"></paper-icon-button></td>
-                <td>{{record.row.name}}</td>
-                <td style="text-align: center">{{record.row.display.age}}</td>
-                <td style="text-align: center">{{record.row.fee}}</td>
-                <td style="text-align: right">{{record.row.display.auth_hours}}</td>
-                <td style="text-align: right">{{record.row.display.total_hours}}</td>
-                <td style="text-align: right" class="{{record.row.display.hours_sign}}">{{record.row.display.rem_hours}}</td>
-                <td style="text-align: right">{{record.row.display.auth_days}}</td>
-                <td style="text-align: right">{{record.row.display.total_days}}</td>
-                <td style="text-align: right" class="{{record.row.display.days_sign}}">{{record.row.display.rem_days}}</td>
+                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}">{{record.row.name}}</td>
+                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: center">{{record.row.display.age}}</td>
+                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right" class="{{record.row.display.period_sign}}">{{record.row.display.auth_period}}</td>
+                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right">{{record.row.claim_num}}</td>
+                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right">{{record.row.line_num}}</td>
+                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right">{{record.row.display.auth_hours}}</td>
+                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right">{{record.row.display.total_hours}}</td>
+                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right" class="{{record.row.display.hours_sign}}">{{record.row.display.rem_hours}}</td>
+                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right">{{record.row.display.auth_days}}</td>
+                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right">{{record.row.display.total_days}}</td>
+                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right" class="{{record.row.display.days_sign}}">{{record.row.display.rem_days}}</td>
             </template>
         </sortable-table>
     </core-header-panel>

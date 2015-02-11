@@ -11,7 +11,8 @@ View.prototype = new EventEmitter();
 
 
 View.prototype.init = function init(enabled, date) {
-    var self = this;
+    var self = this, month = date.getMonth() + 1;
+    date = date.getFullYear() + '-' + (month < 10 ? '0' : '') + month;
 
     this.enabled = enabled;
     this.update_date_button = document.getElementById('update-date-button');
@@ -27,8 +28,7 @@ View.prototype.init = function init(enabled, date) {
 
 
     if (window.polymer_ready) {
-        document.getElementById('report-month-field').value
-            = date.getFullYear() + '-' + (date.getMonth() + 1);
+        document.getElementById('report-month-field').value = date;
         document.getElementById('date-button')
             .addEventListener('click', on_update_date_click);
         document.getElementById('excel-button')
@@ -43,8 +43,7 @@ View.prototype.init = function init(enabled, date) {
         document.body.addEventListener('click', on_edit_click);
     } else {
         window.addEventListener('polymer-ready', function () {
-            document.getElementById('report-month-field').value
-                = date.getFullYear() + '-' + (date.getMonth() + 1);
+            document.getElementById('report-month-field').value = date;
             document.getElementById('date-button')
                 .addEventListener('click', on_update_date_click);
             document.getElementById('excel-button')
@@ -117,11 +116,8 @@ function on_edit_click(event) {
     if (!title_xx.view.enabled) return;
 
     var node = event && event.path && event.path.length && event.path.item(0);
-    if (!node || node.className !== 'edit-button'
-        || node.parentNode.nodeName !== 'TD'
-    ) return;
-
-    title_xx.view.emit('click', 'edit', node.id);
+    if (node && node.nodeName === 'TD')
+        title_xx.view.emit('click', 'edit', node.dataset.id);
 }
 
 

@@ -41,7 +41,9 @@ function update(fields) {
                 || key === 'day_start_time' || key === 'day_end_time'
                 || key === 'last_load';
         }),
-        values = keys.map(function (key) {return fields[key]}),
+        values = keys.map(function (key) {
+            return fields[key] === undefined ? null : fields[key];
+        }),
         statement = keys.join(' = ?,') + (keys.length ? ' = ?' : '');
 
     if (!keys.length)

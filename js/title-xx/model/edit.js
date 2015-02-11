@@ -39,11 +39,7 @@ function save(child) {
 
         // recalculate time units remaining
         child = self.current_child;
-        child.actual
-            = child.auth_unit === 'days' ? child.total_days : child.total_time;
-        child.remaining
-            = Math.round((child.auth_amount - child.actual) * 100) / 100;
-        child.sign = child.remaining < 0 ? 'neg' : 'pos';
+        title_xx.model.load.process_child(child);
 
         title_xx.view.edit_dialog.close();
     });
