@@ -231,10 +231,10 @@ function* process_data(initial) {
                 return prioritize(Object.keys(result), child.classification);
             });
 
-            var months = get_age(new Date(child.dob), report_date);
-            child.classroom = 0 + (months >= 9) + (months >= 18)
-                + (months >= 27) + (months >= 36) + (months >= 48)
-                + (months >= 60) + (months >= 84);
+            child.age = get_age(new Date(child.dob), report_date);
+            child.classroom = 0 + (child.age >= 9) + (child.age >= 18)
+                + (child.age >= 27) + (child.age >= 36) + (child.age >= 48)
+                + (child.age >= 60) + (child.age >= 84);
             make_displayable(child);
 
             if (step*ticks < i) meals.view.status_dialog.tick(++ticks);

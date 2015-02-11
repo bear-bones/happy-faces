@@ -1,7 +1,5 @@
 function read(last_load, child_id) {
-    var year_ago = new Date(0);
-
-    if (last_load === undefined) last_load = year_ago;
+    last_load = new Date(last_load || 0);
 
     return new Promise(function (resolve, reject) {
         var request = new common.mssql.db.Request(),

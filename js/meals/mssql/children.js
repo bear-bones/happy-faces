@@ -10,8 +10,7 @@ function read() {
                     'ON children.childkey = custchild.childkey ' +
                 'INNER JOIN statuses ' +
                     'ON children.statuskey = statuses.statuskey ' +
-                "WHERE statuses.name = 'Active' " +
-                    "AND custchild.chfield1 = 'TXX'"
+                "WHERE statuses.name = 'Active'"
         );
         request.on('row', function (row) {children.push(row)});
         request.on('done', function () {resolve(children)});

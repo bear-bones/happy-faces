@@ -23,6 +23,12 @@ function getHHMM(timestamp) {
     minutes = minutes % 60; hours = hours % 24;
     return hours + ':' + (minutes < 10 ? '0' : '') + minutes;
 }
+function getHHMMam(timestamp) {
+    var minutes = Math.round(timestamp / 1000 / 60),
+        hours = Math.floor(minutes / 60) % 12;
+    minutes = minutes % 60; hours = hours % 24;
+    return hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+}
 
 // round to hundredths
 function round(num) {
@@ -39,8 +45,8 @@ function dollars(num) {
 
 
 module.exports.functions = {
-    cell : cell, cc : cc, sc : sc, getHHMM : getHHMM, round : round,
-    dollars : dollars};
+    cell : cell, cc : cc, sc : sc, getHHMM : getHHMM, getHHMMam : getHHMMam,
+    round : round, dollars : dollars};
 module.exports.worksheet = require('./worksheet.js');
 module.exports.XF_L = 0;
 module.exports.XF_C = 1;

@@ -11,7 +11,8 @@ View.prototype = new EventEmitter();
 
 
 View.prototype.init = function init(enabled, date) {
-    var self = this;
+    var self = this, month = date.getMonth() + 1;
+    date = date.getFullYear() + '-' + (month < 10 ? '0' : '') + month;
 
     require('./menu.js').init();
 
@@ -27,8 +28,7 @@ View.prototype.init = function init(enabled, date) {
 
 
     if (window.polymer_ready) {
-        //document.getElementById('report-month-field').value
-        //    = date.getFullYear() + '-' + (date.getMonth() + 1);
+        document.getElementById('report-month-field').value = date;
         document.getElementById('date-button')
             .addEventListener('click', on_update_date_click);
         document.getElementById('config-button')
@@ -40,8 +40,7 @@ View.prototype.init = function init(enabled, date) {
         });
     } else {
         window.addEventListener('polymer-ready', function () {
-            //document.getElementById('report-month-field').value
-            //    = date.getFullYear() + '-' + (date.getMonth() + 1);
+            document.getElementById('report-month-field').value = date;
             document.getElementById('date-button')
                 .addEventListener('click', on_update_date_click);
             document.getElementById('config-button')

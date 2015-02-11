@@ -26,7 +26,7 @@ function init() {
         item(menu, 'Monthly State', 'meals>state');
         item(menu, '', 'separator');
         item(menu, 'Blank', (function (menu) {
-            item(menu, 'Roll Call by Classroom', 'meals>blank>roll');
+            //item(menu, 'Roll Call by Classroom', 'meals>blank>roll');
             item(menu, 'Saturday by Week', 'meals>blank>saturday');
             item(menu, 'Breakfast by Week', 'meals>blank>breakfast');
             item(menu, 'Morning Snack by Week', 'meals>blank>morning');
@@ -37,7 +37,7 @@ function init() {
             return menu;
         })(new gui.Menu()));
         item(menu, 'Complete', (function (menu) {
-            item(menu, 'Roll Call by Classroom', 'meals>complete>roll');
+            //item(menu, 'Roll Call by Classroom', 'meals>complete>roll');
             item(menu, 'Saturday by Week', 'meals>complete>saturday');
             item(menu, 'Breakfast by Week', 'meals>complete>breakfast');
             item(menu, 'Morning Snack by Week', 'meals>complete>morning');
@@ -51,24 +51,26 @@ function init() {
     })(new gui.Menu()));
 
     item(menu, 'Roll Call', (function (menu) {
-        item(menu, 'Blank', (function (menu) {
-            item(menu, 'Day', 'roll>blank>day');
-            item(menu, 'Week', 'roll>blank>week');
-            item(menu, 'Month', 'roll>blank>month');
-            return menu;
-        })(new gui.Menu()));
-        item(menu, 'Complete', (function (menu) {
-            item(menu, 'Day', 'roll>complete>day');
-            item(menu, 'Week', 'roll>complete>week');
-            item(menu, 'Month', 'roll>complete>month');
-            return menu;
-        })(new gui.Menu()));
-        item(menu, 'Supper', (function (menu) {
-            item(menu, 'Day', 'roll>supper>day');
-            item(menu, 'Week', 'roll>supper>week');
-            item(menu, 'Month', 'roll>supper>month');
-            return menu;
-        })(new gui.Menu()));
+        item(menu, 'Blank', 'roll>blank>month');
+        item(menu, 'Complete', 'roll>complete>month');
+        //item(menu, 'Blank', (function (menu) {
+        //    item(menu, 'Day', 'roll>blank>day');
+        //    item(menu, 'Week', 'roll>blank>week');
+        //    item(menu, 'Month', 'roll>blank>month');
+        //    return menu;
+        //})(new gui.Menu()));
+        //item(menu, 'Complete', (function (menu) {
+        //    item(menu, 'Day', 'roll>complete>day');
+        //    item(menu, 'Week', 'roll>complete>week');
+        //    item(menu, 'Month', 'roll>complete>month');
+        //    return menu;
+        //})(new gui.Menu()));
+        //item(menu, 'Supper', (function (menu) {
+        //    item(menu, 'Day', 'roll>supper>day');
+        //    item(menu, 'Week', 'roll>supper>week');
+        //    item(menu, 'Month', 'roll>supper>month');
+        //    return menu;
+        //})(new gui.Menu()));
         return menu;
     })(new gui.Menu()));
 
