@@ -1,4 +1,5 @@
 try {
+    require('./array.js');
     require('./async');
     require('./date');
     exports.mssql = require('./mssql');
