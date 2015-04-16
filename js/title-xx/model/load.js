@@ -262,6 +262,7 @@ function process_child(child) {
         from = title_xx.model.report_date.clone();
     from.setDate(1);
     from = from.getTime();
+    report_date.setHours(23, 59, 59);
 
     // process authorized date range
     if (child.auth_range_start && child.auth_range_start <= report_date &&

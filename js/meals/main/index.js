@@ -10,6 +10,7 @@ function main() {
     
             skip_mssql = false;
 
+        // last day of the previous month
         date = new Date(date.getFullYear(), date.getMonth(), 0);
 
 
@@ -33,7 +34,7 @@ function main() {
                 log.error(error);
                 log.debug(error.stack);
                 view.show_error('Error initializing Meals reporting app');
-                //return setTimeout(function () {app.quit()}, 2000);
+                return setTimeout(function () {app.quit()}, 2000);
             }
         }
 
@@ -48,7 +49,7 @@ function main() {
                 log.debug(error.stack);
                 view.show_error('Error retrieving and processing information from Childcare Manager');
             }
-            //return setTimeout(function () {app.quit()}, 2000);
+            return setTimeout(function () {app.quit()}, 2000);
         }
 
 
@@ -57,7 +58,7 @@ function main() {
             parameter && log.debug('parameter: ', parameter);
 
             switch (type) {
-            // udpate report date. recalculates punches and redraws grid
+            // update report date. recalculates punches and redraws grid
             case 'date':
                 model.date(parameter);
                 break;

@@ -22,9 +22,6 @@ function get_report(report) {
         name : 'blank breakfast snack by week',
         generate
             : function () {meals.excel.meals.meal.generate(1, 'breakfast')}};
-    case 'meals>blank>morning': return {
-        name : 'blank morning snack by week',
-        generate : function () {meals.excel.meals.meal.generate(1, 'morning')}};
     case 'meals>blank>lunch': return {
         name : 'blank lunch by week',
         generate : function () {meals.excel.meals.meal.generate(1, 'lunch')}};
@@ -48,9 +45,6 @@ function get_report(report) {
         name : 'breakfast by week',
         generate
             : function () {meals.excel.meals.meal.generate(0, 'breakfast')}};
-    case 'meals>complete>morning': return {
-        name : 'morning snack by week',
-        generate : function () {meals.excel.meals.meal.generate(0, 'morning')}};
     case 'meals>complete>lunch': return {
         name : 'lunch by week',
         generate : function () {meals.excel.meals.meal.generate(0, 'lunch')}};
@@ -64,7 +58,6 @@ function get_report(report) {
     case 'meals>complete>evening': return {
         name : 'evening snack by week',
         generate : function () {meals.excel.meals.meal.generate(0, 'evening')}};
-    //TODO
     case 'roll>blank>day': return {
         name : 'blank roll call (day)',
         generate : function () {meals.excel.roll.generate(1, 0, 'day')}};

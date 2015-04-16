@@ -79,10 +79,10 @@ function make_template() {
          common.excel.XF_B10_lrtb_L);
     ++ws.rows;
     for (var j = 0; j < 38; ++j, ++ws.rows)
-        for (var k = 0; k < 16; ++k )
+        for (var k = 0; k < 16; ++k)
             cell(ws, k, ws.rows, '', common.excel.XF_lrtb_C);
     cell(ws, 0, ws.rows, 'Staff Initials', common.excel.XF_L);
-    for (var j = 1; j < 14; ++j )
+    for (var j = 1; j < 14; ++j)
         cell(ws, j, ws.rows, '', common.excel.XF_lrtb_C);
     ++ws.rows;
     ++ws.rows;

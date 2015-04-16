@@ -11,8 +11,9 @@ View.prototype = new EventEmitter();
 
 
 View.prototype.init = function init(enabled, date) {
-    var self = this, month = date.getMonth() + 1;
-    date = date.getFullYear() + '-' + (month < 10 ? '0' : '') + month;
+    var self = this, month = date.getMonth() + 1, day = date.getDate();
+    date = date.getFullYear() + '-' + (month < 10 ? '0' : '') + month + '-' +
+           (day < 10 ? '0' : '') + day;
 
     require('./menu.js').init();
 

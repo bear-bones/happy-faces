@@ -11,26 +11,28 @@ var XLSX = require('xlsx'),
 
 
 
-function generate(blank, period) {
-    var start = meals.model.report_date.clone(), end = start.clone(), weekday;
+function generate(blank, supper, period) {
+    var start = meals.model.report_date.clone(),
+        end = meals.model.report_date.clone();
+    end.setHours(23, 59, 59);
 
-    start.setDate(1);
     switch (period) {
     case 'day':
-        end = setDate(1);
+        // already correct
         break;
     case 'week':
         // this adjusts the start and end to be the monday/saturday of the week
-        // containing the report date.  I *believe* that a sunday date will
-        // yield the previous monday/saturday, but that's a guess.
-        weekday = start.getDay();
-        start.setDate(2 + (!(weekday % 6) ? !!weekday : -weekday)); // monday
-        end.inc(5); // saturday
+        // containing the report date.  a sunday yields the following monday
+        // through saturday.
+        start.setDate(start.getDate() + 1 - start.getDay()); // monday
+        end.setDate(start.getDate() + 5); // saturday
         break;
     case 'month':
-        end = meals.model.report_date;
+        start.setDate(1);
+        end.setMonth(end.getMonth() + 1, 0); // last day of the month
         break;
     }
+    console.log(period, ':', start, ':', end);
 
     try {
         XLSX.writeFile({
@@ -53,6 +55,9 @@ function generate(blank, period) {
 function make_roll_sheet(start, end, blank) {
     var ws = new common.excel.worksheet(16);
 
+    console.log(start);
+    console.log(end);
+
     ws['!page'] = {
         margins : {left : 0.3, right : 0.3, top : 0.4, bottom : 0.4},
         landscape : true
@@ -64,8 +69,9 @@ function make_roll_sheet(start, end, blank) {
 
     // build the sheet
     for (; start <= end; start.inc())
-        for (var room = 1, name, ws; room <= 8; ++room)
-            if (start.getDay()) make_roll_page(ws, start, room, blank);
+        if (start.getDay())
+            for (var room = 1, name, ws; room <= 8; ++room)
+                make_roll_page(ws, start, room, blank);
 
     return ws.export();
 }
@@ -88,8 +94,7 @@ function punch_text(hour, punches) {
 }
 
 function make_roll_page(ws, date, room, blank) {
-    var day = date.getDate() - 1,
-        config = meals.config, pre = 'cat' + room + '_',
+    var config = meals.config, pre = 'cat' + room + '_',
         room_name = config[pre + 'desc'], teacher = config[pre + 'teacher'],
         min = config[pre + 'min_age'], max = config[pre + 'max_age'];
 
@@ -123,20 +128,23 @@ function make_roll_page(ws, date, room, blank) {
     cell(ws, 15, ws.rows++, 'Comments', common.excel.XF_B10_lrtb_L);
 
     var count = 0 - ws.rows;
-    if (!blank) meals.model.data
+    meals.model.data
         .filter(function (child) {return child.classroom === room - 1})
         .forEach(function (child, i) {
-            var punches = child.punches[day].map(function (punch) { return {
-                start : (new Date(punch.start)).getUTCHours(),
-                start_str : getHHMMam(punch.start),
-                end : (new Date(punch.end)).getUTCHours(),
-                end_str : getHHMMam(punch.end)
-            }});
+            var punches = child.punches[date.getMonth()*100 + date.getDate()]
+                .map(function (punch) {return {
+                    start : (new Date(punch.start)).getUTCHours(),
+                    start_str : getHHMMam(punch.start),
+                    end : (new Date(punch.end)).getUTCHours(),
+                    end_str : getHHMMam(punch.end)
+                }});
             cell(ws, 0, ws.rows, i + 1, common.excel.XF_lrtb_R);
             cell(ws, 1, ws.rows, child.name, common.excel.XF_lrtb_L);
-            for (var hour = 6, text; hour < 19; ++hour)
-                cell(ws, hour - 4, ws.rows, text = punch_text(hour, punches),
-                     common.excel['XF_lrtb_' + (text === 'X' ? 'C' : 'R')]);
+            for (var hour = 6, text; hour < 19; ++hour) {
+                text = blank ? '' : punch_text(hour, punches);
+                format = 'XF_lrtb_' + (text === 'X' ? 'C' : 'R');
+                cell(ws, hour - 4, ws.rows, text, common.excel[format]);
+            }
             cell(ws, 15, ws.rows++, '', common.excel.XF_lrtb_L);
         });
 

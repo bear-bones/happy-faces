@@ -10,6 +10,10 @@ var XLSX = require('xlsx'),
     worksheet = common.excel.worksheet;
 
 
+function index(meal) { return index.meals.indexOf(meal) * 4 }
+index.meals = ['breakfast', 'lunch', 'afternoon', 'dinner', 'evening'];
+
+
 
 function generate(blank) {
     var file_name = meals.excel.file_name,
@@ -27,16 +31,8 @@ function generate(blank) {
 
     try {
         XLSX.writeFile({
-            SheetNames : ['Breakfast', 'Morning Snack', 'Lunch',
-                          'Afternoon Snack', 'Supper', 'Evening Snack'],
-            Sheets : {
-                'Breakfast' : make_meal(dates, 'breakfast', blank),
-                'Morning Snack' : make_meal(dates, 'morning', blank),
-                'Lunch' : make_meal(dates, 'lunch', blank),
-                'Afternoon Snack' : make_meal(dates, 'afternoon', blank),
-                'Supper' : make_meal(dates, 'supper', blank),
-                'Evening Snack' : make_meal(dates, 'evening', blank)
-            }
+            SheetNames : ['Saturday'],
+            Sheets : {Saturday: make_sheet(dates)}
         }, file_name);
     } catch (error) {
         log.error(error);
@@ -48,140 +44,126 @@ function generate(blank) {
 
 
 
-function make_meal(dates, meal, blank) {
+function make_sheet(dates) {
     var children = meals.model.data,
-        abc = ['A', 'B', 'C'],
-        map = {}, totals = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-    if (meal === 'supper') meal = 'dinner';
+        month = meals.model.report_date.getMonth(),
+        abc = 'ABC', ML = ['BR', 'LU', 'AS', 'DI', 'ES'],
+        mls = ['breakfast', 'lunch', 'afternoon', 'dinner', 'evening'],
+        data = {};
+        day_totals = dates.map(function (date) {
+            return Array(15).fill(date.getMonth() === month ? 0 : '');
+        });
+
 
     // filter the raw child meal data into a map of child->[a/b/c by day] and
-    // its totals
+    // his totals
     children.forEach(function (child, index) {
         var name = child.name,
             cx = child.classification || meals.config.default_class;
             offset = abc.indexOf(cx);
-        map[name] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]; map[name].cx = cx;
-        if (!blank) dates.forEach(function (date, col) {
-            var meals = child.meals[date.getDate()-1];
-            if (meals && meals.indexOf(meal) >= 0)
-                totals[col*3 + offset] += (map[name][col*3 + offset] = 1);
+        data[name] = dates.map(function (date) {
+            return Array(15).fill(date.getMonth() === month ? 0 : '');
         });
+        data[name].cx = cx;
+        dates
+            .map(function (date) {
+                return child.meals[date.getMonth()*100 + date.getDate()];
+            })
+            .forEach(function (_meals, week) {
+                _meals.forEach(function (meal) {
+                    var column = mls.indexOf(meal)*3 + offset;
+                    ++data[name][week][column];
+                    ++day_totals[week][column];
+                });
+            });
     });
 
 
-    meal =
-        meal === 'breakfast' ? 'Breakfast' :
-        meal === 'morning'   ? 'Morning Snack' :
-        meal === 'lunch'     ? 'Lunch' :
-        meal === 'afternoon' ? 'Afternoon Snack' :
-        meal === 'dinner'    ? 'Supper' :
-        meal === 'evening'   ? 'Evening Snack' : '';
-
-
-    var ws = new common.excel.worksheet(22);
+    var ws = new common.excel.worksheet(78);
     ws['!page'] = {
         margins : {left : 0.4, right : 0.4, top : 0.4, bottom : 0.4},
         landscape : true
     };
-    ws['!cols'] = [{wch:3}, {wch:30}, {wch:5}, {wch:4.5}, {wch:4.5}, {wch:4.5},
-        {wch:3}, {wch:4.5}, {wch:4.5}, {wch:4.5}, {wch:3}, {wch:4.5}, {wch:4.5},
-        {wch:4.5}, {wch:3}, {wch:4.5}, {wch:4.5}, {wch:4.5}, {wch:3}, {wch:4.5},
-        {wch:4.5}, {wch:4.5}];
-    ws['!merges'] = [{s : {c : 0, r : ws.rows}, e : {c : 21, r : ws.rows}},
-        {s : {c : 0, r : ws.rows+1}, e : {c : 21, r : ws.rows+1}},
-        {s : {c : 3, r : ws.rows+2}, e : {c : 5, r : ws.rows+2}},
-        {s : {c : 7, r : ws.rows+2}, e : {c : 9, r : ws.rows+2}},
-        {s : {c : 11, r : ws.rows+2}, e : {c : 13, r : ws.rows+2}},
-        {s : {c : 15, r : ws.rows+2}, e : {c : 17, r : ws.rows+2}},
-        {s : {c : 19, r : ws.rows+2}, e : {c : 21, r : ws.rows+2}},
-        {s : {c : 3, r : ws.rows+3}, e : {c : 5, r : ws.rows+3}},
-        {s : {c : 7, r : ws.rows+3}, e : {c : 9, r : ws.rows+3}},
-        {s : {c : 11, r : ws.rows+3}, e : {c : 13, r : ws.rows+3}},
-        {s : {c : 15, r : ws.rows+3}, e : {c : 17, r : ws.rows+3}},
-        {s : {c : 19, r : ws.rows+3}, e : {c : 21, r : ws.rows+3}}];
+    ws['!cols'] = [
+        {wch:2}, {wch:20}, {wch:3},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}];
+    ws['!merges'] = [{s : {c : 0, r : ws.rows},
+                      e : {c : dates.length*15 + 2, r : ws.rows}},
+                     {s : {c : 0, r : ws.rows+1},
+                      e : {c : dates.length*15 + 2, r : ws.rows+1}}];
+
 
     cell(ws, 0, ws.rows++, 'Record of Meals and Supplements Served',
-         common.excel.XF_C);
+         common.excel.XF_8_C);
     cell(ws, 0, ws.rows++,
-         'Saturday ' + meal + ' ' + dates[0].toLocaleDateString() + '-' +
-         dates[dates.length-1].toLocaleDateString(), common.excel.XF_C);
-    
-    // sometimes last date won't be present so make (overwritable) cells now
-    cell(ws, 19, ws.rows, '', common.excel.XF_ltb_C);
-    cell(ws, 20, ws.rows, '', common.excel.XF_tb_C);
-    cell(ws, 21, ws.rows, '', common.excel.XF_rtb_C);
-    cell(ws, 19, ws.rows+1, '', common.excel.XF_ltb_C);
-    cell(ws, 20, ws.rows+1, '', common.excel.XF_tb_C);
-    cell(ws, 21, ws.rows+1, '', common.excel.XF_rtb_C);
-    dates.forEach(function (date, col) {
-        col = col*4 + 3;
-        cell(ws, col, ws.rows, date.toLocaleDateString(),
-             common.excel.XF_ltb_C);
-        cell(ws, col+1, ws.rows, '', common.excel.XF_tb_C);
-        cell(ws, col+2, ws.rows, '', common.excel.XF_rtb_C);
-        cell(ws, col, ws.rows+1, meal, common.excel.XF_ltb_C);
-        cell(ws, col+1, ws.rows+1, '', common.excel.XF_tb_C);
-        cell(ws, col+2, ws.rows+1, '', common.excel.XF_rtb_C);
-    });
-    ws.rows +=2;
+         'Saturday meals ' + dates[0].toLocaleDateString() + '-' +
+         dates[dates.length-1].toLocaleDateString(), common.excel.XF_8_C);
 
-    cell(ws, 1, ws.rows, 'Last, First', common.excel.XF_lrtb_L);
-    cell(ws, 2, ws.rows, 'Code', common.excel.XF_lrtb_C);
-    cell(ws, 3, ws.rows, 'A', common.excel.XF_lrtb_C);
-    cell(ws, 4, ws.rows, 'B', common.excel.XF_lrtb_C);
-    cell(ws, 5, ws.rows, 'C', common.excel.XF_lrtb_C);
-    cell(ws, 7, ws.rows, 'A', common.excel.XF_lrtb_C);
-    cell(ws, 8, ws.rows, 'B', common.excel.XF_lrtb_C);
-    cell(ws, 9, ws.rows, 'C', common.excel.XF_lrtb_C);
-    cell(ws, 11, ws.rows, 'A', common.excel.XF_lrtb_C);
-    cell(ws, 12, ws.rows, 'B', common.excel.XF_lrtb_C);
-    cell(ws, 13, ws.rows, 'C', common.excel.XF_lrtb_C);
-    cell(ws, 15, ws.rows, 'A', common.excel.XF_lrtb_C);
-    cell(ws, 16, ws.rows, 'B', common.excel.XF_lrtb_C);
-    cell(ws, 17, ws.rows, 'C', common.excel.XF_lrtb_C);
-    cell(ws, 19, ws.rows, 'A', common.excel.XF_lrtb_C);
-    cell(ws, 20, ws.rows, 'B', common.excel.XF_lrtb_C);
-    cell(ws, 21, ws.rows, 'C', common.excel.XF_lrtb_C);
-    ++ws.rows;
 
-    Object.keys(map).sort().forEach(function (name, i) {
-        child = map[name];
-        cell(ws, 0, ws.rows, i + 1, common.excel.XF_C);
-        cell(ws, 1, ws.rows, name, common.excel.XF_lrtb_L);
-        cell(ws, 2, ws.rows, child.cx || meals.config.default_class,
-             common.excel.XF_lrtb_C);
-        for (var j = 1, k = 0; j <= 15; ++j, ++k) {
-            cell(ws, 3 + k, ws.rows, child[j-1] || '', common.excel.XF_lrtb_C);
-            if (j % 3 === 0 && j < 15)
-                cell(ws, 3 + ++k, ws.rows, i + 1, common.excel.XF_C);
+    // for each day
+    for (var i = 0, length = dates.length; i < length; ++i) {
+        // header
+        ws['!merges'].push(
+            {s: {c : 3 + i*15, r : ws.rows},
+             e: {c : 3 + i*15 + 14, r : ws.rows}});
+        cell(ws, 3 + i*15, ws.rows, dates[i].toLocaleDateString(),
+             common.excel.XF_8_LRTB_C);
+        for (var x = 1; x < 15; ++x)
+            cell(ws, 3 + i*15 + x, ws.rows, '', common.excel.XF_8_LRTB_C);
+
+        // for each day's meals
+        for (var j = 0; j < 5; ++j) {
+            // header
+            ws['!merges'].push(
+                {s : {c : 3 + i*15 + j*3, r : ws.rows+1},
+                 e : {c : 3 + i*15 + j*3 + 2, r : ws.rows+1}});
+            cell(ws, 3 + i*15 + j*3, ws.rows+1, ML[j],
+                 common.excel.XF_8_LT_C);
+            cell(ws, 3 + i*15 + j*3 + 1, ws.rows+1, '', common.excel.XF_8_T_C);
+            cell(ws, 3 + i*15 + j*3 + 2, ws.rows+1, '', common.excel.XF_8_RT_C);
+
+            // for each day's meals' classifications
+            for (var k = 0; k < 3; ++k) {
+                // header
+                cell(ws, 3 + i*15 + j*3 + k, ws.rows+2, 'ABC'[k],
+                     common.excel['XF_8_' + ['LB', 'B', 'RB'][k] + '_C']);
+
+                // for each day's meals' classifications' children
+                Object.keys(data).forEach(function (name, l) {
+                    var child = data[name];
+                    // first time through write the row labels
+                    if (i == 0 && j == 0 && k == 0) {
+                        cell(ws, 0, ws.rows+3+l, l + 1, common.excel.XF_8_R);
+                        cell(ws, 1, ws.rows+3+l, name, common.excel.XF_8_L);
+                        cell(ws, 2, ws.rows+3+l, child.cx, common.excel.XF_8_C);
+                    }
+                    cell(ws, 3 + i*15 + j*3 + k, ws.rows+3+l, child[i][j*3 + k],
+                         common.excel['XF_8' + ['_L', '', '_R'][k] + '_R']);
+                });
+
+                // totals
+                cell(ws, 3 + i*15 + j*3 + k, Object.keys(data).length + 5,
+                     day_totals[i][j*3 + k], common.excel.XF_B8_LRTB_R);
+            }
         }
-        ++ws.rows;
-    });
-
-    ++ws.rows;
-    cell(ws, 3, ws.rows, 'A', common.excel.XF_lrtb_C);
-    cell(ws, 4, ws.rows, 'B', common.excel.XF_lrtb_C);
-    cell(ws, 5, ws.rows, 'C', common.excel.XF_lrtb_C);
-    cell(ws, 7, ws.rows, 'A', common.excel.XF_lrtb_C);
-    cell(ws, 8, ws.rows, 'B', common.excel.XF_lrtb_C);
-    cell(ws, 9, ws.rows, 'C', common.excel.XF_lrtb_C);
-    cell(ws, 11, ws.rows, 'A', common.excel.XF_lrtb_C);
-    cell(ws, 12, ws.rows, 'B', common.excel.XF_lrtb_C);
-    cell(ws, 13, ws.rows, 'C', common.excel.XF_lrtb_C);
-    cell(ws, 15, ws.rows, 'A', common.excel.XF_lrtb_C);
-    cell(ws, 16, ws.rows, 'B', common.excel.XF_lrtb_C);
-    cell(ws, 17, ws.rows, 'C', common.excel.XF_lrtb_C);
-    cell(ws, 19, ws.rows, 'A', common.excel.XF_lrtb_C);
-    cell(ws, 20, ws.rows, 'B', common.excel.XF_lrtb_C);
-    cell(ws, 21, ws.rows, 'C', common.excel.XF_lrtb_C);
-
-    ++ws.rows;
-    cell(ws, 1, ws.rows, 'Total', common.excel.XF_lrtb_L);
-    cell(ws, 2, ws.rows, '', common.excel.XF_lrtb_C);
-    for (var j = 1, k = 0; j <= 15; ++j, ++k) {
-        cell(ws, 3 + k, ws.rows, totals[j-1] || '', common.excel.XF_lrtb_C);
-        if (j % 3 === 0) ++k;
     }
+    
+    ws.rows += Object.keys(data).length + 3;
+    cell(ws, 1, ws.rows, 'Total', common.excel.XF_B8_R);
 
 
     return ws.export();

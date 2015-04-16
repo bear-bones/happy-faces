@@ -8,15 +8,16 @@ var XLSX = require('xlsx'),
 
     worksheet = common.excel.worksheet,
     
-    titles = ['Breakfast','AM Snack','Lunch','PM Snack','Supper','EV Snack'];
+    titles = [ 'Breakfast', 'Lunch', 'PM Snack', 'Supper', 'EV Snack'];
 
 
-function index(meal) {return index.meals.indexOf(meal) * 4}
-index.meals = ['breakfast','morning','lunch','afternoon','dinner','evening'];
+function index(meal) { return index.meals.indexOf(meal) * 4 }
+index.meals = ['breakfast', 'lunch', 'afternoon', 'dinner', 'evening'];
 
-function weekday(date) {return weekday.weekdays[date.getDay()]}
-weekday.weekdays =
-    ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+function weekday(date) { return weekday.weekdays[date.getDay()] }
+weekday.weekdays = [
+    'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+];
 
 function mealrate(column) {
     var remainder = column % 4, quotient = (column - remainder) / 4;
@@ -24,7 +25,9 @@ function mealrate(column) {
         [mealrate.meals[quotient] + '_' + 'abc'[remainder-1] + '_rate'];
 
 }
-mealrate.meals = ['br', 'ms', 'lu', 'as', 'di', 'es'];
+mealrate.meals = ['br', 'lu', 'as', 'di', 'es'];
+
+
 
 function generate() {
     var file_name = meals.excel.file_name;
@@ -47,7 +50,7 @@ function generate() {
 
 function make_calendar_sheet() {
     var date = meals.model.report_date,
-        ws = new worksheet(116),
+        ws = new worksheet(98),
 
         monday = date.clone(), saturday,
         month = date.getMonth(), weekday, i = 1;
@@ -57,30 +60,24 @@ function make_calendar_sheet() {
         landscape : true
     };
     ws['!cols'] = [
-        {wch:8}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25},
-        {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25},
-        {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25},
-        {wch:2.25},
-        {wch:0.5}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25},
-        {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25},
-        {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25},
-        {wch:2.25},
-        {wch:0.5}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25},
-        {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25},
-        {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25},
-        {wch:2.25},
-        {wch:0.5}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25},
-        {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25},
-        {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25},
-        {wch:2.25},
-        {wch:0.5}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25},
-        {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25},
-        {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25},
-        {wch:2.25},
-        {wch:0.5}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25},
-        {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25},
-        {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25}, {wch:2.25},
-        {wch:2.25},
+        {wch:8}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:0.5}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:0.5}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:0.5}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:0.5}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:0.5}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
         {wch: 6}];
     ws['!merges'] = [];
 
@@ -105,8 +102,8 @@ function make_calendar_sheet() {
 function make_week(ws, monday, saturday) {
     var children = meals.model.data,
         month = meals.model.report_date.getMonth(),
-        abc = 'ABC', ML = ['BR', 'MS', 'LU', 'AS', 'DI', 'ES'],
-        mls = ['breakfast','morning','lunch','afternoon','dinner','evening'],
+        abc = 'ABC', ML = ['BR', 'LU', 'AS', 'DI', 'ES'],
+        mls = ['breakfast', 'lunch', 'afternoon', 'dinner', 'evening'],
         dates = Array(6).fill(null).map(function (_, index) {
             if (index === 0) return monday;
             if (index === 5) return saturday;
@@ -114,12 +111,12 @@ function make_week(ws, monday, saturday) {
         }),
         data = Array(8).fill(null).map(function () {
             return dates.map(function (date) {
-                return Array(18).fill(date.getMonth() === month ? 0 : '');
+                return Array(15).fill(date.getMonth() === month ? 0 : '');
             });
         }),
         room_totals = Array(8).fill(0),
         day_totals = dates.map(function (date) {
-            return Array(18).fill(date.getMonth() === month ? 0 : '');
+            return Array(15).fill(date.getMonth() === month ? 0 : '');
         });
 
 
@@ -131,10 +128,10 @@ function make_week(ws, monday, saturday) {
         dates
             .map(function (date) {
                 if (date.getMonth() !== month) return [];
-                return child.meals[date.getDate()-1];
+                return child.meals[date.getMonth()*100 + date.getDate()];
             })
-            .forEach(function (meals, weekday) {
-                meals.forEach(function (meal) {
+            .forEach(function (_meals, weekday) {
+                _meals.forEach(function (meal) {
                     var column = mls.indexOf(meal)*3 + offset;
                     ++data[child.classroom][weekday][column];
                     ++room_totals[child.classroom];
@@ -148,35 +145,35 @@ function make_week(ws, monday, saturday) {
     for (var i = 0; i < 6; ++i) {
         // header
         ws['!merges'].push(
-            {s: {c : i*19 + 1, r : ws.rows}, e: {c : i*19 + 18, r : ws.rows}});
+            {s: {c : i*16 + 1, r : ws.rows}, e: {c : i*16 + 15, r : ws.rows}});
         if (dates[i].getMonth() === month)
-            cell(ws, i*19 + 1, ws.rows, dates[i].toLocaleDateString(),
+            cell(ws, i*16 + 1, ws.rows, dates[i].toLocaleDateString(),
                  common.excel.XF_8_C);
 
         // for each day's meals
-        for (var j = 0; j < 6; ++j) {
+        for (var j = 0; j < 5; ++j) {
             // header
             ws['!merges'].push(
-                {s : {c : i*19 + j*3 + 1, r : ws.rows+1},
-                 e : {c : i*19 + j*3 + 3, r : ws.rows+1}});
-            cell(ws, i*19 + j*3 + 1, ws.rows+1, ML[j], common.excel.XF_8_LT_C);
-            cell(ws, i*19 + j*3 + 2, ws.rows+1, '', common.excel.XF_8_T_C);
-            cell(ws, i*19 + j*3 + 3, ws.rows+1, '', common.excel.XF_8_RT_C);
+                {s : {c : i*16 + j*3 + 1, r : ws.rows+1},
+                 e : {c : i*16 + j*3 + 3, r : ws.rows+1}});
+            cell(ws, i*16 + j*3 + 1, ws.rows+1, ML[j], common.excel.XF_8_LT_C);
+            cell(ws, i*16 + j*3 + 2, ws.rows+1, '', common.excel.XF_8_T_C);
+            cell(ws, i*16 + j*3 + 3, ws.rows+1, '', common.excel.XF_8_RT_C);
 
             // for each day's meals' classifications
             for (var k = 0; k < 3; ++k) {
                 // header
-                cell(ws, i*19 + j*3 + 1 + k, ws.rows+2, 'ABC'[k],
+                cell(ws, i*16 + j*3 + 1 + k, ws.rows+2, 'ABC'[k],
                      common.excel['XF_8_' + ['LB', 'B', 'RB'][k] + '_C']);
 
                 // for each day's meals' classifications' rooms
                 for (var l = 0; l < 8; ++l)
-                    cell(ws, i*19 + j*3 + 1 + k, ws.rows+3+l,
+                    cell(ws, i*16 + j*3 + 1 + k, ws.rows+3+l,
                          data[l][i][j*3 + k],
                          common.excel['XF_8' + ['_L', '', '_R'][k] + '_R']);
 
                 // totals
-                cell(ws, i*19 + j*3 + 1 + k, ws.rows+11, day_totals[i][j*3 + k],
+                cell(ws, i*16 + j*3 + 1 + k, ws.rows+11, day_totals[i][j*3 + k],
                      common.excel.XF_B8_LRTB_R);
             }
         }
@@ -188,11 +185,11 @@ function make_week(ws, monday, saturday) {
     for (var i = 0; i < 8; ++i) {
         cell(ws, 0, ws.rows, meals.config['cat' + (i+1) + '_desc'],
              common.excel.XF_8_R);
-        cell(ws, 114, ws.rows++, room_totals[i], common.excel.XF_8_R);
+        cell(ws, 96, ws.rows++, room_totals[i], common.excel.XF_8_R);
     }
 
     cell(ws, 0, ws.rows, 'Total', common.excel.XF_B8_R);
-    cell(ws, 114, ws.rows++, room_totals.reduce(function (a, b) {return a + b}),
+    cell(ws, 96, ws.rows++, room_totals.reduce(function (a, b) {return a + b}),
          common.excel.XF_B8_R);
 
     ws.rows += 3;
@@ -201,10 +198,11 @@ function make_week(ws, monday, saturday) {
 
 
 function make_totals_sheet() {
-    var date = meals.model.report_date,
+    var date = meals.model.report_date.clone(),
         children = meals.model.data,
-        data = Array(25).fill(0), mtotals = Array(6).fill(0), totals,
-        ws = new worksheet(28);
+        data = Array(21).fill(0), mtotals = Array(5).fill(0), totals,
+        ws = new worksheet(24);
+    date.setMonth(date.getMonth() + 1, 0);  // last day of month
 
     // data is a 2d array [meal][day]
     data = data.map(function () {return Array(date.getDate()).fill(0)});
@@ -214,13 +212,16 @@ function make_totals_sheet() {
     children.forEach(function (child) {
         var offset =
             'ABC'.indexOf(child.classification || meals.config.default_class);
-        child.meals.forEach(function(meals, day) {
-            if (meals.length) ++data[data.length - 1][day];
-            meals.forEach(function (meal) {
+        for (var day in child.meals) {
+            if (Math.trunc(day/100) !== date.getMonth()) continue;
+            var _meals = child.meals[day];
+            day = day%100 - 1;
+            if (_meals.length) ++data[data.length - 1][day];
+            _meals.forEach(function (meal) {
                 ++data[index(meal) + offset][day];
                 ++data[index(meal) + 3][day];
             });
-        });
+        }
     });
     totals = data.map(function (column) {
         return column.reduce(function (a, b) {return a + b});
@@ -231,45 +232,43 @@ function make_totals_sheet() {
         margins : {left : 0.3, right : 0.3, top : 0.4, bottom : 0.4},
         landscape : true
     };
-    ws['!cols'] = [{wch:9}, {wch:6}, {wch:6}, {wch:6}, {wch:6},
-        {wch:4}, {wch:6}, {wch:6}, {wch:6}, {wch:4}, {wch:6},
-        {wch:6}, {wch:6}, {wch:4}, {wch:6}, {wch:6}, {wch:6},
-        {wch:4}, {wch:6}, {wch:6}, {wch:6}, {wch:4}, {wch:6},
-        {wch:6}, {wch:6}, {wch:4}, {wch:7}, {wch:7}];
+    ws['!cols'] = [{wch:9}, {wch:6}, {wch:6}, {wch:6}, {wch:6}, {wch:4},
+        {wch:6}, {wch:6}, {wch:6}, {wch:4}, {wch:6}, {wch:6}, {wch:6}, {wch:4},
+        {wch:6}, {wch:6}, {wch:6}, {wch:4}, {wch:6}, {wch:6}, {wch:6}, {wch:4},
+        {wch:7}, {wch:7}];
     ws['!merges'] = [
         {s : {c : 2, r : ws.rows}, e : {c : 4, r : ws.rows}},
         {s : {c : 6, r : ws.rows}, e : {c : 8, r : ws.rows}},
         {s : {c : 10, r : ws.rows}, e : {c : 12, r : ws.rows}},
         {s : {c : 14, r : ws.rows}, e : {c : 16, r : ws.rows}},
         {s : {c : 18, r : ws.rows}, e : {c : 20, r : ws.rows}},
-        {s : {c : 22, r : ws.rows}, e : {c : 24, r : ws.rows}},
         {s : {c : 0, r : ws.rows+1}, e : {c : 1, r : ws.rows+1}}];
 
-    for (var i = 0; i < 6; ++i) {
+    for (var i = 0; i < 5; ++i) {
         cell(ws, 4*i + 2, ws.rows, titles[i], common.excel.XF_8_LTB_C);
         cell(ws, 4*i + 3, ws.rows, '', common.excel.XF_8_TB_L);
         cell(ws, 4*i + 4, ws.rows, '', common.excel.XF_8_RTB_L);
     }
-    cell(ws, 26, ws.rows, 'Daily', common.excel.XF_8_LRT_C);
-    cell(ws, 27, ws.rows++, 'Labor', common.excel.XF_8_LRT_C);
+    cell(ws, 22, ws.rows, 'Daily', common.excel.XF_8_LRT_C);
+    cell(ws, 23, ws.rows++, 'Labor', common.excel.XF_8_LRT_C);
 
     cell(ws, 0, ws.rows, 'Date', common.excel.XF_8_LRTB_C);
     cell(ws, 1, ws.rows, '', common.excel.XF_8_LRTB_C);
-    for (var i = 2; i < 26; ++i)
+    for (var i = 2; i < 22; ++i)
         if (i%4 !== 1)
             cell(ws, i, ws.rows, "P FR"[i%4], common.excel.XF_8_LRTB_C);
-    cell(ws, 26, ws.rows, 'Att', common.excel.XF_8_LRB_C);
-    cell(ws, 27, ws.rows++, 'Days', common.excel.XF_8_LRB_C);
+    cell(ws, 22, ws.rows, 'Att', common.excel.XF_8_LRB_C);
+    cell(ws, 23, ws.rows++, 'Days', common.excel.XF_8_LRB_C);
 
     var i = 0, l = 0, d = date.clone(); d.setDate(1);
     for (; i < date.getDate(); ++i, ++ws.rows, d.inc()) {
         cell(ws, 0, ws.rows, weekday(d), common.excel.XF_8_L_L);
         cell(ws, 1, ws.rows, d.getDate(), common.excel.XF_8_R_R);
-        for (var j = 2; j < 27; ++j)
+        for (var j = 2; j < 23; ++j)
             cell(ws, j, ws.rows, data[j-2][i],
                  j % 4 === 1 ? common.excel.XF_8_R : common.excel.XF_8_LR_R);
-        if (d.getDay()) cell(ws, 27, ws.rows, ++l, common.excel.XF_8_LR_R);
-        else cell(ws, 27, ws.rows, '', common.excel.XF_8_LR_R);
+        if (d.getDay()) cell(ws, 23, ws.rows, ++l, common.excel.XF_8_LR_R);
+        else cell(ws, 23, ws.rows, '', common.excel.XF_8_LR_R);
     }
 
     ws['!merges'].push({s: {c: 0, r: ws.rows}, e: {c: 1, r: ws.rows}});
@@ -281,7 +280,7 @@ function make_totals_sheet() {
     cell(ws, 1, ws.rows, '', common.excel.XF_8_RTB_R);
     cell(ws, 1, ws.rows+1, '', common.excel.XF_8_RTB_R);
     cell(ws, 1, ws.rows+2, '', common.excel.XF_8_RTB_R);
-    for (var i = 2, total, rate, grand = 0; i < 26; ++i) {
+    for (var i = 2, total, rate, grand = 0; i < 22; ++i) {
         total = totals[i - 2]; rate = mealrate(i - 1);
         cell(ws, i, ws.rows, total, common.excel.XF_8_LRTB_R);
         if (i % 4 === 1) cell(ws, i, ws.rows+1, '', common.excel.XF_8_LRTB_R);
@@ -291,21 +290,21 @@ function make_totals_sheet() {
                   common.excel.XF_8_LRTB_R);
         if (i % 4 !== 1) grand += total * rate;
     }
-    cell(ws, 26, ws.rows, totals[24], common.excel.XF_8_LRTB_R);
-    cell(ws, 27, ws.rows++, l, common.excel.XF_8_LRTB_R);
-    cell(ws, 26, ws.rows, '', common.excel.XF_8_LRTB_C);
-    cell(ws, 27, ws.rows++, '', common.excel.XF_8_LRTB_C);
-    cell(ws, 26, ws.rows, dollars(grand), common.excel.XF_8_LRTB_R);
-    cell(ws, 27, ws.rows++, '', common.excel.XF_8_LRTB_C);
+    cell(ws, 22, ws.rows, totals[20], common.excel.XF_8_LRTB_R);
+    cell(ws, 23, ws.rows++, l, common.excel.XF_8_LRTB_R);
+    cell(ws, 22, ws.rows, '', common.excel.XF_8_LRTB_C);
+    cell(ws, 23, ws.rows++, '', common.excel.XF_8_LRTB_C);
+    cell(ws, 22, ws.rows, dollars(grand), common.excel.XF_8_LRTB_R);
+    cell(ws, 23, ws.rows++, '', common.excel.XF_8_LRTB_C);
 
     ++ws.rows;
 
-    ws['!merges'].push({s : {c : 24, r : ws.rows}, e : {c : 26, r : ws.rows}})
-    cell(ws, 24, ws.rows, 'Total', common.excel.XF_B8_R);
-    cell(ws, 27, ws.rows++, dollars(grand), common.excel.XF_8_R);
-    ws['!merges'].push({s : {c : 23, r : ws.rows}, e : {c : 26, r : ws.rows}})
-    cell(ws, 23, ws.rows, 'Average Daily Attendance', common.excel.XF_B8_R);
-    cell(ws, 27, ws.rows++, dollars(totals[totals.length - 1] / date.getDate()),
+    ws['!merges'].push({s : {c : 20, r : ws.rows}, e : {c : 22, r : ws.rows}})
+    cell(ws, 20, ws.rows, 'Total', common.excel.XF_B8_R);
+    cell(ws, 23, ws.rows++, dollars(grand), common.excel.XF_8_R);
+    ws['!merges'].push({s : {c : 19, r : ws.rows}, e : {c : 22, r : ws.rows}})
+    cell(ws, 19, ws.rows, 'Average Daily Attendance', common.excel.XF_B8_R);
+    cell(ws, 23, ws.rows++, dollars(totals[totals.length - 1] / date.getDate()),
          common.excel.XF_8_R);
 
 

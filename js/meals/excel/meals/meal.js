@@ -68,8 +68,8 @@ function make_week(monday, friday, meal, blank) {
             offset = abc.indexOf(cx);
         map[name] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]; map[name].cx = cx;
         if (!blank) dates.forEach(function (date, col) {
-            var meals = child.meals[date.getDate()-1];
-            if (date.getMonth() === month && meals && meals.indexOf(meal) >= 0)
+            var _meals = child.meals[date.getMonth()*100 + date.getDate()];
+            if (_meals && _meals.indexOf(meal) >= 0)
                 totals[col*3 + offset] += (map[name][col*3 + offset] = 1);
         });
     });
@@ -77,7 +77,6 @@ function make_week(monday, friday, meal, blank) {
 
     meal =
         meal === 'breakfast' ? 'Breakfast' :
-        meal === 'morning'   ? 'Morning Snack' :
         meal === 'lunch'     ? 'Lunch' :
         meal === 'afternoon' ? 'Afternoon Snack' :
         meal === 'dinner'    ? 'Supper' :

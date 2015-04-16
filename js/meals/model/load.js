@@ -151,7 +151,6 @@ function prioritize(list, abc) {
     var stack; abc = (abc || 'a').toLowerCase();
     if (list.length < 3) return list;
     stack = [{name : 'breakfast', rate : meals.config['br_' + abc + '_rate']},
-             {name : 'morning',   rate : meals.config['ms_' + abc + '_rate']},
              {name : 'lunch',     rate : meals.config['lu_' + abc + '_rate']},
              {name : 'afternoon', rate : meals.config['as_' + abc + '_rate']},
              {name : 'dinner',    rate : meals.config['di_' + abc + '_rate']},
@@ -171,35 +170,49 @@ function* process_data(initial) {
 
 
     var data = meals.model.data,
-        report_date = meals.model.report_date,
-        date = new Date(report_date.getTime()),
+        start_date = meals.model.report_date.clone(),
+        end_date = meals.model.report_date.clone(),
+        start_day, end_day,
         cfg = meals.config,
         _meals = [
             {start : cfg.br_start, end : cfg.br_end, name : 'breakfast'},
-            {start : cfg.ms_start, end : cfg.ms_end, name : 'morning'},
             {start : cfg.lu_start, end : cfg.lu_end, name : 'lunch'},
             {start : cfg.as_start, end : cfg.as_end, name : 'afternoon'},
             {start : cfg.di_start, end : cfg.di_end, name : 'dinner'},
             {start : cfg.es_start, end : cfg.es_end, name : 'evening'}
         ];
 
-    date.setDate(1);
-    date = date.getTime();
+    // set to monday of the first week that has days in the report month, or to
+    // the first of the month, whichever is earlier
+    start_date.setDate(1);
+    start_day = start_date.getDay();
+    start_date.setDate(2 + (start_day%6 ? -start_day : !!start_day));
+    if (start_date.getDate() < 10) start_date.setDate(1);
+    // set to saturday of the last week that has days in the report month, or to
+    // the last of the month, whichever is later
+    end_date.setHours(23, 59, 59);
+    end_day = end_date.getDay();
+    end_date.setDate(end_date.getDate() + 6 - end_day);
+    if (end_date.getDate() > 20) end_date.setMonth(end_date.getMonth() + 1, 0);
 
 
     try {
-        var ticks = 0, step = data.length / 100, days = report_date.getDate();
+        var ticks = 0, step = data.length / 100,
+            start = start_date.getTime(), end = end_date.getTime();
         for (var i = 0, length = data.length; i < length; ++i) {
             var child = data[i],
                 punches = yield meals.websql.punches.read(
-                    child.child_id, date, report_date.getTime()
+                    child.child_id, start, end
                 );
 
-            // store punches in a 2d array, day x punches
-            child.punches = new Array(days);
-            for (var j = 0; j < days; ++j) child.punches[j] = [];
+            // store punches in a 2d 'array', day x punches
+            child.punches = {};
+            for (var date = start_date.clone(); date <= end_date; date.inc()) {
+                child.punches[date.getMonth()*100 + date.getDate()] = [];
+            }
             for (var j = 0, len = punches.length; j < len; ++j) {
-                var day = (new Date(punches[j].time_in)).getDate() - 1;
+                var date = new Date(punches[j].time_in),
+                    day = date.getMonth()*100 + date.getDate();
                 child.punches[day] = child.punches[day] || [];
                 child.punches[day].push({
                     start : punches[j].time_in, end : punches[j].time_out
@@ -207,16 +220,20 @@ function* process_data(initial) {
             }
 
             // map 2d punches array to a 2d array of meals
-            child.meals = child.punches.map(function (punches) {
-                if (!punches || !punches.length) return [];
+            child.meals = {};
+            for (var day in child.punches) {
+                var punches = child.punches[day];
+                if (!punches || !punches.length) {
+                    child.meals[day] = [];
+                    continue;
+                }
                 punches = punches.map(function (punch) {return {
                     start : Math.round(punch.start / 60000) % 1440,
                     end : Math.round(punch.end / 60000) % 1440
                 }});
-                // this nifty algorithm takes two lists of ranges (in this case,
-                // punch- and meal-times) and yields a list of their overlapping
-                // ranges (in this case, those meals for which the child was
-                // present)
+                // take two lists of ranges (punch- and meal-times) and yield a
+                // list of their overlapping ranges (in this case, those meals
+                // for which the child was present)
                 var p = 1, m = 1,
                     punch = punches[0], meal = _meals[0],
                     result = {};
@@ -228,10 +245,11 @@ function* process_data(initial) {
                         meal = _meals[m++];
                     }
                 }
-                return prioritize(Object.keys(result), child.classification);
-            });
+                child.meals[day]
+                    = prioritize(Object.keys(result), child.classification);
+            }
 
-            child.age = get_age(new Date(child.dob), report_date);
+            child.age = get_age(new Date(child.dob), meals.model.report_date);
             child.classroom = 0 + (child.age >= 9) + (child.age >= 18)
                 + (child.age >= 27) + (child.age >= 36) + (child.age >= 48)
                 + (child.age >= 60) + (child.age >= 84);

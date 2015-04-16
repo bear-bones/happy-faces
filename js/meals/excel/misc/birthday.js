@@ -21,9 +21,10 @@ function generate() {
     ws['!merges'] = [{s : {c : 0, r : ws.rows}, e : {c : 2, r : ws.rows}}];
 
     cell(ws, 0, ws.rows,
-        'Birthday Report for ' +
-        (date.getMonth() + 1) + '/' + date.getFullYear(),
-        common.excel.XF_B10_C);
+        'Birthday Report for ' + (date.getMonth() + 1) + '/'
+            + date.getFullYear(),
+        common.excel.XF_B10_C
+    );
     ws.rows += 2;
 
     cell(ws, 0, ws.rows, 'Child Name', common.excel.XF_B10_TB_L);

@@ -7,16 +7,18 @@ var XLSX = require('xlsx'),
 
     worksheet = common.excel.worksheet,
     
-    titles = ['Breakfast','AM Snack','Lunch','PM Snack','Supper','EV Snack'];
+    titles = ['Breakfast','Lunch','PM Snack','Supper','EV Snack'];
 
 
 function index(meal) {return index.meals.indexOf(meal) * 3}
-index.meals = ['breakfast','morning','lunch','afternoon','dinner','evening'];
+index.meals = ['breakfast','lunch','afternoon','dinner','evening'];
 
 function generate() {
-    var file_name = meals.excel.file_name, date = meals.model.report_date,
+    var file_name = meals.excel.file_name,
+        date = meals.model.report_date.clone(),
         children = meals.model.data, data = Array(19).fill(0), totals,
         ws = new worksheet(20);
+    date.setMonth(date.getMonth() + 1, 0); // last day of month
 
     // data is a 2d array [meal][day]
     data = data.map(function () {return Array(date.getDate()).fill(0)});
@@ -26,10 +28,13 @@ function generate() {
     children.forEach(function (child) {
         var offset =
             'ABC'.indexOf(child.classification || meals.config.default_class);
-        child.meals.forEach(function(meals, day) {
-            if (meals.length) ++data[data.length - 1][day];
-            meals.forEach(function (meal) {++data[index(meal) + offset][day]});
-        });
+        for (var day in child.meals) {
+            if (Math.trunc(day/100) !== date.getMonth()) continue;
+            var _meals = child.meals[day];
+            day = day%100 - 1;
+            if (_meals.length) ++data[data.length - 1][day];
+            _meals.forEach(function (meal) {++data[index(meal) + offset][day]});
+        }
     });
     totals = data.map(function (column) {
         return column.reduce(function (a, b) {return a + b});
