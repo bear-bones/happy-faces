@@ -74,6 +74,7 @@ function make_sheet(type) {
         {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
         {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
         {wch:1.75}, {wch:1.75}, {wch:1.75}];
+    ws['!merges'] = [];
 
     switch (type) {
     case 'complete': case 'blank':
@@ -81,7 +82,7 @@ function make_sheet(type) {
         break;
     default:
         for (var i = 0; i < 8; ++i) write_section(
-            meals.config[(i+1) + 'desc'], month, dates,
+            meals.config['cat' + (i+1) + '_desc'], month, dates,
             children.filter(function (child) {return child.classroom === i}), ws
         );
     }
@@ -121,10 +122,10 @@ function write_section(type, month, dates, children, ws) {
     });
 
     // header for this chunk o' data
-    ws['!merges'] = [{s : {c : 0, r : ws.rows},
-                      e : {c : dates.length*15 + 2, r : ws.rows}},
-                     {s : {c : 0, r : ws.rows+1},
-                      e : {c : dates.length*15 + 2, r : ws.rows+1}}];
+    ws['!merges'].push({s : {c : 0, r : ws.rows},
+                        e : {c : dates.length*15 + 2, r : ws.rows}});
+    ws['!merges'].push({s : {c : 0, r : ws.rows+1},
+                        e : {c : dates.length*15 + 2, r : ws.rows+1}});
     cell(ws, 0, ws.rows++, 'Record of Meals and Supplements Served',
          common.excel.XF_8_C);
     cell(ws, 0, ws.rows++,
@@ -141,15 +142,12 @@ function write_section(type, month, dates, children, ws) {
             // for each day's meals' classifications
             for (var k = 0; k < 3; ++k) {
                 // for each day's meals' classifications' children
-                Object.keys(data).forEach(function (name, l) {
+                Object.keys(data).sort().forEach(function (name, l) {
                     var child = data[name];
                     // if child is at top of page, write headers
                     if (l === 0 || l === 67 || l === 136 || l === 205 ||
                         l === 274 || l === 373 || l === 412 || l === 481) {
                         if (j === 0 && k === 0) {
-                            log.debug(i,
-                                {s: {c : 3 + i*15, r : r(ws, l-1) + 1},
-                                 e: {c : 3 + i*15 + 14, r : r(ws, l-1) + 1}});
                             ws['!merges'].push(
                                 {s: {c : 3 + i*15, r : r(ws, l-1) + 1},
                                  e: {c : 3 + i*15 + 14, r : r(ws, l-1) + 1}});
@@ -195,7 +193,9 @@ function write_section(type, month, dates, children, ws) {
     cell(ws, 1, ws.rows, 'Total', common.excel.XF_B8_R);
 
     // pad out to end of page in case we have another section
-    ws.rows += 72 - ws.rows%72;
+    for (i = 0, length = 72 - (ws.rows%72); i < length; ++i, ++ws.rows)
+        for (j = 0; j < 78; ++j)
+            cell(ws, j, ws.rows + 1, '', xf.XF_8_C);
 }
 
 

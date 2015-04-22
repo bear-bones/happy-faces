@@ -1,63 +1,95 @@
 function get_report(report) {
     switch (report) {
+    // child birthdays
     case 'misc>birthday': return {
         name : 'birthday',
         generate : meals.excel.misc.birthday.generate};
+    // punches without clockout (TODO)
     case 'misc>no-clock-out': return {
         name : 'no-clock-out',
         generate : meals.excel.misc.no_clock_out.generate};
-    case 'meals>summary': return { //TODO
+    // monthly summary report
+    case 'meals>summary': return {
         name : 'monthly summary',
         generate : meals.excel.meals.summary.generate};
-    case 'meals>state': return { //TODO
+    // monthly state reimbursement report
+    case 'meals>state': return {
         name : 'monthly state',
         generate : meals.excel.meals.state.generate};
-    //case 'meals>blank>roll': return {
-    //    name : 'blank roll call by room',
-    //    generate : function () {meals.excel.meals.roll.generate(1)}};
+    // blank meals reports
     case 'meals>blank>saturday': return {
         name : 'blank saturday',
-        generate : function () {meals.excel.meals.saturday.generate(1)}};
+        generate : function () {meals.excel.meals.saturday.generate('blank')}};
     case 'meals>blank>breakfast': return {
         name : 'blank breakfast snack by week',
-        generate
-            : function () {meals.excel.meals.meal.generate(1, 'breakfast')}};
+        generate : function () {
+            meals.excel.meals.meal.generate('blank', 'breakfast')}};
     case 'meals>blank>lunch': return {
         name : 'blank lunch by week',
-        generate : function () {meals.excel.meals.meal.generate(1, 'lunch')}};
+        generate :
+            function () {meals.excel.meals.meal.generate('blank', 'lunch')}};
     case 'meals>blank>afternoon': return {
         name : 'blank afternoon snack by week',
-        generate
-            : function () {meals.excel.meals.meal.generate(1, 'afternoon')}};
+        generate : function () {
+            meals.excel.meals.meal.generate('blank', 'afternoon')}};
     case 'meals>blank>supper': return {
         name : 'blank supper by week',
-        generate : function () {meals.excel.meals.meal.generate(1, 'supper')}};
+        generate :
+            function () {meals.excel.meals.meal.generate('blank', 'supper')}};
     case 'meals>blank>evening': return {
         name : 'blank evening snack by week',
-        generate : function () {meals.excel.meals.meal.generate(1, 'evening')}};
-    //case 'meals>complete>roll': return {
-    //    name : 'roll call by room',
-    //    generate : meals.excel.meals.roll.generate};
+        generate :
+            function () {meals.excel.meals.meal.generate('blank', 'evening')}};
+    // completed meals reports (single table)
     case 'meals>complete>saturday': return {
         name : 'saturday',
-        generate : meals.excel.meals.saturday.generate};
+        generate :
+            function () {meals.excel.meals.saturday.generate('complete')}};
     case 'meals>complete>breakfast': return {
         name : 'breakfast by week',
-        generate
-            : function () {meals.excel.meals.meal.generate(0, 'breakfast')}};
+        generate : function () {
+            meals.excel.meals.meal.generate('complete', 'breakfast')}};
     case 'meals>complete>lunch': return {
         name : 'lunch by week',
-        generate : function () {meals.excel.meals.meal.generate(0, 'lunch')}};
+        generate : function () {
+            meals.excel.meals.meal.generate('complete', 'lunch')}};
     case 'meals>complete>afternoon': return {
         name : 'afternoon snack by week',
-        generate
-            : function () {meals.excel.meals.meal.generate(0, 'afternoon')}};
+        generate : function () {
+            meals.excel.meals.meal.generate('complete', 'afternoon')}};
     case 'meals>complete>supper': return {
         name : 'supper by week',
-        generate : function () {meals.excel.meals.meal.generate(0, 'supper')}};
+        generate : function () {
+            meals.excel.meals.meal.generate('complete', 'supper')}};
     case 'meals>complete>evening': return {
         name : 'evening snack by week',
-        generate : function () {meals.excel.meals.meal.generate(0, 'evening')}};
+        generate : function () {
+            meals.excel.meals.meal.generate('complete', 'evening')}};
+    // completed meals reports (tables by classroom)
+    case 'meals>classroom>saturday': return {
+        name : 'saturday',
+        generate :
+            function () {meals.excel.meals.saturday.generate('classroom')}};
+    case 'meals>classroom>breakfast': return {
+        name : 'breakfast by week',
+        generate : function () {
+            meals.excel.meals.meal.generate('classroom', 'breakfast')}};
+    case 'meals>classroom>lunch': return {
+        name : 'lunch by week',
+        generate : function () {
+            meals.excel.meals.meal.generate('classroom', 'lunch')}};
+    case 'meals>classroom>afternoon': return {
+        name : 'afternoon snack by week',
+        generate : function () {
+            meals.excel.meals.meal.generate('classroom', 'afternoon')}};
+    case 'meals>classroom>supper': return {
+        name : 'supper by week',
+        generate : function () {
+            meals.excel.meals.meal.generate('classroom', 'supper')}};
+    case 'meals>classroom>evening': return {
+        name : 'evening snack by week',
+        generate : function () {
+            meals.excel.meals.meal.generate('classroom', 'evening')}};
     case 'roll>blank>day': return {
         name : 'blank roll call (day)',
         generate : function () {meals.excel.roll.generate(1, 0, 'day')}};

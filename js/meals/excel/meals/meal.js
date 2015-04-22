@@ -1,5 +1,7 @@
 var XLSX = require('xlsx'),
 
+    ABC = 'ABC',
+
     cell = common.excel.functions.cell,
     cc = common.excel.functions.cc,
     sc = common.excel.functions.sc,
@@ -10,30 +12,26 @@ var XLSX = require('xlsx'),
     worksheet = common.excel.worksheet;
 
 
-function generate(blank, meal) {
+
+function pretty_meal(meal) {
+    if (meal === 'breakfast') return 'Breakfast';
+    if (meal === 'lunch')     return 'Lunch';
+    if (meal === 'afternoon') return 'Afternoon Snack';
+    if (meal === 'supper')    return 'Dinner';
+    if (meal === 'evening')   return 'Evening Snack';
+}
+
+
+
+function generate(type, meal) {
     var file_name = meals.excel.file_name,
-        date = meals.model.report_date,
-
-        names = [], sheets = {},
-        monday = date.clone(), friday,
-        month = date.getMonth(), weekday, i = 1;
-
-    // adjust things so that our range is the workweek containing the 1st
-    monday.setDate(1);
-    weekday = monday.getDay();
-    monday.setDate(2 + (!(weekday % 6) ? !!weekday : -weekday));
-    friday = monday.clone();
-    friday.inc(4);
-
-    // build sheets for each workweek that has at least one day in the month
-    while (monday.getMonth() === month || friday.getMonth() === month) {
-        names.push('Week ' + i);
-        sheets['Week ' + i++] = make_week(monday, friday, meal, blank);
-        monday.inc(7), friday.inc(7);
-    }
-
+        options = {};
+    
     try {
-        XLSX.writeFile({SheetNames : names, Sheets : sheets}, file_name);
+        options.SheetNames = [pretty_meal(meal)];
+        options.Sheets = {};
+        options.Sheets[pretty_meal(meal)] = make_sheet(type, meal);
+        XLSX.writeFile(options, file_name);
     } catch (error) {
         log.error(error);
         log.debug(error.stack);
@@ -44,145 +42,166 @@ function generate(blank, meal) {
 
 
 
-function make_week(monday, friday, meal, blank) {
+function make_sheet(type, meal) {
     var children = meals.model.data,
         month = meals.model.report_date.getMonth(),
-        abc = ['A', 'B', 'C'], dates = [0,0,0,0,0],
-        map = {}, totals = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-    if (meal === 'supper') meal = 'dinner';
+        monday = meals.model.report_date.clone(), friday, weekday,
+        dates = [];
 
-    // get the dates for each day of the week
-    dates = dates.map(function (date, index) {
-        if (index === 0) return monday;
-        if (index === 4) return friday;
-        date = monday.clone();
-        date.inc(index);
-        return date;
-    });
+    // get the monday and friday of the workweek containing the first
+    monday.setDate(1);
+    weekday = monday.getDay();
+    monday.setDate(2 + (!(weekday%6) ? !!weekday : -weekday));
+    friday = monday.clone();
+    friday.inc(4);
 
-    // filter the raw child meal data into a map of child->[a/b/c by day] and
-    // its totals
-    children.forEach(function (child, index) {
-        var name = child.name,
-            cx = child.classification || meals.config.default_class;
-            offset = abc.indexOf(cx);
-        map[name] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]; map[name].cx = cx;
-        if (!blank) dates.forEach(function (date, col) {
-            var _meals = child.meals[date.getMonth()*100 + date.getDate()];
-            if (_meals && _meals.indexOf(meal) >= 0)
-                totals[col*3 + offset] += (map[name][col*3 + offset] = 1);
-        });
-    });
+    // build a list of dates of each day in each workweek in the month
+    while (monday.getMonth() === month || friday.getMonth() === month) {
+        for (var i = 0; i < 5; ++i) dates.push(monday.clone().inc(i));
+        monday.inc(7), friday.inc(7);
+    }
 
-
-    meal =
-        meal === 'breakfast' ? 'Breakfast' :
-        meal === 'lunch'     ? 'Lunch' :
-        meal === 'afternoon' ? 'Afternoon Snack' :
-        meal === 'dinner'    ? 'Supper' :
-        meal === 'evening'   ? 'Evening Snack' : '';
-
-
-    var ws = new common.excel.worksheet(22);
+    // initialize worksheet
+    var ws = new common.excel.worksheet(78);
     ws['!page'] = {
         margins : {left : 0.4, right : 0.4, top : 0.4, bottom : 0.4},
         landscape : true
     };
-    ws['!cols'] = [{wch:3}, {wch:30}, {wch:5}, {wch:4.5}, {wch:4.5}, {wch:4.5},
-        {wch:3}, {wch:4.5}, {wch:4.5}, {wch:4.5}, {wch:3}, {wch:4.5}, {wch:4.5},
-        {wch:4.5}, {wch:3}, {wch:4.5}, {wch:4.5}, {wch:4.5}, {wch:3}, {wch:4.5},
-        {wch:4.5}, {wch:4.5}];
-    ws['!merges'] = [{s : {c : 0, r : ws.rows}, e : {c : 21, r : ws.rows}},
-        {s : {c : 0, r : ws.rows+1}, e : {c : 21, r : ws.rows+1}},
-        {s : {c : 3, r : ws.rows+2}, e : {c : 5, r : ws.rows+2}},
-        {s : {c : 7, r : ws.rows+2}, e : {c : 9, r : ws.rows+2}},
-        {s : {c : 11, r : ws.rows+2}, e : {c : 13, r : ws.rows+2}},
-        {s : {c : 15, r : ws.rows+2}, e : {c : 17, r : ws.rows+2}},
-        {s : {c : 19, r : ws.rows+2}, e : {c : 21, r : ws.rows+2}},
-        {s : {c : 3, r : ws.rows+3}, e : {c : 5, r : ws.rows+3}},
-        {s : {c : 7, r : ws.rows+3}, e : {c : 9, r : ws.rows+3}},
-        {s : {c : 11, r : ws.rows+3}, e : {c : 13, r : ws.rows+3}},
-        {s : {c : 15, r : ws.rows+3}, e : {c : 17, r : ws.rows+3}},
-        {s : {c : 19, r : ws.rows+3}, e : {c : 21, r : ws.rows+3}}];
+    ws['!cols'] = [
+        {wch:2}, {wch:20}, {wch:3},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75}, {wch:1.75},
+        {wch:1.75}, {wch:1.75}, {wch:1.75}];
+    ws['!merges'] = [];
 
-    cell(ws, 0, ws.rows++, 'Record of Meals and Supplements Served',
-         common.excel.XF_C);
-    cell(ws, 0, ws.rows++,
-         meal + ' ' + monday.toLocaleDateString() + '-' +
-         friday.toLocaleDateString(), common.excel.XF_C);
-    
-    dates.forEach(function (date, col) {
-        col = col*4 + 3;
-        cell(ws, col, ws.rows, date.toLocaleDateString(),
-             common.excel.XF_ltb_C);
-        cell(ws, col+1, ws.rows, '', common.excel.XF_tb_C);
-        cell(ws, col+2, ws.rows, '', common.excel.XF_rtb_C);
-        cell(ws, col, ws.rows+1, meal, common.excel.XF_ltb_C);
-        cell(ws, col+1, ws.rows+1, '', common.excel.XF_tb_C);
-        cell(ws, col+2, ws.rows+1, '', common.excel.XF_rtb_C);
-    });
-    ws.rows +=2;
-
-    cell(ws, 1, ws.rows, 'Last, First', common.excel.XF_lrtb_L);
-    cell(ws, 2, ws.rows, 'Code', common.excel.XF_lrtb_C);
-    cell(ws, 3, ws.rows, 'A', common.excel.XF_lrtb_C);
-    cell(ws, 4, ws.rows, 'B', common.excel.XF_lrtb_C);
-    cell(ws, 5, ws.rows, 'C', common.excel.XF_lrtb_C);
-    cell(ws, 7, ws.rows, 'A', common.excel.XF_lrtb_C);
-    cell(ws, 8, ws.rows, 'B', common.excel.XF_lrtb_C);
-    cell(ws, 9, ws.rows, 'C', common.excel.XF_lrtb_C);
-    cell(ws, 11, ws.rows, 'A', common.excel.XF_lrtb_C);
-    cell(ws, 12, ws.rows, 'B', common.excel.XF_lrtb_C);
-    cell(ws, 13, ws.rows, 'C', common.excel.XF_lrtb_C);
-    cell(ws, 15, ws.rows, 'A', common.excel.XF_lrtb_C);
-    cell(ws, 16, ws.rows, 'B', common.excel.XF_lrtb_C);
-    cell(ws, 17, ws.rows, 'C', common.excel.XF_lrtb_C);
-    cell(ws, 19, ws.rows, 'A', common.excel.XF_lrtb_C);
-    cell(ws, 20, ws.rows, 'B', common.excel.XF_lrtb_C);
-    cell(ws, 21, ws.rows, 'C', common.excel.XF_lrtb_C);
-    ++ws.rows;
-
-    Object.keys(map).sort().forEach(function (name, i) {
-        child = map[name];
-        cell(ws, 0, ws.rows, i + 1, common.excel.XF_C);
-        cell(ws, 1, ws.rows, name, common.excel.XF_lrtb_L);
-        cell(ws, 2, ws.rows, child.cx || meals.config.default_class,
-             common.excel.XF_lrtb_C);
-        for (var j = 1, k = 0; j <= 15; ++j, ++k) {
-            cell(ws, 3 + k, ws.rows, child[j-1] || '', common.excel.XF_lrtb_C);
-            if (j % 3 === 0 && j < 15)
-                cell(ws, 3 + ++k, ws.rows, i + 1, common.excel.XF_C);
-        }
-        ++ws.rows;
-    });
-
-    ++ws.rows;
-    cell(ws, 3, ws.rows, 'A', common.excel.XF_lrtb_C);
-    cell(ws, 4, ws.rows, 'B', common.excel.XF_lrtb_C);
-    cell(ws, 5, ws.rows, 'C', common.excel.XF_lrtb_C);
-    cell(ws, 7, ws.rows, 'A', common.excel.XF_lrtb_C);
-    cell(ws, 8, ws.rows, 'B', common.excel.XF_lrtb_C);
-    cell(ws, 9, ws.rows, 'C', common.excel.XF_lrtb_C);
-    cell(ws, 11, ws.rows, 'A', common.excel.XF_lrtb_C);
-    cell(ws, 12, ws.rows, 'B', common.excel.XF_lrtb_C);
-    cell(ws, 13, ws.rows, 'C', common.excel.XF_lrtb_C);
-    cell(ws, 15, ws.rows, 'A', common.excel.XF_lrtb_C);
-    cell(ws, 16, ws.rows, 'B', common.excel.XF_lrtb_C);
-    cell(ws, 17, ws.rows, 'C', common.excel.XF_lrtb_C);
-    cell(ws, 19, ws.rows, 'A', common.excel.XF_lrtb_C);
-    cell(ws, 20, ws.rows, 'B', common.excel.XF_lrtb_C);
-    cell(ws, 21, ws.rows, 'C', common.excel.XF_lrtb_C);
-
-    ++ws.rows;
-    cell(ws, 1, ws.rows, 'Total', common.excel.XF_lrtb_L);
-    cell(ws, 2, ws.rows, '', common.excel.XF_lrtb_C);
-    for (var j = 1, k = 0; j <= 15; ++j, ++k) {
-        cell(ws, 3 + k, ws.rows, totals[j-1] || '', common.excel.XF_lrtb_C);
-        if (j % 3 === 0) ++k;
+    switch (type) {
+    case 'complete': case 'blank':
+        write_section(type, meal, month, dates, children, ws);
+        break;
+    default:
+        for (var i = 0; i < 8; ++i) write_section(
+            meals.config['cat' + (i+1) + '_desc'], meal, month, dates,
+            children.filter(function (child) {return child.classroom === i}), ws
+        );
     }
 
-
     return ws.export();
+}
+
+
+
+var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+              'August', 'September', 'October', 'November', 'December'];
+function write_section(type, meal, month, dates, children, ws) {
+    var data = {}, day_totals = Array(75).fill(0);
+
+    // filter the raw child meal data into a map of child->[a/b/c by day] and
+    // his totals
+    children.forEach(function (child, index) {
+        var name = child.name,
+            cx = child.classification || meals.config.default_class;
+            offset = ABC.indexOf(cx);
+        data[name] = Array(75).fill(0);
+        data[name].cx = cx;
+        dates.forEach(function (date, i) {
+            var key = date.getMonth()*100 + date.getDate();
+            if (child.meals[key].indexOf(meal) >= 0) {
+                ++data[name][i*3 + offset];
+                ++day_totals[i*3 + offset];
+            }
+        });
+    });
+
+    // header for this chunk o' data
+    ws['!merges'].push({s : {c : 0, r : ws.rows},
+                        e : {c : dates.length*3 + 2, r : ws.rows}});
+    ws['!merges'].push({s : {c : 0, r : ws.rows+1},
+                        e : {c : dates.length*3 + 2, r : ws.rows+1}});
+    cell(ws, 0, ws.rows++, 'Record of Meals and Supplements Served',
+         common.excel.XF_8_C);
+    cell(ws, 0, ws.rows++,
+         pretty_meal(meal) +
+         (type === 'complete' || type === 'blank' ? '' : ' for ' + type) +
+         ' for ' + months[month] + ' ' + dates[7].getFullYear(),
+         common.excel.XF_8_C);
+
+    // for each day
+    var xf = common.excel;
+    for (var i = 0, length = dates.length; i < length; ++i) {
+        gray = i % 5 ? '' : 'GRAY_';
+        // for each day's meals' classifications
+        for (var j = 0; j < 3; ++j) {
+            // for each day's meals' classifications' children
+            Object.keys(data).sort().forEach(function (name, k) {
+                var child = data[name];
+                // if child is at top of page, write headers
+                if (k === 0 || k === 68 || k === 138 || k === 208 ||
+                    k === 278 || k === 378 || k === 418 || k === 488) {
+                    if (j === 0) {
+                        ws['!merges'].push(
+                            {s : {c : 3 + i*3, r : r(ws, k-1) + 1},
+                             e : {c : 3 + i*3 + 2, r : r(ws, k-1)+1}}
+                        );
+                        cell(ws, 3 + i*3, r(ws, k-1) + 1, 
+                             (dates[i].getMonth()+1) + '/' + dates[i].getDate(),
+                             xf['XF_8_' + gray + 'LT_C']);
+                        cell(ws, 3 + i*3 + 1, r(ws, k-1) + 1, '',
+                             xf['XF_8_' + gray + 'T_C']);
+                        cell(ws, 3 + i*3 + 2, r(ws, k-1) + 1, '',
+                             xf['XF_8_' + gray + 'RT_C']);
+                    }
+                    cell(ws, 3 + i*3 + j, r(ws, k-1) + 2, ABC[j],
+                         xf['XF_8_' + gray + ['L', '', 'R'][j] + 'tB_C']);
+                }
+                // first time through write the row labels
+                if (i === 0 && j === 0) {
+                    cell(ws, 0, r(ws, k), k + 1, xf.XF_8_R);
+                    cell(ws, 1, r(ws, k), name, xf.XF_8_L);
+                    cell(ws, 2, r(ws, k), child.cx, xf.XF_8_C);
+                }
+                cell(ws, 3 + i*3 + j, r(ws, k),
+                     type !== 'blank' && child[i*3 + j] || '',
+                     xf['XF_8_' + gray + ['L', '', 'R'][j] + 'b_C']);
+            });
+            // totals
+            cell(ws, 3 + i*3 + j, r(ws, Object.keys(data).length),
+                 type === 'blank' ? '' : day_totals[i*3 + j],
+                 xf['XF_B8_' + gray + 'LRTB_R']);
+        }
+    }
+    
+    ws.rows = r(ws, Object.keys(data).length);
+    cell(ws, 1, ws.rows, 'Total', common.excel.XF_B8_R);
+
+    // pad out to end of page in case we have another section
+    for (i = 0, length = 72 - (ws.rows%72); i < length; ++i, ++ws.rows)
+        for (j = 0; j < 78; ++j)
+            cell(ws, j, ws.rows + 1, '', xf.XF_8_C);
+}
+
+
+
+function r(ws, row) {
+    if (row < 0)   return row + ws.rows;
+    if (row < 68)  return row + ws.rows + 2;
+    if (row < 138) return row + ws.rows + 4;
+    if (row < 208) return row + ws.rows + 6;
+    if (row < 278) return row + ws.rows + 8;
+    if (row < 378) return row + ws.rows + 10;
+    if (row < 418) return row + ws.rows + 12;
+    if (row < 488) return row + ws.rows + 14;
 }
 
 

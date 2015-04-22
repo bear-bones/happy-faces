@@ -26,7 +26,6 @@ function init() {
         item(menu, 'Monthly State', 'meals>state');
         item(menu, '', 'separator');
         item(menu, 'Blank', (function (menu) {
-            //item(menu, 'Roll Call by Classroom', 'meals>blank>roll');
             item(menu, 'Saturday by Week', 'meals>blank>saturday');
             item(menu, 'Breakfast by Week', 'meals>blank>breakfast');
             item(menu, 'Lunch by Week', 'meals>blank>lunch');
@@ -36,13 +35,21 @@ function init() {
             return menu;
         })(new gui.Menu()));
         item(menu, 'Complete', (function (menu) {
-            //item(menu, 'Roll Call by Classroom', 'meals>complete>roll');
             item(menu, 'Saturday by Week', 'meals>complete>saturday');
             item(menu, 'Breakfast by Week', 'meals>complete>breakfast');
             item(menu, 'Lunch by Week', 'meals>complete>lunch');
             item(menu, 'Afternoon Snack by Week', 'meals>complete>afternoon');
             item(menu, 'Supper by Week', 'meals>complete>supper');
             item(menu, 'Evening Snack by Week', 'meals>complete>evening');
+            return menu;
+        })(new gui.Menu()));
+        item(menu, 'By Classroom', (function (menu) {
+            item(menu, 'Saturday by Week', 'meals>classroom>saturday');
+            item(menu, 'Breakfast by Week', 'meals>classroom>breakfast');
+            item(menu, 'Lunch by Week', 'meals>classroom>lunch');
+            item(menu, 'Afternoon Snack by Week', 'meals>classroom>afternoon');
+            item(menu, 'Supper by Week', 'meals>classroom>supper');
+            item(menu, 'Evening Snack by Week', 'meals>classroom>evening');
             return menu;
         })(new gui.Menu()));
         return menu;

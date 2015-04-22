@@ -70,8 +70,7 @@ function make_roll_sheet(start, end, blank) {
     // build the sheet
     for (; start <= end; start.inc())
         if (start.getDay())
-            for (var room = 1, name, ws; room <= 8; ++room)
-                make_roll_page(ws, start, room, blank);
+            for (var i = 1; i <= 8; ++i) make_roll_page(ws, start, i, blank);
 
     return ws.export();
 }
