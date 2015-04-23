@@ -1,0 +1,124 @@
+<html><head><title></title><script>
+var sizes = ['10', '8'],  // 10 comes first because first font is default
+    patterns = ['none', 'gray125'],
+    widths = ['', 'thin', 'medium'],
+    cwidths = [s => '', s => s, s => s.toUpperCase()],
+    fonts = [], fills = [], borders = [],
+    cfonts = [], cfills = [], cborders = [], caligns = ['L', 'C', 'R'],
+    fontcount = 0, fillcount = 0, bordercount = 0, aligncount = 3;
+
+var a;
+function e(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+a = function a(c,s) {c&&fonts.push(e(s||c));return a};
+for (var size = 0; size < 2; ++size) {
+  for (var bold = 0; bold < 2; ++bold) {
+    ++fontcount;
+    a("'<font>");
+      a(bold, '<b val="true"/>');
+      a('<sz val="')(sizes[size])('"/>');
+      a('<name val="Arial"/>')('<family val="2"/>');
+    a("</font>',");
+    cfonts.push((bold ? 'B' : '') + sizes[size]);
+  }
+}
+
+a = function a(c,s) {c&&fills.push(e(s||c));return a};
+for (var background = 0; background < 2; ++background) {
+  ++fillcount;
+  a("'<fill>");
+    a('<patternFill patternType="')(patterns[background])('"/>');
+  a("</fill>',");
+  cfills.push(background ? 'GRAY' : '');
+}
+
+a = function a(c,s) {c&&borders.push(e(s||c));return a};
+for (var left = 0; left < 3; ++left) {
+  for (var right = 0; right < 3; ++right) {
+    for (var _top = 0; _top < 3; ++_top) {
+      for (var bottom = 0; bottom < 3; ++bottom) {
+        ++bordercount;
+        a("'<border>");
+          a('<left')(left, ' style="')(widths[left])(left, '"')('/>');
+          a('<right')(right, ' style="')(widths[right])(right, '"')('/>');
+          a('<top')(_top, ' style="')(widths[_top])(_top, '"')('/>');
+          a('<bottom')(bottom, ' style="')(widths[bottom])(bottom, '"')('/>');
+          a('<diagonal/>');
+        a("</border>',");
+        cborders.push(
+          cwidths[left]('l') + cwidths[right]('r') + cwidths[_top]('t') +
+          cwidths[bottom]('b')
+        );
+      }
+    }
+  }
+}
+
+document.writeln('<pre>');
+  document.writeln(e("'<fonts count=\"" + fontcount + "\">',"));
+    for (var i=0, item, line=['  ']; i<fonts.length; ++i) {
+      line.push(item = fonts[i]);
+      if (item === "&lt;/font&gt;',") {
+        document.writeln(line.join(''));
+        line = ['  '];
+      }
+    }
+  document.writeln(e("'</fonts>'"));
+  document.writeln(e("'<fills count=\"" + fillcount + "\">',"));
+    for (var i=0, item, line=['  ']; i<fills.length; ++i) {
+      line.push(item = fills[i]);
+      if (item === "&lt;/fill&gt;',") {
+        document.writeln(line.join(''));
+        line = ['  '];
+      }
+    }
+  document.writeln(e("'</fills>'"));
+  document.writeln(e("'<borders count=\"" + bordercount + "\">',"));
+    for (var i=0, item, line=['  ']; i<borders.length; ++i) {
+      line.push(item = borders[i]);
+      if (item === "&lt;/border&gt;',") {
+        document.writeln(line.join(''));
+        line = ['  '];
+      }
+    }
+  document.writeln(e("'</borders>'"));
+  var constants = [];
+  for (var i = 0; i < fontcount; ++i) {
+    for (var j = 0; j < fillcount; ++j) {
+      for (var k = 0; k < bordercount; ++k) {
+        for (var l = 0; l < aligncount; ++l) {
+          constants.push(
+            'XF_' + cfonts[i] + '_' +
+            cfills[j] + (cfills[j] && cborders[k] && '_') +
+            cborders[k] + ((cfills[j] || cborders[k]) && '_') + caligns[l]
+          );
+        }
+      }
+    }
+  }
+  var xfid = 0;
+  document.writeln(e("'<cellXfs count=\"" + constants.length + "\">',"));
+  for (var i = 0; i < fontcount; ++i) {
+    for (var j = 0; j < fillcount; ++j) {
+      for (var k = 0; k < bordercount; ++k) {
+        for (var l = 0; l < aligncount; ++l) {
+          document.writeln(e(
+            "  '<xf numFmtId=\"0\" fontId=\"" + i + '" fillId="' + j +
+            '" borderId="' + k + '" xfId="' + xfid++ + '"' + (l
+              ? '><alignment horizontal="'+(l==1?'center':'right')+"\"/></xf>',"
+              : "/>',"
+            )
+          ));
+        }
+      }
+    }
+  }
+  document.writeln(e("'</cellXfs>'"));
+  document.writeln();
+  for (var i = 0, length = constants.length; i < length; ++i) {
+    document.writeln(constants[i] + ' = ' + i + ';');
+  }
+document.writeln('</pre>');
+</script></head><body></body></html>
