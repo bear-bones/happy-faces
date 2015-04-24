@@ -13,25 +13,14 @@ var XLSX = require('xlsx'),
 
 function generate() {
     var file_name = meals.excel.file_name,
-        children = meals.model.data,
+        punches = meals.model.no_punch_out,
         config = meals.model.config,
         date = meals.model.report_date;
 
-    var ws = new common.excel.worksheet(2),
-        punches = [];
+    var ws = new common.excel.worksheet(2);
     ws['!cols'] = [{wch:40}, {wch:20}];
     ws['!merges'] = [{s : {c : 0, r : ws.rows}, e : {c : 1, r : ws.rows}}];
 
-    children.forEach(function (child) {
-        child.punches.forEach(function (punch) {
-            var time_in = punch.time_in && new Date(punch.time_in);
-            if (!punch.time_out && time_in &&
-                time_in.getMonth() === date.getMonth() &&
-                time_in.getFullYear() === date.getFullYear()
-            ) punches.push({
-                name : child.name, date : time_in.toLocaleDateString()});
-        });
-    });
 
     cell(ws, 0, ws.rows,
         'No Clock Out Report for ' +
@@ -40,12 +29,12 @@ function generate() {
     ws.rows += 2;
 
     cell(ws, 0, ws.rows, 'Name', common.excel.XF_B10_TB_L);
-    cell(ws, 1, ws.rows, 'Date', common.excel.XF_B10_TB_L);
+    cell(ws, 1, ws.rows, 'Punch In', common.excel.XF_B10_TB_L);
     ++ws.rows;
 
     punches.forEach(function (punch) {
         cell(ws, 0, ws.rows, punch.name);
-        cell(ws, 1, ws.rows, punch.date);
+        cell(ws, 1, ws.rows, (new Date(punch.time_in)).toLocaleString());
         ++ws.rows;
     });
 

@@ -31,8 +31,9 @@ function getHHMMam(timestamp) {
 }
 
 // round to hundredths
-function round(num) {
-    return Math.round(num * 100) / 100;
+function round(num, prec) {
+    prec = prec || 100;
+    return Math.round(num * prec) / prec;
 }
 // get string representation with exactly two decimal digits
 function dollars(num) {
@@ -1635,7 +1636,7 @@ module.exports.XF_B8_lrtB_R = 1583;
 module.exports.XF_B8_lrT_L = 1584;
 module.exports.XF_B8_lrT_C = 1585;
 module.exports.XF_B8_lrT_R = 1586;
-module.exports.XF_B8_lrTb_L = 15.5;
+module.exports.XF_B8_lrTb_L = 1587;
 module.exports.XF_B8_lrTb_C = 1588;
 module.exports.XF_B8_lrTb_R = 1589;
 module.exports.XF_B8_lrTB_L = 1590;

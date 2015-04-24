@@ -89,6 +89,7 @@ function* read_ccm() {
         log.debug(error.stack);
         throw new meals.model_error('Error reading child information');
     }
+    meals.model.no_punch_out = [];
     meals.model.data = children.map(function (child) {
         var result = {
             child_id : child.childkey,
@@ -201,9 +202,14 @@ function* process_data(initial) {
             start = start_date.getTime(), end = end_date.getTime();
         for (var i = 0, length = data.length; i < length; ++i) {
             var child = data[i],
-                punches = yield meals.websql.punches.read(
+                punches = (yield meals.websql.punches.read(
                     child.child_id, start, end
-                );
+                )).filter(function (punch) {
+                    if (!punch.time_out) meals.model.no_punch_out.push({
+                        name: child.name, time_in: punch.time_in
+                    });
+                    else return true;
+                });
 
             // store punches in a 2d 'array', day x punches
             child.punches = {};

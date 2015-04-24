@@ -90,33 +90,31 @@ function get_report(report) {
         name : 'evening snack by week',
         generate : function () {
             meals.excel.meals.meal.generate('classroom', 'evening')}};
+    case 'roll>classroom': return {
+        name : 'roll call by classroom (day)',
+        generate : function () {meals.excel.roll.classroom.generate()}};
     case 'roll>blank>day': return {
         name : 'blank roll call (day)',
-        generate : function () {meals.excel.roll.generate(1, 0, 'day')}};
+        generate : function () {meals.excel.roll.common.generate(1, 0, 'day')}};
     case 'roll>blank>week': return {
         name : 'blank roll call (week)',
-        generate : function () {meals.excel.roll.generate(1, 0, 'week')}};
+        generate : function () {
+            meals.excel.roll.common.generate(1, 0, 'week')}};
     case 'roll>blank>month': return {
         name : 'blank roll call (month)',
-        generate : function () {meals.excel.roll.generate(1, 0, 'month')}};
+        generate : function () {
+            meals.excel.roll.common.generate(1, 0, 'month')}};
     case 'roll>complete>day': return {
         name : 'roll call (day)',
-        generate : function () {meals.excel.roll.generate(0, 0, 'day')}};
+        generate : function () {meals.excel.roll.common.generate(0, 0, 'day')}};
     case 'roll>complete>week': return {
         name : 'roll call (week)',
-        generate : function () {meals.excel.roll.generate(0, 0, 'week')}};
+        generate : function () {
+            meals.excel.roll.common.generate(0, 0, 'week')}};
     case 'roll>complete>month': return {
         name : 'roll call (month)',
-        generate : function () {meals.excel.roll.generate(0, 0, 'month')}};
-    //case 'roll>supper>day': return {
-    //    name : 'supper roll call (day)',
-    //    generate : function () {meals.excel.roll.generate(0, 1, 'day')}};
-    //case 'roll>supper>week': return {
-    //    name : 'supper roll call (week)',
-    //    generate : function () {meals.excel.roll.generate(0, 1, 'week')}};
-    //case 'roll>supper>month': return {
-    //    name : 'supper roll call (month)',
-    //    generate : function () {meals.excel.roll.generate(0, 1, 'month')}};
+        generate : function () {
+            meals.excel.roll.common.generate(0, 0, 'month')}};
     };
 }
 

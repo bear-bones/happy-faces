@@ -56,6 +56,8 @@ function init() {
     })(new gui.Menu()));
 
     item(menu, 'Roll Call', (function (menu) {
+        item(menu, 'Hours by Classroom', 'roll>classroom');
+        item(menu, '', 'separator');
         item(menu, 'Blank', (function (menu) {
             item(menu, 'Day', 'roll>blank>day');
             item(menu, 'Week', 'roll>blank>week');

@@ -57,7 +57,7 @@ function read(child_id, time_in, time_out) {
         }
 
         if (time_out !== undefined) {
-            sql += ' AND time_out <= ?';
+            sql += ' AND (time_out IS NULL OR time_out <= ?)';
             values.push(time_out);
         }
     }
