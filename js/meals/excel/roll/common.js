@@ -32,7 +32,6 @@ function generate(blank, supper, period) {
         end.setMonth(end.getMonth() + 1, 0); // last day of the month
         break;
     }
-    console.log(period, ':', start, ':', end);
 
     try {
         XLSX.writeFile({
@@ -54,9 +53,6 @@ function generate(blank, supper, period) {
 
 function make_roll_sheet(start, end, blank) {
     var ws = new common.excel.worksheet(16);
-
-    console.log(start);
-    console.log(end);
 
     ws['!page'] = {
         margins : {left : 0.3, right : 0.3, top : 0.4, bottom : 0.4},

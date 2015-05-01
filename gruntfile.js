@@ -27,7 +27,8 @@ module.exports = function (grunt) {
                     src : [
                         'meals.html', 'css/**', 'img/**', 'js/common/**',
                         'js/meals/**', 'license/*', 'bower_components/**',
-                        'node_modules/log/**'
+                        'node_modules/log/**', 'node_modules/mssql/**',
+                        'node_modules/xlsx/**'
                     ], dest : 'build/meals/'
                 }, {
                     src : ['meals-package.json'],
@@ -47,7 +48,8 @@ module.exports = function (grunt) {
                     src : [
                         'title-xx.html', 'css/**', 'img/**', 'js/common/**',
                         'js/title-xx/**', 'license/*', 'bower_components/**',
-                        'node_modules/log/**'
+                        'node_modules/log/**', 'node_modules/mssql/**',
+                        'node_modules/tedious/**', 'node_modules/xlsx/**'
                     ], dest : 'build/title-xx/'
                 }, {
                     src : ['title-xx-package.json'],

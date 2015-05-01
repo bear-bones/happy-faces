@@ -25,31 +25,27 @@ function init() {
         item(menu, 'Monthly Summary', 'meals>summary');
         item(menu, 'Monthly State', 'meals>state');
         item(menu, '', 'separator');
+        item(menu, 'Saturdays by Classroom', 'meals>saturdays');
+        item(menu, 'Weekdays by Classroom', 'meals>weekdays');
+        item(menu, '', 'separator');
         item(menu, 'Blank', (function (menu) {
-            item(menu, 'Saturday by Week', 'meals>blank>saturday');
-            item(menu, 'Breakfast by Week', 'meals>blank>breakfast');
-            item(menu, 'Lunch by Week', 'meals>blank>lunch');
-            item(menu, 'Afternoon Snack by Week', 'meals>blank>afternoon');
-            item(menu, 'Supper by Week', 'meals>blank>supper');
-            item(menu, 'Evening Snack by Week', 'meals>blank>evening');
+            item(menu, 'Saturday', 'meals>blank>saturday');
+            item(menu, '', 'separator');
+            item(menu, 'Breakfast', 'meals>blank>breakfast');
+            item(menu, 'Lunch', 'meals>blank>lunch');
+            item(menu, 'Afternoon Snack', 'meals>blank>afternoon');
+            item(menu, 'Supper', 'meals>blank>supper');
+            item(menu, 'Evening Snack', 'meals>blank>evening');
             return menu;
         })(new gui.Menu()));
         item(menu, 'Complete', (function (menu) {
-            item(menu, 'Saturday by Week', 'meals>complete>saturday');
-            item(menu, 'Breakfast by Week', 'meals>complete>breakfast');
-            item(menu, 'Lunch by Week', 'meals>complete>lunch');
-            item(menu, 'Afternoon Snack by Week', 'meals>complete>afternoon');
-            item(menu, 'Supper by Week', 'meals>complete>supper');
-            item(menu, 'Evening Snack by Week', 'meals>complete>evening');
-            return menu;
-        })(new gui.Menu()));
-        item(menu, 'By Classroom', (function (menu) {
-            item(menu, 'Saturday by Week', 'meals>classroom>saturday');
-            item(menu, 'Breakfast by Week', 'meals>classroom>breakfast');
-            item(menu, 'Lunch by Week', 'meals>classroom>lunch');
-            item(menu, 'Afternoon Snack by Week', 'meals>classroom>afternoon');
-            item(menu, 'Supper by Week', 'meals>classroom>supper');
-            item(menu, 'Evening Snack by Week', 'meals>classroom>evening');
+            item(menu, 'Saturday', 'meals>complete>saturday');
+            item(menu, '', 'separator');
+            item(menu, 'Breakfast', 'meals>complete>breakfast');
+            item(menu, 'Lunch', 'meals>complete>lunch');
+            item(menu, 'Afternoon Snack', 'meals>complete>afternoon');
+            item(menu, 'Supper', 'meals>complete>supper');
+            item(menu, 'Evening Snack', 'meals>complete>evening');
             return menu;
         })(new gui.Menu()));
         return menu;
