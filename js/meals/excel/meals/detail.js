@@ -49,6 +49,8 @@ function generate(saturday) {
 
 
 
+var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+              'August', 'September', 'October', 'November', 'December'];
 function make_sheet(dates, saturday) {
     var ws = new excel.worksheet(32),
         totals = {
@@ -77,7 +79,12 @@ function make_sheet(dates, saturday) {
             {s : {c : 0, r : ws.rows}, e : {c : 31, r : ws.rows}});
         ws['!merges'].push(
             {s : {c : 0, r : ws.rows + 1}, e : {c : 31, r : ws.rows + 1}});
+        ws['!merges'].push(
+            {s : {c : 0, r : ws.rows + 2}, e : {c : 31, r : ws.rows + 2}});
         cell(ws, 0, ws.rows++, 'Record of Meals and Supplements Served',
+             excel.XF_B8_C);
+        cell(ws, 0, ws.rows++,
+             months[dates[2].getMonth()] + ' ' + dates[2].getFullYear(),
              excel.XF_B8_C);
         cell(ws, 0, ws.rows++,
              i ? 'Second Floor (5-13 years)' : 'First Floor (0-4 years)',
@@ -96,7 +103,13 @@ function make_sheet(dates, saturday) {
             {s : {c : 0, r : ws.rows}, e : {c : 31, r : ws.rows}});
         ws['!merges'].push(
             {s : {c : 0, r : ws.rows + 1}, e : {c : 31, r : ws.rows + 1}});
+        ws['!merges'].push(
+            {s : {c : 0, r : ws.rows + 2}, e : {c : 31, r : ws.rows + 2}});
         cell(ws, 0, ws.rows++, 'Record of Meals and Supplements Served',
+             excel.XF_B8_C);
+        cell(ws, 0, ws.rows++,
+             dates[0].toLocaleDateString() + ' through ' +
+             dates[dates.length - 1].toLocaleDateString(),
              excel.XF_B8_C);
         cell(ws, 0, ws.rows++, meals.config['cat' + i + '_desc'],
              excel.XF_B8_C);

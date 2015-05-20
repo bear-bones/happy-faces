@@ -237,17 +237,18 @@ function make_totals_sheet() {
         {wch:6}, {wch:6}, {wch:6}, {wch:4}, {wch:6}, {wch:6}, {wch:6}, {wch:4},
         {wch:7}, {wch:7}];
     ws['!merges'] = [
-        {s : {c : 2, r : ws.rows}, e : {c : 4, r : ws.rows}},
-        {s : {c : 6, r : ws.rows}, e : {c : 8, r : ws.rows}},
-        {s : {c : 10, r : ws.rows}, e : {c : 12, r : ws.rows}},
-        {s : {c : 14, r : ws.rows}, e : {c : 16, r : ws.rows}},
-        {s : {c : 18, r : ws.rows}, e : {c : 20, r : ws.rows}},
+        {s : {c : 2, r : ws.rows}, e : {c : 5, r : ws.rows}},
+        {s : {c : 6, r : ws.rows}, e : {c : 9, r : ws.rows}},
+        {s : {c : 10, r : ws.rows}, e : {c : 13, r : ws.rows}},
+        {s : {c : 14, r : ws.rows}, e : {c : 17, r : ws.rows}},
+        {s : {c : 18, r : ws.rows}, e : {c : 21, r : ws.rows}},
         {s : {c : 0, r : ws.rows+1}, e : {c : 1, r : ws.rows+1}}];
 
     for (var i = 0; i < 5; ++i) {
         cell(ws, 4*i + 2, ws.rows, titles[i], common.excel.XF_8_LTB_C);
         cell(ws, 4*i + 3, ws.rows, '', common.excel.XF_8_TB_L);
-        cell(ws, 4*i + 4, ws.rows, '', common.excel.XF_8_RTB_L);
+        cell(ws, 4*i + 4, ws.rows, '', common.excel.XF_8_TB_L);
+        cell(ws, 4*i + 5, ws.rows, '', common.excel.XF_8_RTB_L);
     }
     cell(ws, 22, ws.rows, 'Daily', common.excel.XF_8_LRT_C);
     cell(ws, 23, ws.rows++, 'Labor', common.excel.XF_8_LRT_C);

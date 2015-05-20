@@ -77,21 +77,21 @@ function make_sheet() {
     ws['!merges'] = [];
 
     blank_to(ws, 44);
-    make_page_header(ws);
+    make_page_header(ws, date);
     make_totals_line(ws, meals.config['cat1_desc'], '', 'XF_B8_lrTb_');
     make_room_chunk(ws, date, 1, infant_totals);
     make_totals_line(ws, meals.config['cat2_desc'], '', 'XF_B8_lrtb_');
     make_room_chunk(ws, date, 2, infant_totals);
     make_totals_line(ws, 'Infants', infant_totals);
     blank_to(ws, 88);
-    make_page_header(ws);
+    make_page_header(ws, date);
     make_totals_line(ws, meals.config['cat3_desc'], '', 'XF_B8_lrTb_');
     make_room_chunk(ws, date, 3, toddler_totals);
     make_totals_line(ws, meals.config['cat4_desc'], '', 'XF_B8_lrtb_');
     make_room_chunk(ws, date, 4, toddler_totals);
     make_totals_line(ws, 'Toddlers', toddler_totals);
     blank_to(ws, 132);
-    make_page_header(ws);
+    make_page_header(ws, date);
     make_totals_line(ws, meals.config['cat5_desc'], '', 'XF_B8_lrTb_');
     make_room_chunk(ws, date, 5, discovery_totals);
     make_totals_line(ws, 'Pre-K (' + meals.config['cat5_desc'] + ')',
@@ -102,7 +102,7 @@ function make_sheet() {
     make_totals_line(ws, 'Pre-K (' + meals.config['cat6_desc'] + ')',
                      creativity_totals);
     blank_to(ws, 176);
-    make_page_header(ws);
+    make_page_header(ws, date);
     make_totals_line(ws, meals.config['cat7_desc'], '', 'XF_B8_lrTb_');
     make_room_chunk(ws, date, 7, school_totals);
     make_totals_line(ws, meals.config['cat8_desc'], '', 'XF_B8_lrtb_');
@@ -121,7 +121,7 @@ function make_sheet() {
     cell(ws, 1, ws.rows++, date.toLocaleDateString(), common.excel.XF_B8_C);
     ws.rows += 2;
 
-    make_page_header(ws, '');
+    make_page_header(ws, date, '');
 
     ++ws.rows;
     ws['!merges'].push({s : {c : 2, r : ws.rows}, e : {c : 17, r : ws.rows}});
@@ -173,8 +173,12 @@ function make_sheet() {
 }
 
 
-function make_page_header(ws, label) {
+var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+              'August', 'September', 'October', 'November', 'December'];
+function make_page_header(ws, date, label) {
     label = label === undefined ? 'Name' : label;
+    ws['!merges'].push({s : {c : 2, r : ws.rows}, e : {c : 17, r : ws.rows}});
+    cell(ws, 2, ws.rows++, months[date.getMonth()] + ' ' + date.getFullYear());
     cell(ws, 2, ws.rows, label, common.excel.XF_B8_lrTB_L);
     cell(ws, 3, ws.rows, '6:00', common.excel.XF_B8_lrTB_R);
     cell(ws, 4, ws.rows, '7:00', common.excel.XF_B8_lrTB_R);

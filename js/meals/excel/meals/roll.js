@@ -55,6 +55,7 @@ function make_template() {
         {wch:4.5}, {wch:4.5}, {wch:4.5}, {wch:12}, {wch:29}];
     ws['!merges'] = [
         {s : {c : 0, r : ws.rows}, e : {c : 15, r : ws.rows}},
+        {s : {c : 0, r : ws.rows + 1}, e : {c : 15, r : ws.rows + 1}},
         {s : {c : 0, r : ws.rows + 53}, e : {c : 15, r : ws.rows + 53}}
     ];
     cell(ws, 0, ws.rows++, 'Happy Faces Child Development Center',
@@ -116,7 +117,10 @@ function make_sheet(month, monday, friday) {
         );
         cell(ws, 0, ws.rows++, 'Happy Faces Child Development Center',
              common.excel.XF_B10_C);
-        ++ws.rows;
+        cell(ws, 0, ws.rows++,
+             monday.toLocaleDateString() + ' through ' +
+             friday.toLocaleDateString(),
+             common.excel.XF_B10_C);
         cell(ws, 0, ws.rows, 'Name', common.excel.XF_B10_lrtb_L);
         cell(ws, 1, ws.rows, '6:00', common.excel.XF_B10_lrtb_R);
         cell(ws, 2, ws.rows, '7:00', common.excel.XF_B10_lrtb_R);
