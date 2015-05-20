@@ -258,11 +258,12 @@ function* read_local() {
 
 function process_child(child) {
     var year = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
-        report_date = title_xx.model.report_date.getTime(),
+        report_date = title_xx.model.report_date.clone(),
         from = title_xx.model.report_date.clone();
     from.setDate(1);
     from = from.getTime();
     report_date.setHours(23, 59, 59);
+    report_date = report_date.getTime();
 
     // process authorized date range
     if (child.auth_range_start && child.auth_range_start <= report_date &&
@@ -275,7 +276,7 @@ function process_child(child) {
             auth_hours : child.auth_hours, auth_days : child.auth_days
         };
     } else if (child.alt_range_start && child.alt_range_start <= report_date &&
-        child.alt_range_end && child.alt_range_end >= report_date
+               child.alt_range_end && child.alt_range_end >= report_date
     ) {
         child.current = {
             type : 'alt',
