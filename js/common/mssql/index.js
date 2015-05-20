@@ -4,7 +4,7 @@ var config = {
         server : 'LOCALHOST\\CCMSERVER',
         database : 'HAPPY FACES',
         options : {
-            connectTimeout : 1000,
+            connectTimeout : 2500,
             requestTimeout : 1000000
         }
     },
