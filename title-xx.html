@@ -58,9 +58,9 @@
         <sortable-table class="bootstrap" id="child-grid" data="{{data}}" rowTemplate="template" disableColumnMove sortColumn="name">
             <sortable-column name="name">Name</sortable-column>
             <sortable-column name="age">Age</sortable-column>
-            <sortable-column name="period" formula="function (row) {return (row.current && row.current.auth_range_end) || row.auth_range_end || row.alt_range_end}">Auth Period</sortable-column>
-            <sortable-column name="page" formula="function (row) {return row.claim_num*1000 + row.line_num}">Page</sortable-column>
-            <sortable-column name="line" formula="function (row) {return row.claim_num*1000 + row.line_num}">Line</sortable-column>
+            <sortable-column name="period" formula="function (row) {return !row || (row.current && row.current.auth_range_end) || row.auth_range_end || row.alt_range_end}">Auth Period</sortable-column>
+            <sortable-column name="page" formula="function (row) {return row && row.claim_num*1000 + row.line_num}">Page</sortable-column>
+            <sortable-column name="line" formula="function (row) {return row && row.claim_num*1000 + row.line_num}">Line</sortable-column>
             <sortable-column name="auth_hours">Auth H</sortable-column>
             <sortable-column name="display_hours">Used H</sortable-column>
             <sortable-column name="rem_hours">Rem H</sortable-column>
