@@ -62,6 +62,8 @@ function read(child_id, time_in, time_out) {
         }
     }
 
+    sql += ' ORDER BY time_in';
+
     return new Promise(function (resolve, reject) {
         common.websql.db.transaction(function (t) {
             t.executeSql(sql, values, function (t, results) {

@@ -41,7 +41,7 @@ var range_cruft_regexp = /(?:[cu$].*$|\s+)/g,
     time_cruft_regexp = /(?:[cu$].*$|\s+|\.00)/g,
     time_dash_regexp = /[\/.-]+/g,  // condense sequences of /, -, and . to 1 -
     time_days_regexp = /-?d(?:a?y(?:s\.?)?)?/g,  // normalize "days" units
-    time_hours_regexp = /-?h(?:(?:ou)?r(?:s\.?)?)?/g,  // normalize "hours" units
+    time_hours_regexp = /-?h(?:(?:ou)?r(?:s\.?)?)?/g, // normalize "hours" units
     // only digits, dashes, d's, and h's, must start w/digit, end w/[dh]
     time_valid_chars_regexp = /(?:^\D+|[^dh]+$|[^\ddh-]+)/g,
     days_regexp = /^\d+d$/,  // digits followed by d
@@ -184,10 +184,13 @@ function* read_ccm() {
         //if (child.chfield3 && child.chfield4) update_txx_data(child, result);
         return result;
     });
-    title_xx.view.status_dialog.next('loaded ' + children.length + ' children.');
+    title_xx.view.status_dialog
+        .next('loaded ' + children.length + ' children.');
 
     try {
-        punches = yield title_xx.mssql.punches.read(title_xx.config.last_load);
+        var last = 0, existing = yield title_xx.websql.punches.read();
+        if (existing.length > 0) last = existing[existing.length - 1].time_in;
+        punches = yield title_xx.mssql.punches.read(last);
     } catch (error) {
         log.error(error);
         log.debug(error.stack);
@@ -258,16 +261,16 @@ function* read_local() {
 
 function process_child(child) {
     var year = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}],
-        report_date = title_xx.model.report_date.clone(),
-        from = title_xx.model.report_date.clone();
+        from = title_xx.model.report_date.clone(),
+        to = title_xx.model.report_date.clone();
     from.setDate(1);
     from = from.getTime();
-    report_date.setHours(23, 59, 59);
-    report_date = report_date.getTime();
+    to.setHours(23, 59, 59);
+    to = to.getTime();
 
     // process authorized date range
-    if (child.auth_range_start && child.auth_range_start <= report_date &&
-        child.auth_range_end && child.auth_range_end >= report_date
+    if (child.auth_range_start && child.auth_range_start <= to &&
+        child.auth_range_end && child.auth_range_end >= to
     ) {
         child.current = {
             type : 'auth',
@@ -275,8 +278,8 @@ function process_child(child) {
             auth_range_end : child.auth_range_end,
             auth_hours : child.auth_hours, auth_days : child.auth_days
         };
-    } else if (child.alt_range_start && child.alt_range_start <= report_date &&
-               child.alt_range_end && child.alt_range_end >= report_date
+    } else if (child.alt_range_start && child.alt_range_start <= to &&
+        child.alt_range_end && child.alt_range_end >= to
     ) {
         child.current = {
             type : 'alt',
@@ -292,7 +295,7 @@ function process_child(child) {
     if (child.current) from = child.current.auth_range_start;
 
     child.punches = child.all_punches.filter(function (punch) {
-        return punch.time_in >= from && punch.time_out <= report_date;
+        return punch.time_in >= from && punch.time_out <= to;
     });
     child.total_days = 0;
     child.total_hours = 0.0;
