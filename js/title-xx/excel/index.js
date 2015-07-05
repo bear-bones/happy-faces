@@ -29,6 +29,7 @@ function generate(file_name, children, config, report_date) {
         child.hours = 0;
         child.days = 0;
     });
+    build_footer.page = 0;
 
     var sheet_one = worksheet_one(children, report_date),
         sheet_two = worksheet_two(children, report_date),
@@ -76,7 +77,7 @@ function worksheet_one(children, report_date) {
         build_header(ws, report_date, 1, 15);
         for (var k = 1; k < 5; ++k) {
             if (k > 1) build_spacer(ws, report_date, 1, 15);
-            if (child && child.claim_num === i && child.line_num === k) {
+            if (child && child.line_num % 4 === k % 4) {
                 build_child(ws, report_date, 1, 15, child);
                 child = ++j < children.length ? children[j] : null;
             } else {
@@ -499,8 +500,8 @@ function build_child(ws, report_date, first_day, last_day, child) {
     cell(ws, punches.length + 2, rows + 1, '', common.excel.XF_L_L);
     cell(ws, punches.length + 2, rows + 2, '', common.excel.XF_L_L);
     cell(ws, punches.length + 2, rows + 3, '', common.excel.XF_LB_L);
-    cell(ws, punches.length + 2, rows + 4, round(total_hours),
-         common.excel.XF_LTb_C);
+    cell(ws, punches.length + 2, rows + 4,
+         getHHMM(total_hours * 1000 * 60 * 60, true), common.excel.XF_LTb_C);
     cell(ws, punches.length + 2, rows + 5, 0, common.excel.XF_LtB_C);
 
     cell(ws, punches.length + 3, rows, 'Days', common.excel.XF_lRTb_C);
@@ -545,7 +546,6 @@ function build_footer(ws, report_date, first_day, last_day) {
 
     ws.rows += 8;
 }
-build_footer.page = 0;
 
 
 

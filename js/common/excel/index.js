@@ -17,10 +17,11 @@ function sc(string, style) {
 }
 
 // get time as \d?\d:\d\d
-function getHHMM(timestamp) {
+function getHHMM(timestamp, nomod) {
     var minutes = Math.round(timestamp / 1000 / 60),
         hours = Math.floor(minutes / 60);
-    minutes = minutes % 60; hours = hours % 24;
+    minutes = minutes % 60;
+    if (!nomod) hours = hours % 24;
     return hours + ':' + (minutes < 10 ? '0' : '') + minutes;
 }
 function getHHMMam(timestamp) {
