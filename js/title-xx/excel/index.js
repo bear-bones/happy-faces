@@ -18,6 +18,7 @@ var XLSX = require('xlsx'),
 
 function generate(file_name, children, config, report_date) {
     log.debug('Generating excel spreadsheet...');
+    var sheet_one, sheet_two, sheet_three, sheet_four, sheet_five, data;
 
     children = children.filter(function (child) {return child.line_num});
     children = children.sort(function (a, b) {
@@ -29,14 +30,15 @@ function generate(file_name, children, config, report_date) {
         child.hours = 0;
         child.days = 0;
     });
-    build_footer.page = 0;
 
-    var sheet_one = worksheet_one(children, report_date),
-        sheet_two = worksheet_two(children, report_date),
-        data = calculate_totals(children, report_date, config),
-        sheet_three = worksheet_three(data.children),
-        sheet_four = worksheet_four(data),
-        sheet_five;
+    build_footer.page = 0;
+    sheet_one = worksheet_one(children, report_date),
+    build_footer.page = 0;
+    sheet_two = worksheet_two(children, report_date),
+    data = calculate_totals(children, report_date, config),
+    sheet_three = worksheet_three(data.children),
+    sheet_four = worksheet_four(data),
+    sheet_five;
 
     try {
         XLSX.writeFile({
@@ -46,7 +48,7 @@ function generate(file_name, children, config, report_date) {
                 '16-31' : sheet_two,
                 'Summary' : sheet_three,
                 'Totals' : sheet_four/*,
-                'Notes' : worksheet_five()*/
+                'Notes' : sheet_five*/
             }
         }, file_name);
     } catch (error) {
@@ -114,7 +116,7 @@ function worksheet_two(children, report_date) {
         build_header(ws, report_date, 16, last_day);
         for (var k = 1; k < 5; ++k) {
             if (k > 1) build_spacer(ws, report_date, 16, last_day);
-            if (child && child.claim_num === i && child.line_num === k) {
+            if (child && child.line_num % 4 === k % 4) {
                 build_child(ws, report_date, 16, last_day, child);
                 child = ++j < children.length ? children[j] : null;
             } else {
