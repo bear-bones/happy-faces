@@ -163,14 +163,14 @@ function calculate_totals(children, report_date, config) {
 
         result.days = child.logical_days;
         result.daily_rate = config['rate' + rate_index + '_daily_rate'];
-        result.daily_amount = result.days * result.daily_rate;
+        result.daily_amount = round(result.days * result.daily_rate);
         data.total_days += result.days;
         data.total_dollars += result.daily_amount;
         data.rates[rate_index - 1].days += result.days;
 
         result.hours = child.logical_hours;
         result.hourly_rate = config['rate' + rate_index + '_hourly_rate'];
-        result.hourly_amount = result.hours * result.hourly_rate;
+        result.hourly_amount = round(result.hours * result.hourly_rate);
         data.total_hours += result.hours;
         data.total_dollars += result.hourly_amount;
         data.rates[rate_index - 1].hours += result.hours;
