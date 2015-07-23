@@ -73,6 +73,10 @@ function get_report(report) {
         name : 'evening snack',
         generate : function () {
             meals.excel.meals.meal.generate('complete', 'evening')}};
+    // roll call reports
+    case 'roll>classroom': return {
+        name : 'hours by classroom',
+        generate : function () {meals.excel.roll.classroom.generate()}};
     case 'roll>blank>day': return {
         name : 'blank roll call (day)',
         generate : function () {meals.excel.roll.common.generate(1, 0, 'day')}};

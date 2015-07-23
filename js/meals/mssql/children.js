@@ -4,7 +4,8 @@ function read() {
         request.stream = true;
         request.query(
             'SELECT children.childkey, children.first, children.last, ' +
-                   'children.middle, children.dob, custchild.chfield2 ' +
+                   'children.middle, children.dob, custchild.chfield1, ' +
+                   'custchild.chfield2 ' +
                 'FROM children ' +
                 'INNER JOIN custchild ' +
                     'ON children.childkey = custchild.childkey ' +

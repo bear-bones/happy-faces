@@ -33,13 +33,15 @@ function generate() {
     ++ws.rows;
 
     children
-        .filter(
-            function (child) {return child.dob.getMonth() === date.getMonth()})
-        .sort(function (a, b) {return a.dob.getDate() - b.dob.getDate()})
+        .filter(function (child) {
+            return new Date(child.dob).getMonth() === date.getMonth()
+        })
+        .sort(function (a, b) {return a.dob - b.dob})
         .forEach(function (child) {
             cell(ws, 0, ws.rows, child.name);
             cell(ws, 1, ws.rows, child.display.dob);
-            cell(ws, 2, ws.rows, date.getFullYear() - child.dob.getFullYear());
+            cell(ws, 2, ws.rows,
+                 date.getFullYear() - new Date(child.dob).getFullYear());
             ++ws.rows;
         });
 

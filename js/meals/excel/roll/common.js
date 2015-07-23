@@ -134,7 +134,8 @@ function make_roll_page(ws, date, room, blank) {
                     end_str : getHHMMam(punch.end)
                 }});
             cell(ws, 0, ws.rows, i + 1, common.excel.XF_lrtb_R);
-            cell(ws, 1, ws.rows, child.name, common.excel.XF_lrtb_L);
+            cell(ws, 1, ws.rows, child.name + (child.txx ? ' (TXX)' : ''),
+                 common.excel.XF_lrtb_L);
             for (var hour = 6, text; hour < 19; ++hour) {
                 text = blank ? '' : punch_text(hour, punches);
                 format = 'XF_lrtb_' + (text === 'X' ? 'C' : 'R');

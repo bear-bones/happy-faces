@@ -66,10 +66,12 @@ module.exports = function* load(skip_mssql) {
     meals.view.status_dialog.next();
 
     try {
+        meals.model.no_punch_out = [];
         if (!skip_mssql) {
             yield* read_ccm();
             yield* write_local();
         }
+        yield* read_local();
         yield* process_data(true);
     } catch (error) {
         meals.view.status_dialog.close();
@@ -89,15 +91,14 @@ function* read_ccm() {
         log.debug(error.stack);
         throw new meals.model_error('Error reading child information');
     }
-    meals.model.no_punch_out = [];
     meals.model.data = children.map(function (child) {
-        var result = {
+        console.log(child);
+        return {
             child_id : child.childkey,
-            name : child.last + ', ' + child.first + ' ' + (child.middle || ''),
-            dob : child.dob, age : get_age(child.dob),
-            classification : child.chfield2
+            name: child.last + ', ' + child.first + ' ' + (child.middle || ''),
+            dob: child.dob, age: get_age(child.dob),
+            txx: +(child.chfield1 === 'TXX'), classification: child.chfield2
         };
-        return result;
     });
     meals.view.status_dialog.next('loaded ' + children.length + ' children.');
 
@@ -128,6 +129,21 @@ function* read_ccm() {
 
 
 function* write_local() {
+    try {
+        var exists = yield meals.websql.children.exists(meals.model.data);
+        yield meals.websql.children.create_all(
+            meals.model.data.filter(function (_, key) {return !exists[key]})
+        );
+        yield meals.websql.children.update_all(
+            meals.model.data.filter(function(_, key) {return exists[key]})
+        );
+        yield meals.websql.children.delete_except(meals.model.data);
+    } catch (error) {
+        log.error(error);
+        log.debug(error.stack);
+        throw new meals.model.model_error('Error saving child information into reporting database');
+    }
+
     try {
         yield meals.websql.punches.create_all(meals.model.punches);
     } catch (error) {
@@ -162,6 +178,18 @@ function prioritize(list, abc) {
         do meal = stack.pop(); while (meal && list.indexOf(meal) < 0);
         return meal;
     });
+}
+
+
+
+function* read_local() {
+    try {
+        meals.model.data = yield meals.websql.children.read();
+    } catch (error) {
+        log.error(error);
+        log.debug(error.stack);
+        throw new meals.model.model_error('Error reading child information from reporting database');
+    }
 }
 
 
