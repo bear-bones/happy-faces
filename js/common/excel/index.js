@@ -28,7 +28,7 @@ function getHHMMam(timestamp) {
     var minutes = Math.round(timestamp / 1000 / 60),
         hours = Math.floor(minutes / 60) % 12;
     minutes = minutes % 60; hours = hours % 24;
-    return hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+    return (hours || '12') + ':' + (minutes < 10 ? '0' : '') + minutes;
 }
 
 // round to hundredths
