@@ -200,7 +200,7 @@ function make_week(ws, monday, saturday) {
 function make_totals_sheet() {
     var date = meals.model.report_date.clone(),
         children = meals.model.data,
-        data = Array(21).fill(0), mtotals = Array(5).fill(0), totals,
+        data = Array(22).fill(0), mtotals = Array(5).fill(0), totals,
         ws = new worksheet(24);
     date.setMonth(date.getMonth() + 1, 0);  // last day of month
 
@@ -216,10 +216,11 @@ function make_totals_sheet() {
             if (Math.trunc(day/100) !== date.getMonth()) continue;
             var _meals = child.meals[day];
             day = day%100 - 1;
-            if (_meals.length) ++data[data.length - 1][day];
+            if (_meals.length) ++data[data.length - 2][day];
             _meals.forEach(function (meal) {
                 ++data[index(meal) + offset][day];
                 ++data[index(meal) + 3][day];
+                ++data[data.length - 1][day];
             });
         }
     });
@@ -245,31 +246,44 @@ function make_totals_sheet() {
         {s : {c : 0, r : ws.rows+1}, e : {c : 1, r : ws.rows+1}}];
 
     for (var i = 0; i < 5; ++i) {
-        cell(ws, 4*i + 2, ws.rows, titles[i], common.excel.XF_8_LTB_C);
+        cell(ws, 4*i + 2, ws.rows, titles[i],
+             i ? common.excel.XF_8_lTB_C : common.excel.XF_8_LTB_C);
         cell(ws, 4*i + 3, ws.rows, '', common.excel.XF_8_TB_L);
         cell(ws, 4*i + 4, ws.rows, '', common.excel.XF_8_TB_L);
-        cell(ws, 4*i + 5, ws.rows, '', common.excel.XF_8_RTB_L);
+        cell(ws, 4*i + 5, ws.rows, '', common.excel.XF_8_rTB_L);
     }
-    cell(ws, 22, ws.rows, 'Daily', common.excel.XF_8_LRT_C);
-    cell(ws, 23, ws.rows++, 'Labor', common.excel.XF_8_LRT_C);
+    cell(ws, 22, ws.rows, 'Daily', common.excel.XF_8_LrT_C);
+    cell(ws, 23, ws.rows, 'Daily', common.excel.XF_8_lrT_C);
+    cell(ws, 24, ws.rows++, 'Labor', common.excel.XF_8_lRT_C);
 
-    cell(ws, 0, ws.rows, 'Date', common.excel.XF_8_LRTB_C);
-    cell(ws, 1, ws.rows, '', common.excel.XF_8_LRTB_C);
+    cell(ws, 0, ws.rows, 'Date', common.excel.XF_8_LTB_C);
+    cell(ws, 1, ws.rows, '', common.excel.XF_8_RTB_C);
     for (var i = 2; i < 22; ++i)
-        if (i%4 !== 1)
-            cell(ws, i, ws.rows, "P FR"[i%4], common.excel.XF_8_LRTB_C);
-    cell(ws, 22, ws.rows, 'Att', common.excel.XF_8_LRB_C);
-    cell(ws, 23, ws.rows++, 'Days', common.excel.XF_8_LRB_C);
+        cell(ws, i, ws.rows, "P FR"[i%4],
+             common.excel['XF_8_' + (i%4 === 1 ? 'GRAY_' : '') + 'lrTB_C']);
+    cell(ws, 22, ws.rows, 'Att', common.excel.XF_8_LrB_C);
+    cell(ws, 23, ws.rows, 'Meals', common.excel.XF_8_lrB_C);
+    cell(ws, 24, ws.rows++, 'Days', common.excel.XF_8_lRB_C);
 
     var i = 0, l = 0, d = date.clone(); d.setDate(1);
     for (; i < date.getDate(); ++i, ++ws.rows, d.inc()) {
         cell(ws, 0, ws.rows, weekday(d), common.excel.XF_8_L_L);
         cell(ws, 1, ws.rows, d.getDate(), common.excel.XF_8_R_R);
-        for (var j = 2; j < 23; ++j)
-            cell(ws, j, ws.rows, data[j-2][i],
-                 j % 4 === 1 ? common.excel.XF_8_R : common.excel.XF_8_LR_R);
-        if (d.getDay()) cell(ws, 23, ws.rows, ++l, common.excel.XF_8_LR_R);
-        else cell(ws, 23, ws.rows, '', common.excel.XF_8_LR_R);
+        if (d.getDay()) {
+            for (var j = 2; j < 22; ++j)
+                cell(ws, j, ws.rows, data[j-2][i],
+                     common.excel['XF_8_' + (j%4===1 ? 'GRAY_' : '') + 'lr_R']);
+            cell(ws, 22, ws.rows, data[20][i], common.excel.XF_8_Lr_R);
+            cell(ws, 23, ws.rows, data[21][i], common.excel.XF_8_lr_R);
+            cell(ws, 24, ws.rows, ++l, common.excel.XF_8_lR_R);
+        } else {
+            for (var j = 2; j < 22; ++j)
+                cell(ws, j, ws.rows, '',
+                     common.excel['XF_8_' + (j%4===1 ? 'GRAY_' : '') + 'lr_R']);
+            cell(ws, 22, ws.rows, '', common.excel.XF_8_Lr_R);
+            cell(ws, 23, ws.rows, '', common.excel.XF_8_lr_R);
+            cell(ws, 24, ws.rows, '', common.excel.XF_8_lR_R);
+        }
     }
 
     ws['!merges'].push({s: {c: 0, r: ws.rows}, e: {c: 1, r: ws.rows}});
@@ -283,29 +297,36 @@ function make_totals_sheet() {
     cell(ws, 1, ws.rows+2, '', common.excel.XF_8_RTB_R);
     for (var i = 2, total, rate, grand = 0; i < 22; ++i) {
         total = totals[i - 2]; rate = mealrate(i - 1);
-        cell(ws, i, ws.rows, total, common.excel.XF_8_LRTB_R);
-        if (i % 4 === 1) cell(ws, i, ws.rows+1, '', common.excel.XF_8_LRTB_R);
-        else cell(ws, i, ws.rows+1, dollars(rate), common.excel.XF_8_LRTB_R);
-        if (i % 4 === 1) cell(ws, i, ws.rows+2, '', common.excel.XF_8_LRTB_R);
+        cell(ws, i, ws.rows, total, common.excel.XF_8_lrTB_R);
+        if (i % 4 === 1) cell(ws, i, ws.rows+1, '', common.excel.XF_8_lrTB_R);
+        else cell(ws, i, ws.rows+1, dollars(rate), common.excel.XF_8_lrTB_R);
+        if (i % 4 === 1) cell(ws, i, ws.rows+2, '', common.excel.XF_8_lrTB_R);
         else cell(ws, i, ws.rows+2, dollars(total * rate),
-                  common.excel.XF_8_LRTB_R);
+                  common.excel.XF_8_lrTB_R);
         if (i % 4 !== 1) grand += total * rate;
     }
-    cell(ws, 22, ws.rows, totals[20], common.excel.XF_8_LRTB_R);
-    cell(ws, 23, ws.rows++, l, common.excel.XF_8_LRTB_R);
-    cell(ws, 22, ws.rows, '', common.excel.XF_8_LRTB_C);
-    cell(ws, 23, ws.rows++, '', common.excel.XF_8_LRTB_C);
-    cell(ws, 22, ws.rows, dollars(grand), common.excel.XF_8_LRTB_R);
-    cell(ws, 23, ws.rows++, '', common.excel.XF_8_LRTB_C);
+    cell(ws, 22, ws.rows, totals[20], common.excel.XF_8_LrTB_R);
+    cell(ws, 23, ws.rows, totals[21], common.excel.XF_8_lrTB_R);
+    cell(ws, 24, ws.rows++, l, common.excel.XF_8_lRTB_R);
+    cell(ws, 22, ws.rows, '', common.excel.XF_8_LrTB_C);
+    cell(ws, 23, ws.rows, '', common.excel.XF_8_lrTB_C);
+    cell(ws, 24, ws.rows++, '', common.excel.XF_8_lRTB_C);
+    cell(ws, 22, ws.rows, dollars(grand), common.excel.XF_8_LrTB_R);
+    cell(ws, 23, ws.rows, '', common.excel.XF_8_lrTB_C);
+    cell(ws, 24, ws.rows++, '', common.excel.XF_8_lRTB_C);
 
     ++ws.rows;
 
-    ws['!merges'].push({s : {c : 20, r : ws.rows}, e : {c : 22, r : ws.rows}})
-    cell(ws, 20, ws.rows, 'Total', common.excel.XF_B8_R);
-    cell(ws, 23, ws.rows++, dollars(grand), common.excel.XF_8_R);
-    ws['!merges'].push({s : {c : 19, r : ws.rows}, e : {c : 22, r : ws.rows}})
-    cell(ws, 19, ws.rows, 'Average Daily Attendance', common.excel.XF_B8_R);
-    cell(ws, 23, ws.rows++, dollars(totals[totals.length - 1] / date.getDate()),
+    ws['!merges'].push({s : {c : 21, r : ws.rows}, e : {c : 23, r : ws.rows}})
+    cell(ws, 21, ws.rows, 'Total', common.excel.XF_B8_R);
+    cell(ws, 24, ws.rows++, dollars(grand), common.excel.XF_8_R);
+    ws['!merges'].push({s : {c : 20, r : ws.rows}, e : {c : 23, r : ws.rows}})
+    cell(ws, 20, ws.rows, 'Average Daily Attendance', common.excel.XF_B8_R);
+    cell(ws, 24, ws.rows++, dollars(totals[totals.length - 2] / l),
+         common.excel.XF_8_R);
+    ws['!merges'].push({s : {c : 20, r : ws.rows}, e : {c : 23, r : ws.rows}})
+    cell(ws, 20, ws.rows, 'Average Daily Meals', common.excel.XF_B8_R);
+    cell(ws, 24, ws.rows++, dollars(totals[totals.length - 1] / l),
          common.excel.XF_8_R);
 
 
