@@ -14,32 +14,54 @@ var XLSX = require('xlsx'),
     worksheet = common.excel.worksheet;
 
 
-function index(meal) { return index.meals.indexOf(meal) * 4 }
+function index(meal) {return index.meals.indexOf(meal) * 4}
 index.meals = ['breakfast', 'lunch', 'afternoon', 'dinner', 'evening'];
 
 
 
-function generate(type) {
-    var file_name = meals.excel.file_name;
+function generate(done, type) {
+    var options = {}, source, date;
+
+    options.SheetNames = ['Saturday'];
+    options.Sheets = {};
+
+    function execute(source) {
+        try {
+            options.Sheets.Saturday =
+                make_sheet(type, source.report_date, source.data);
+            XLSX.writeFile(options, meals.excel.file_name);
+            log.debug('Spreadsheet generated.');
+            done();
+        } catch (e) {
+            done(e);
+        }
+    }
 
     try {
-        XLSX.writeFile({
-            SheetNames : ['Saturday'],
-            Sheets : {Saturday: make_sheet(type)}
-        }, file_name);
+        if (type === 'blank') {
+            date = meals.model.report_date.clone();
+            date.setDate(28); // make sure it's ok when we subtract a month
+            date.setMonth(date.getMonth() - 1);
+            source =
+                {data: meals.model.data, report_date: date, no_punch_out: []};
+            co(function* () {
+                yield*  meals.model.load.process_data(false, source);
+                execute(source);
+            });
+        } else {
+            execute(meals.model);
+        }
     } catch (error) {
         log.error(error);
         log.debug(error.stack);
         throw new Error('Error generating spreadsheet');
     }
-    log.debug('Spreadsheet generated.');
 }
 
 
 
-function make_sheet(type) {
-    var children = meals.model.data,
-        date = meals.model.report_date.clone(),
+function make_sheet(type, report_date, children) {
+    var date = report_date.clone(),
         month = date.getMonth(),
         dates = [];
 
@@ -97,6 +119,8 @@ function write_section(type, month, dates, children, ws) {
         day_totals = dates.map(function (date) {
             return Array(15).fill(date.getMonth() === month ? 0 : '');
         });
+
+    log.debug(dates);
 
     // filter the raw child meal data into a map of child->[a/b/c by day] and
     // his totals

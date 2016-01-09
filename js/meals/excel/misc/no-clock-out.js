@@ -11,7 +11,7 @@ var XLSX = require('xlsx'),
 
 
 
-function generate() {
+function generate(done) {
     var file_name = meals.excel.file_name,
         punches = meals.model.no_punch_out,
         config = meals.model.config,
@@ -53,6 +53,7 @@ function generate() {
         throw new Error('Error generating spreadsheet');
     }
     log.debug('Spreadsheet generated.');
+    done();
 }
 
 

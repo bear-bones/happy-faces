@@ -13,45 +13,67 @@ var XLSX = require('xlsx'),
 
 
 
-function generate(saturday) {
+function generate(done, blank) {
     var date = meals.model.report_date.clone(),
         month = date.getMonth(),
-        dates = [];
+        dates = [],
+        filter_dates = [],
+        options = {},
+        source;
 
-    if (saturday) {
-        // build a list of all saturdays in the month
-        date.setDate(1);
-        date.inc(6 - date.getDay());
-        do {
-            dates.push(date.clone());
-            date.inc(7);
-        } while (date.getMonth() === month);
-    } else {
-        // build a list of the monday-friday containing the report date
-        date.setDate(date.getDate() + 1 - date.getDay());
-        for (var i = 0; i < 5; ++i, date.inc())
-            dates.push(date.clone());
+    // build a list of all saturdays in the month
+    date.setDate(1);
+    date.inc(6 - date.getDay());
+    do {
+        dates.push(date.clone());
+        date.inc(7);
+    } while (date.getMonth() === month);
+
+    options.SheetNames = ['Roll Call'];
+    options.Sheets = {};
+
+    function execute(data, filter_dates) {
+        try {
+            options.Sheets['Roll Call'] =
+                make_sheet(data, dates, filter_dates, blank);
+            XLSX.writeFile(options, meals.excel.file_name);
+            log.debug('Spreadsheet generated.');
+            done();
+        } catch (e) {
+            done(e);
+        }
     }
 
     try {
-        XLSX.writeFile({
-            SheetNames : ['Roll Call'],
-            Sheets : {'Roll Call' : make_sheet(dates, saturday)}
-        }, meals.excel.file_name);
+        if (blank) {
+            var date = dates[0].clone().inc(-7), month = date.getMonth();
+            while (date.getMonth() === month) {
+                filter_dates.unshift(date.clone());
+                date = date.inc(-7);
+            }
+            source = {
+                data: meals.model.data, report_date: date.inc(28),
+                no_punch_out: []
+            };
+            co(function* () {
+                yield* meals.model.load.process_data(false, source);
+                execute(source.data, filter_dates);
+            });
+        } else {
+            execute(meals.model.data, dates);
+        }
     } catch (error) {
         log.error(error);
         log.debug(error.stack);
         throw new Error('Error generating spreadsheet');
     }
-
-    log.debug('Spreadsheet generated.');
 }
 
 
 
 var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
               'August', 'September', 'October', 'November', 'December'];
-function make_sheet(dates, saturday) {
+function make_sheet(data, dates, filter_dates, blank) {
     var ws = new excel.worksheet(32),
         totals = {
             A : (new Array(dates.length*5 + 5)).fill(0),
@@ -73,8 +95,8 @@ function make_sheet(dates, saturday) {
         {wch:2.75}];
     ws['!merges'] = [];
 
-    if (saturday) for (var i = 0; i < 2; ++i) {
-        // saturday report uses the two floors
+    // saturday report uses the two floors instead of rooms
+    for (var i = 0; i < 2; ++i) {
         ws['!merges'].push(
             {s : {c : 0, r : ws.rows}, e : {c : 31, r : ws.rows}});
         ws['!merges'].push(
@@ -92,31 +114,7 @@ function make_sheet(dates, saturday) {
         ['A', 'B', 'C'].forEach(function (code) {
             ++ws.rows;
             make_header(ws, code, dates);
-            make_data(ws, i, code, dates, totals, saturday);
-        });
-        for (; ws.rows % 44; ++ws.rows)
-            for (var j = 0; j < 32; ++j)
-                cell(ws, j, ws.rows, '', excel.XF_8_L);
-    } else for (var i = 1; i <= 8; ++i) {
-        // weekday report uses the eight rooms
-        ws['!merges'].push(
-            {s : {c : 0, r : ws.rows}, e : {c : 31, r : ws.rows}});
-        ws['!merges'].push(
-            {s : {c : 0, r : ws.rows + 1}, e : {c : 31, r : ws.rows + 1}});
-        ws['!merges'].push(
-            {s : {c : 0, r : ws.rows + 2}, e : {c : 31, r : ws.rows + 2}});
-        cell(ws, 0, ws.rows++, 'Record of Meals and Supplements Served',
-             excel.XF_B8_C);
-        cell(ws, 0, ws.rows++,
-             dates[0].toLocaleDateString() + ' through ' +
-             dates[dates.length - 1].toLocaleDateString(),
-             excel.XF_B8_C);
-        cell(ws, 0, ws.rows++, meals.config['cat' + i + '_desc'],
-             excel.XF_B8_C);
-        ['A', 'B', 'C'].forEach(function (code) {
-            ++ws.rows;
-            make_header(ws, code, dates);
-            make_data(ws, i - 1, code, dates, totals);
+            make_data(data, ws, i, code, dates, filter_dates, totals, blank);
         });
         for (; ws.rows % 44; ++ws.rows)
             for (var j = 0; j < 32; ++j)
@@ -124,7 +122,7 @@ function make_sheet(dates, saturday) {
     }
 
     // write grand totals by code
-    ['A', 'B', 'C'].forEach(function (code) {
+    if (!blank) ['A', 'B', 'C'].forEach(function (code) {
         cell(ws, 0, ws.rows, 'Grand Total "' + code + '" Meals',
              excel.XF_B8_lrtb_C);
         for (var i = 0; i < 5; ++i)
@@ -158,23 +156,20 @@ function make_header(ws, code, dates) {
 }
 
 
-function make_data(ws, room, code, dates, grand_totals, saturday) {
+function make_data(data, ws, room, code, dates, filter_dates, grand_totals,
+                   blank) {
     var totals = (new Array(dates.length*5 + 5)).fill(0);
-    meals.model.data
-        .filter(function (child) {
-            // room (weekday) or floor (saturday) has to match
-            if (saturday) {
-                if (room === 0 && child.classroom >= 6) return false;
-                if (room === 1 && child.classroom <= 5) return false;
-            } else
-                if (child.classroom !== room) return false;
+    data.filter(function (child) {
+            // floor has to match
+            if (room === 0 && child.classroom >= 6) return false;
+            if (room === 1 && child.classroom <= 5) return false;
             // a/b/c classification has to match
             if ((child.classification || meals.config.default_class) !== code)
                 return false;
             // child has to have punches
-            return dates.some(function (d) {
+            return filter_dates.some(function (d) {
                 var index = d.getMonth()*100 + d.getDate();
-                return child.meals[index].length > 0;
+                return child.meals[index] && child.meals[index].length > 0;
             });
         })
         .forEach(function (child, index) {
@@ -183,27 +178,27 @@ function make_data(ws, room, code, dates, grand_totals, saturday) {
                 var meals = child.meals[d.getMonth()*100 + d.getDate()];
                 cell(ws, i*6 + 1, ws.rows, index + 1, excel.XF_8_C);
                 cell(ws, i*6 + 2, ws.rows, '', excel.XF_8_lrtb_C);
-                if (meals.indexOf('breakfast') >= 0) {
+                if (!blank && meals.indexOf('breakfast') >= 0) {
                     cell(ws, i*6 + 2, ws.rows, 'X', excel.XF_8_lrtb_C);
                     ++totals[i*5 + 0]; ++grand_totals[code][i*5 + 0];
                 }
                 cell(ws, i*6 + 3, ws.rows, '', excel.XF_8_lrtb_C);
-                if (meals.indexOf('lunch') >= 0) {
+                if (!blank && meals.indexOf('lunch') >= 0) {
                     cell(ws, i*6 + 3, ws.rows, 'X', excel.XF_8_lrtb_C);
                     ++totals[i*5 + 1]; ++grand_totals[code][i*5 + 1];
                 }
                 cell(ws, i*6 + 4, ws.rows, '', excel.XF_8_lrtb_C);
-                if (meals.indexOf('afternoon') >= 0) {
+                if (!blank && meals.indexOf('afternoon') >= 0) {
                     cell(ws, i*6 + 4, ws.rows, 'X', excel.XF_8_lrtb_C);
                     ++totals[i*5 + 2]; ++grand_totals[code][i*5 + 2];
                 }
                 cell(ws, i*6 + 5, ws.rows, '', excel.XF_8_lrtb_C);
-                if (meals.indexOf('dinner') >= 0) {
+                if (!blank && meals.indexOf('dinner') >= 0) {
                     cell(ws, i*6 + 5, ws.rows, 'X', excel.XF_8_lrtb_C);
                     ++totals[i*5 + 3]; ++grand_totals[code][i*5 + 3];
                 }
                 cell(ws, i*6 + 6, ws.rows, '', excel.XF_8_lrtb_C);
-                if (meals.indexOf('evening') >= 0) {
+                if (!blank && meals.indexOf('evening') >= 0) {
                     cell(ws, i*6 + 6, ws.rows, 'X', excel.XF_8_lrtb_C);
                     ++totals[i*5 + 4]; ++grand_totals[code][i*5 + 4];
                 }
@@ -214,7 +209,7 @@ function make_data(ws, room, code, dates, grand_totals, saturday) {
     cell(ws, 0, ws.rows, 'Total "' + code + '" Meals', excel.XF_B8_lrtb_C);
     for (var i = 0; i < 5; ++i)
         for (var j = 0; j < 5; ++j)
-            cell(ws, i*6 + 2 + j, ws.rows, totals[i*5 + j],
+            cell(ws, i*6 + 2 + j, ws.rows, blank ? '' : totals[i*5 + j],
                  j ? excel.XF_B8_lrtb_C : excel.XF_B8_lrtb_C);
     ++ws.rows;
 }

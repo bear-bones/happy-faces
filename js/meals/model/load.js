@@ -92,7 +92,6 @@ function* read_ccm() {
         throw new meals.model_error('Error reading child information');
     }
     meals.model.data = children.map(function (child) {
-        console.log(child);
         return {
             child_id : child.childkey,
             name: child.last + ', ' + child.first + ' ' + (child.middle || ''),
@@ -194,13 +193,14 @@ function* read_local() {
 
 
 
-function* process_data(initial) {
+function* process_data(initial, source) {
     log.debug('processing data');
+    source = source || meals.model;
 
 
-    var data = meals.model.data,
-        start_date = meals.model.report_date.clone(),
-        end_date = meals.model.report_date.clone(),
+    var data = source.data,
+        start_date = source.report_date.clone(),
+        end_date = source.report_date.clone(),
         start_day, end_day,
         cfg = meals.config,
         _meals = [
@@ -233,7 +233,7 @@ function* process_data(initial) {
                 punches = (yield meals.websql.punches.read(
                     child.child_id, start, end
                 )).filter(function (punch) {
-                    if (!punch.time_out) meals.model.no_punch_out.push({
+                    if (!punch.time_out) source.no_punch_out.push({
                         name: child.name, time_in: punch.time_in
                     });
                     else return true;
@@ -283,7 +283,7 @@ function* process_data(initial) {
                     = prioritize(Object.keys(result), child.classification);
             }
 
-            child.age = get_age(new Date(child.dob), meals.model.report_date);
+            child.age = get_age(new Date(child.dob), source.report_date);
             child.classroom = 0 + (child.age >= 9) + (child.age >= 18)
                 + (child.age >= 27) + (child.age >= 36) + (child.age >= 48)
                 + (child.age >= 60) + (child.age >= 84);
@@ -294,21 +294,21 @@ function* process_data(initial) {
     } catch (error) {
         log.error(error);
         log.debug(error.stack);
-        throw new meals.model.model_error('Error loading punch information per child');
+        throw new source.model_error('Error loading punch information per child');
     }
 
+    source.data = data;
 
-    meals.model.data = data;
-
-
-    meals.view.status_dialog.next();
-    setImmediate(function () {
-        // grid processing freezes the rendering thread. run it at the start of
-        // the next event loop, so the user sees the 'child process complete'
-        // status.
-        meals.view.set_grid(meals.model.data); // synchronous and slow
-        meals.view.status_dialog.close();
-    });
+    if (source === meals.model) {
+        meals.view.status_dialog.next();
+        setImmediate(function () {
+            // grid processing freezes the rendering thread. run it at the start
+            // of the next event loop, so the user sees the 'child process
+            // complete' status.
+            meals.view.set_grid(source.data); // synchronous and slow
+            meals.view.status_dialog.close();
+        });
+    }
 }
 
 

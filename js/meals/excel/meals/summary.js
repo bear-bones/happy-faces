@@ -29,7 +29,7 @@ mealrate.meals = ['br', 'lu', 'as', 'di', 'es'];
 
 
 
-function generate() {
+function generate(done) {
     var file_name = meals.excel.file_name;
 
     try {
@@ -44,6 +44,7 @@ function generate() {
         throw new Error('Error generating spreadsheet');
     }
     log.debug('Spreadsheet generated.');
+    done();
 }
 
 
@@ -216,7 +217,7 @@ function make_totals_sheet() {
             if (Math.trunc(day/100) !== date.getMonth()) continue;
             var _meals = child.meals[day];
             day = day%100 - 1;
-            if (_meals.length) ++data[data.length - 2][day];
+            if (_meals && _meals.length) ++data[data.length - 2][day];
             _meals.forEach(function (meal) {
                 ++data[index(meal) + offset][day];
                 ++data[index(meal) + 3][day];

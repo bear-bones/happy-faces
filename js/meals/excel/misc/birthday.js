@@ -11,7 +11,7 @@ var XLSX = require('xlsx'),
 
 
 
-function generate() {
+function generate(done) {
     var file_name = meals.excel.file_name,
         children = meals.model.data,
         date = meals.model.report_date;
@@ -61,6 +61,7 @@ function generate() {
         throw new Error('Error generating spreadsheet');
     }
     log.debug('Spreadsheet generated.');
+    done();
 }
 
 

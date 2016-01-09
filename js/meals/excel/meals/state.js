@@ -13,7 +13,7 @@ var XLSX = require('xlsx'),
 function index(meal) {return index.meals.indexOf(meal) * 3}
 index.meals = ['breakfast','lunch','afternoon','dinner','evening'];
 
-function generate() {
+function generate(done) {
     var file_name = meals.excel.file_name,
         date = meals.model.report_date.clone(),
         children = meals.model.data, data = Array(19).fill(0), totals,
@@ -115,6 +115,7 @@ function generate() {
         throw new Error('Error generating spreadsheet');
     }
     log.debug('Spreadsheet generated.');
+    done();
 }
 
 

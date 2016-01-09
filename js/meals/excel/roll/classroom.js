@@ -26,9 +26,7 @@ function punch_text(hour, punches) {
 }
 
 function combine(a, b, c, d, e) {
-    return a.map(function (_, i) {
-        return a[i] + b[i] + c[i] + d[i] + e[i];
-    });
+    return a.map(function (_, i) {return a[i] + b[i] + c[i] + d[i] + e[i]});
 }
 
 function blank_to(ws, row) {
@@ -39,7 +37,7 @@ function blank_to(ws, row) {
 }
 
 
-function generate() {
+function generate(done) {
     try {
         XLSX.writeFile({
             SheetNames : ['Roll Call by Classroom'],
@@ -53,6 +51,7 @@ function generate() {
         throw new Error('Error generating spreadsheet');
     }
     log.debug('Spreadsheet generated.');
+    done();
 }
 
 

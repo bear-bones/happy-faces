@@ -23,28 +23,48 @@ function pretty_meal(meal) {
 
 
 
-function generate(type, meal) {
-    var file_name = meals.excel.file_name,
-        options = {};
+function generate(done, type, meal) {
+    var options = {}, source, date;
     
+    options.SheetNames = [pretty_meal(meal)];
+    options.Sheets = {};
+
+    function execute(source) {
+        try {
+            options.Sheets[pretty_meal(meal)] =
+                make_sheet(type, meal, source.data);
+            XLSX.writeFile(options, meals.excel.file_name);
+            log.debug('Spreadsheet generated.');
+            done();
+        } catch (e) {
+            done(e);
+        }
+    }
+
     try {
-        options.SheetNames = [pretty_meal(meal)];
-        options.Sheets = {};
-        options.Sheets[pretty_meal(meal)] = make_sheet(type, meal);
-        XLSX.writeFile(options, file_name);
+        if (type === 'blank') {
+            date = meals.model.report_date.clone();
+            date.setMonth(date.getMonth() - 1);
+            source =
+                {data: meals.model.data, report_date: date, no_punch_out: []};
+            co(function* () {
+                yield* meals.model.load.process_data(false, source);
+                execute(source);
+            });
+        } else {
+            execute(meals.model);
+        }
     } catch (error) {
         log.error(error);
         log.debug(error.stack);
         throw new Error('Error generating spreadsheet');
     }
-    log.debug('Spreadsheet generated.');
 }
 
 
 
-function make_sheet(type, meal) {
-    var children = meals.model.data,
-        month = meals.model.report_date.getMonth(),
+function make_sheet(type, meal, data) {
+    var month = meals.model.report_date.getMonth(),
         monday = meals.model.report_date.clone(), friday, weekday,
         dates = [];
 
@@ -86,16 +106,7 @@ function make_sheet(type, meal) {
         {wch:1.75}, {wch:1.75}, {wch:1.75}];
     ws['!merges'] = [];
 
-    switch (type) {
-    case 'complete': case 'blank':
-        write_section(type, meal, month, dates, children, ws);
-        break;
-    default:
-        for (var i = 0; i < 8; ++i) write_section(
-            meals.config['cat' + (i+1) + '_desc'], meal, month, dates,
-            children.filter(function (child) {return child.classroom === i}), ws
-        );
-    }
+    write_section(type, meal, month, dates, data, ws);
 
     return ws.export();
 }
@@ -117,7 +128,7 @@ function write_section(type, meal, month, dates, children, ws) {
         data[name].cx = cx;
         dates.forEach(function (date, i) {
             var key = date.getMonth()*100 + date.getDate();
-            if (child.meals[key].indexOf(meal) >= 0) {
+            if (key in child.meals && child.meals[key].indexOf(meal) >= 0) {
                 ++data[name][i*3 + offset];
                 ++day_totals[i*3 + offset];
             }
