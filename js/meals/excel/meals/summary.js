@@ -215,9 +215,9 @@ function make_totals_sheet() {
             'ABC'.indexOf(child.classification || meals.config.default_class);
         for (var day in child.meals) {
             if (Math.trunc(day/100) !== date.getMonth()) continue;
-            var _meals = child.meals[day];
+            var _meals = child.meals[day], punches = child.punches[day];
             day = day%100 - 1;
-            if (_meals && _meals.length) ++data[data.length - 2][day];
+            if (punches && punches.length) ++data[data.length - 2][day];
             _meals.forEach(function (meal) {
                 ++data[index(meal) + offset][day];
                 ++data[index(meal) + 3][day];
