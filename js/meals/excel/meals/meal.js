@@ -120,20 +120,27 @@ function write_section(type, meal, month, dates, children, ws) {
 
     // filter the raw child meal data into a map of child->[a/b/c by day] and
     // his totals
-    children.forEach(function (child, index) {
-        var name = child.name,
-            cx = child.classification || meals.config.default_class;
-            offset = ABC.indexOf(cx);
-        data[name] = Array(75).fill(0);
-        data[name].cx = cx;
-        dates.forEach(function (date, i) {
-            var key = date.getMonth()*100 + date.getDate();
-            if (key in child.meals && child.meals[key].indexOf(meal) >= 0) {
-                ++data[name][i*3 + offset];
-                ++day_totals[i*3 + offset];
-            }
+    children
+        .filter(function (child) {
+            return dates.some(function (date) {
+                var _meals = child.meals[date.getMonth()*100 + date.getDate()];
+                return _meals && _meals.length;
+            });
+        })
+        .forEach(function (child, index) {
+            var name = child.name,
+                cx = child.classification || meals.config.default_class;
+                offset = ABC.indexOf(cx);
+            data[name] = Array(75).fill(0);
+            data[name].cx = cx;
+            dates.forEach(function (date, i) {
+                var key = date.getMonth()*100 + date.getDate();
+                if (key in child.meals && child.meals[key].indexOf(meal) >= 0) {
+                    ++data[name][i*3 + offset];
+                    ++day_totals[i*3 + offset];
+                }
+            });
         });
-    });
 
     // header for this chunk o' data
     ws['!merges'].push({s : {c : 0, r : ws.rows},

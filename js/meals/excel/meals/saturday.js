@@ -124,26 +124,33 @@ function write_section(type, month, dates, children, ws) {
 
     // filter the raw child meal data into a map of child->[a/b/c by day] and
     // his totals
-    children.forEach(function (child, index) {
-        var name = child.name,
-            cx = child.classification || meals.config.default_class;
-            offset = ABC.indexOf(cx);
-        data[name] = dates.map(function (date) {
-            return Array(15).fill(date.getMonth() === month ? 0 : '');
-        });
-        data[name].cx = cx;
-        dates
-            .map(function (date) {
-                return child.meals[date.getMonth()*100 + date.getDate()];
-            })
-            .forEach(function (_meals, week) {
-                _meals.forEach(function (meal) {
-                    var column = MLS.indexOf(meal)*3 + offset;
-                    ++data[name][week][column];
-                    ++day_totals[week][column];
-                });
+    children
+        .filter(function (child) {
+            return dates.some(function (date) {
+                var _meals = child.meals[date.getMonth()*100 + date.getDate()];
+                return _meals && _meals.length;
             });
-    });
+        })
+        .forEach(function (child, index) {
+            var name = child.name,
+                cx = child.classification || meals.config.default_class;
+                offset = ABC.indexOf(cx);
+            data[name] = dates.map(function (date) {
+                return Array(15).fill(date.getMonth() === month ? 0 : '');
+            });
+            data[name].cx = cx;
+            dates
+                .map(function (date) {
+                    return child.meals[date.getMonth()*100 + date.getDate()];
+                })
+                .forEach(function (_meals, week) {
+                    _meals.forEach(function (meal) {
+                        var column = MLS.indexOf(meal)*3 + offset;
+                        ++data[name][week][column];
+                        ++day_totals[week][column];
+                    });
+                });
+        });
 
     // header for this chunk o' data
     ws['!merges'].push({s : {c : 0, r : ws.rows},
