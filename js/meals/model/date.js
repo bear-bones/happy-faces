@@ -4,8 +4,14 @@ module.exports = function update(new_date) {
     new_date = new_date.split('-');
     new_date = new Date(new_date[0], new_date[1] - 1, new_date[2]);
 
-    if (new_date.getTime() === meals.model.report_date.getTime()) return;
-    else meals.model.report_date = new_date;
+    if (isNaN(new_date.getTime())) {
+        meals.view.show_error('Invalid date.');
+        return;
+    } else if (new_date.getTime() === meals.model.report_date.getTime()) {
+        return;
+    } else {
+        meals.model.report_date = new_date;
+    }
 
     meals.view.status_dialog.open([{
         processing_message : 'Reprocessing punches by child for new date',
