@@ -91,7 +91,7 @@ function make_roll_sheet(data, dates, filter_dates, blank) {
         margins : {left : 0.3, right : 0.3, top : 0.4, bottom : 0.4},
         landscape : true
     };
-    ws['!cols'] = [{wch: 4.5}, {wch:31}, {wch:4.5}, {wch:4.5}, {wch:4.5},
+    ws['!cols'] = [{wch: 4.5}, {wch:30}, {wch:4.5}, {wch:4.5}, {wch:4.5},
         {wch:4.5}, {wch:4.5}, {wch:4.5}, {wch:4.5}, {wch:4.5}, {wch:4.5},
         {wch:4.5}, {wch:4.5}, {wch:4.5}, {wch:4.5}, {wch:30}];
     ws['!merges'] = [];
