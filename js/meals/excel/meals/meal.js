@@ -123,8 +123,9 @@ function write_section(type, meal, month, dates, children, ws) {
     children
         .filter(function (child) {
             return dates.some(function (date) {
-                var _meals = child.meals[date.getMonth()*100 + date.getDate()];
-                return _meals && _meals.length;
+                var _meals = child.meals,
+                    key = date.getMonth()*100 + date.getDate();
+                return key in _meals && _meals[key].indexOf(meal) >= 0;
             });
         })
         .forEach(function (child, index) {
