@@ -3,18 +3,16 @@ var XLSX = require('xlsx');
 
 
 function cell(worksheet, col, row, contents, style) {
-    worksheet[cc(col, row)] = sc(contents, style);
+    var cell = {
+        t: isNaN(+contents) ? 's' : 'n',
+        v: contents
+    };
+    if (style) cell.raw_style = style;
+    worksheet[cc(col, row)] = cell;
 }
 
 // cell coordinates
-function cc(col, row) {return XLSX.utils.encode_cell({c : col, r : row})}
-
-// string cell
-function sc(string, style) {
-    var result = {t : 's', v : string};
-    if (style) result.raw_style = style;
-    return result;
-}
+function cc(col, row) {return XLSX.utils.encode_cell({c: col, r: row})}
 
 // get time as \d?\d:\d\d
 function getHHMM(timestamp, nomod) {
@@ -47,8 +45,8 @@ function dollars(num) {
 
 
 module.exports.functions = {
-    cell : cell, cc : cc, sc : sc, getHHMM : getHHMM, getHHMMam : getHHMMam,
-    round : round, dollars : dollars};
+    cell: cell, cc: cc, getHHMM: getHHMM, getHHMMam: getHHMMam,
+    round: round, dollars: dollars};
 module.exports.worksheet = require('./worksheet.js');
 module.exports.XF_L = 0;
 module.exports.XF_C = 1;
