@@ -1,6 +1,6 @@
 function ModelError(message) {
-    this.name = 'ModelError';
-    this.message = message;
+   this.name = 'ModelError';
+   this.message = message;
 }
 
 ModelError.prototype = new Error();

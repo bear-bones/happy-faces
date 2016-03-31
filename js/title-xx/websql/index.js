@@ -5,7 +5,7 @@ var children = require('./children.js'),
 
 
 function init() {
-    return Promise.all([children.init(), config.init(), punches.init()]);
+   return Promise.all([children.init(), config.init(), punches.init()]);
 }
 
 

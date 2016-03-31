@@ -3,12 +3,12 @@ var XLSX = require('xlsx');
 
 
 function cell(worksheet, col, row, contents, style) {
-    var cell = {
-        t: isNaN(+contents) ? 's' : 'n',
-        v: contents
-    };
-    if (style) cell.raw_style = style;
-    worksheet[cc(col, row)] = cell;
+   var cell = {
+      t: isNaN(+contents) ? 's' : 'n',
+      v: contents
+   };
+   if (style) cell.raw_style = style;
+   worksheet[cc(col, row)] = cell;
 }
 
 // cell coordinates
@@ -16,30 +16,30 @@ function cc(col, row) {return XLSX.utils.encode_cell({c: col, r: row})}
 
 // get time as \d?\d:\d\d
 function getHHMM(timestamp, nomod) {
-    var minutes = Math.round(timestamp / 1000 / 60),
-        hours = Math.floor(minutes / 60);
-    minutes = minutes % 60;
-    if (!nomod) hours = hours % 24;
-    return hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+   var minutes = Math.round(timestamp / 1000 / 60),
+       hours = Math.floor(minutes / 60);
+   minutes = minutes % 60;
+   if (!nomod) hours = hours % 24;
+   return hours + ':' + (minutes < 10 ? '0' : '') + minutes;
 }
 function getHHMMam(timestamp) {
-    var minutes = Math.round(timestamp / 1000 / 60),
-        hours = Math.floor(minutes / 60) % 12;
-    minutes = minutes % 60; hours = hours % 24;
-    return (hours || '12') + ':' + (minutes < 10 ? '0' : '') + minutes;
+   var minutes = Math.round(timestamp / 1000 / 60),
+       hours = Math.floor(minutes / 60) % 12;
+   minutes = minutes % 60; hours = hours % 24;
+   return (hours || '12') + ':' + (minutes < 10 ? '0' : '') + minutes;
 }
 
 // round to hundredths
 function round(num, prec) {
-    prec = prec || 100;
-    return Math.round(num * prec) / prec;
+   prec = prec || 100;
+   return Math.round(num * prec) / prec;
 }
 // get string representation with exactly two decimal digits
 function dollars(num) {
-    var parts = ('' + round(num)).split('.');
-    if (parts.length === 1) parts.push('00');
-    else if (parts[1].length === 1) parts[1] += '0';
-    return parts.join('.');
+   var parts = ('' + round(num)).split('.');
+   if (parts.length === 1) parts.push('00');
+   else if (parts[1].length === 1) parts[1] += '0';
+   return parts.join('.');
 }
 
 

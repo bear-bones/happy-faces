@@ -1,102 +1,103 @@
 <html>
 <head>
-    <title>Happy Faces Meals Report Generator</title>
+   <title>Happy Faces Meals Report Generator</title>
 
 
-    <meta charset="utf-8" />
+   <meta charset="utf-8" />
 
 
-    <link href="app://happy-faces/bower_components/polymer/polymer.html" rel="import" />
+   <link href="app://happy-faces/bower_components/polymer/polymer.html" rel="import" />
 
-    <link href="app://happy-faces/bower_components/font-roboto/roboto.html" rel="import" />
+   <link href="app://happy-faces/bower_components/font-roboto/roboto.html" rel="import" />
 
-    <link href="app://happy-faces/bower_components/core-header-panel/core-header-panel.html" rel="import" />
-    <link href="app://happy-faces/bower_components/core-toolbar/core-toolbar.html" rel="import" />
+   <link href="app://happy-faces/bower_components/core-header-panel/core-header-panel.html" rel="import" />
+   <link href="app://happy-faces/bower_components/core-toolbar/core-toolbar.html" rel="import" />
 
-    <link href="app://happy-faces/bower_components/core-icon/core-icon.html" rel="import" />
-    <link href="app://happy-faces/bower_components/core-icons/core-icons.html" rel="import" />
-    <link href="app://happy-faces/bower_components/core-icons/editor-icons.html" rel="import" />
-    <link href="app://happy-faces/bower_components/paper-button/paper-button.html" rel="import" />
-    <link href="app://happy-faces/bower_components/paper-icon-button/paper-icon-button.html" rel="import" />
+   <link href="app://happy-faces/bower_components/core-icon/core-icon.html" rel="import" />
+   <link href="app://happy-faces/bower_components/core-icons/core-icons.html" rel="import" />
+   <link href="app://happy-faces/bower_components/core-icons/editor-icons.html" rel="import" />
+   <link href="app://happy-faces/bower_components/paper-button/paper-button.html" rel="import" />
+   <link href="app://happy-faces/bower_components/paper-icon-button/paper-icon-button.html" rel="import" />
 
-    <link href="app://happy-faces/bower_components/paper-dialog/paper-dialog.html" rel="import" />
-    <link href="app://happy-faces/bower_components/paper-dialog/paper-dialog-transition.html" rel="import" />
-    <link href="app://happy-faces/bower_components/paper-progress/paper-progress.html" rel="import" />
+   <link href="app://happy-faces/bower_components/paper-dialog/paper-dialog.html" rel="import" />
+   <link href="app://happy-faces/bower_components/paper-dialog/paper-dialog-transition.html" rel="import" />
+   <link href="app://happy-faces/bower_components/paper-progress/paper-progress.html" rel="import" />
 
-    <link href="app://happy-faces/bower_components/paper-input/paper-input-decorator.html" rel="import" />
+   <link href="app://happy-faces/bower_components/paper-input/paper-input-decorator.html" rel="import" />
 
-    <link href="app://happy-faces/bower_components/paper-tabs/paper-tabs.html" rel="import" />
-    <link href="app://happy-faces/bower_components/core-pages/core-pages.html" rel="import" />
+   <link href="app://happy-faces/bower_components/paper-tabs/paper-tabs.html" rel="import" />
+   <link href="app://happy-faces/bower_components/core-pages/core-pages.html" rel="import" />
 
-    <link href="app://happy-faces/bower_components/paper-toast/paper-toast.html" rel="import" />
+   <link href="app://happy-faces/bower_components/paper-toast/paper-toast.html" rel="import" />
 
-    <link href="app://happy-faces/bower_components/sortable-table/sortable-table.html" rel="import" />
+   <link href="app://happy-faces/bower_components/sortable-table/sortable-table.html" rel="import" />
 
 
-    <link rel="stylesheet" href="app://happy-faces/css/meals.css" />
-    <link rel="stylesheet" href="app://happy-faces/bower_components/sortable-table/css/bootstrap.css">
+   <link rel="stylesheet" href="app://happy-faces/css/meals.css" />
+   <link rel="stylesheet" href="app://happy-faces/bower_components/sortable-table/css/bootstrap.css">
 </head>
 
 
 
 <body unresolved fullbleed layout vertical>
-    <core-header-panel flex>
-        <core-toolbar>
-            <div flex class="toolbar-flex"></div>
+   <core-header-panel flex>
+      <core-toolbar>
+         <div flex class="toolbar-flex"></div>
 
-            <input type="date" value="2014-12-01" id="report-month-field" />
-            <paper-icon-button icon="forward" title="Update report month" id="date-button"></paper-icon-button>
+         <input type="date" value="2014-12-01" id="report-month-field" />
+         <paper-icon-button icon="forward" title="Update report month" id="date-button"></paper-icon-button>
 
-            <div flex class="toolbar-flex"></div>
+         <div flex class="toolbar-flex"></div>
 
-            <paper-icon-button icon="settings" title="Update application settings" id="config-button"></paper-icon-button>
-        </core-toolbar>
+         <paper-icon-button icon="settings" title="Update application settings" id="config-button"></paper-icon-button>
+      </core-toolbar>
 
-        <sortable-table class="bootstrap" id="child-grid" data="{{data}}" rowTemplate="template" disableColumnMove sortColumn="name">
-            <sortable-column name="name">Name</sortable-column>
-            <sortable-column name="dob">DoB</sortable-column>
-            <sortable-column name="classification">Classification</sortable-column>
-            <sortable-column name="classroom">Classroom</sortable-column>
+      <sortable-table class="bootstrap" id="child-grid" data="{{data}}" rowTemplate="template" disableColumnMove sortColumn="name">
+         <sortable-column name="name">Name</sortable-column>
+         <sortable-column name="dob">DoB</sortable-column>
+         <sortable-column name="classification">Classification</sortable-column>
+         <sortable-column name="classroom">Classroom</sortable-column>
 
-            <template id="template">
-                <td>{{record.row.name}}</td>
-                <td style="text-align: right">{{record.row.display.dob}}</td>
-                <td style="text-align: center">{{record.row.classification}}</td>
-                <td>{{record.row.display.classroom}}</td>
-            </template>
-        </sortable-table>
-    </core-header-panel>
+         <template id="template">
+            <td>{{record.row.name}}</td>
+            <td style="text-align: right">{{record.row.display.dob}}</td>
+            <td style="text-align: center">{{record.row.classification}}</td>
+            <td>{{record.row.display.classroom}}</td>
+         </template>
+      </sortable-table>
+   </core-header-panel>
 
-    <paper-toast id="error-toast" text="Cannot save; there are invalid fields."></paper-toast>
+   <paper-toast id="error-toast" text="Cannot save; there are invalid fields."></paper-toast>
 
-    <!-- permanently hidden. we programatically click it when the user clicks a report button -->
-    <input style="display: none" id="file" type="file">
+   <!-- permanently hidden. we programatically click it when the user clicks a report button -->
+   <input style="display: none" id="file" type="file">
 
 
-    
-    <script>
-    window.addEventListener('polymer-ready', function () {window.polymer_ready = true});
+   
+   <script>
+   window.addEventListener('polymer-ready', function () {
+      window.polymer_ready = true;
+   });
 
-    function last_resort(error) {
-        try {
-            global.log.error(error);
-        } catch (e) {
-            console.error(error);
-        }
-    }
+   function last_resort(error) {
+      try {
+         global.log.error(error);
+      } catch (e) {
+         console.error(error);
+      }
+   }
 
-    try {
-        global.gui = window.gui = require('nw.gui');
-        global.app = window.app = gui.App;
-        global.common = window.common = require('./js/common');
-        global.meals = window.meals = require('./js/meals');
+   try {
+      global.gui = window.gui = require('nw.gui');
+      global.app = window.app = gui.App;
+      global.common = window.common = require('./js/common');
+      global.meals = window.meals = require('./js/meals');
+      meals.main();
+   } catch (error) {
+      last_resort(error);
+   }
 
-        meals.main();
-    } catch (error) {
-        last_resort(error);
-    }
-
-    process.on('uncaughtException', last_resort);
-    </script>
+   process.on('uncaughtException', last_resort);
+   </script>
 </body>
 </html>

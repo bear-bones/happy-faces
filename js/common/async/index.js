@@ -3,18 +3,18 @@
  * yielding function.
  */
 window.promise = global.promise = function promise(async) {
-    return function () {
-        var parameters = [].slice.call(arguments);
-        return new Promise(function (resolve, reject) {
-            parameters.push(function () {
-                var parameters = [].slice.call(arguments),
-                    error = parameters.shift();
-                if (error) reject(error);
-                else resolve.apply(this, parameters);
-            });
-            async.apply(this, parameters);
-        });
-    }
+   return function () {
+      var parameters = [].slice.call(arguments);
+      return new Promise(function (resolve, reject) {
+         parameters.push(function () {
+            var parameters = [].slice.call(arguments),
+                error = parameters.shift();
+            if (error) reject(error);
+            else resolve.apply(this, parameters);
+         });
+         async.apply(this, parameters);
+      });
+   }
 };
 
 
@@ -25,19 +25,19 @@ window.promise = global.promise = function promise(async) {
  * prefixing it with `yield`.
  */
 window.co = global.co = function co(generator) {
-    generator = generator();
-    var result;
-     
-    (function recurse(error, value) {
-        if (error) generator.throw(error);
+   generator = generator();
+   var result;
+    
+   (function recurse(error, value) {
+      if (error) generator.throw(error);
 
-        result = generator.next(value);
-        if (result.done) return;
-         
-        if (result && result.value && 'then' in result.value) {  // quack quack
-            result.value.then(function (v) {recurse(null, v)}, recurse);
-        } else {
-            process.nextTick(function () {recurse(null, result.value)});
-        }
-    })();
+      result = generator.next(value);
+      if (result.done) return;
+       
+      if (result && result.value && 'then' in result.value) {  // quack quack
+         result.value.then(function (v) {recurse(null, v)}, recurse);
+      } else {
+         process.nextTick(function () {recurse(null, result.value)});
+      }
+   })();
 };

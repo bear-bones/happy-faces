@@ -1,6 +1,6 @@
 function ViewError(message) {
-    this.name = 'ViewError';
-    this.message = message;
+   this.name = 'ViewError';
+   this.message = message;
 }
 
 ViewError.prototype = new Error();

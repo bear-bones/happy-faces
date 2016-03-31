@@ -1,120 +1,120 @@
 <html>
 <head>
-    <title>Happy Faces Title XX Report Generator</title>
+   <title>Happy Faces Title XX Report Generator</title>
 
 
-    <meta charset="utf-8" />
+   <meta charset="utf-8" />
 
 
-    <link href="app://happy-faces/bower_components/polymer/polymer.html" rel="import" />
+   <link href="app://happy-faces/bower_components/polymer/polymer.html" rel="import" />
 
-    <link href="app://happy-faces/bower_components/font-roboto/roboto.html" rel="import" />
+   <link href="app://happy-faces/bower_components/font-roboto/roboto.html" rel="import" />
 
-    <link href="app://happy-faces/bower_components/core-header-panel/core-header-panel.html" rel="import" />
-    <link href="app://happy-faces/bower_components/core-toolbar/core-toolbar.html" rel="import" />
+   <link href="app://happy-faces/bower_components/core-header-panel/core-header-panel.html" rel="import" />
+   <link href="app://happy-faces/bower_components/core-toolbar/core-toolbar.html" rel="import" />
 
-    <link href="app://happy-faces/bower_components/core-icon/core-icon.html" rel="import" />
-    <link href="app://happy-faces/bower_components/core-icons/core-icons.html" rel="import" />
-    <link href="app://happy-faces/bower_components/core-icons/editor-icons.html" rel="import" />
-    <link href="app://happy-faces/bower_components/paper-button/paper-button.html" rel="import" />
-    <link href="app://happy-faces/bower_components/paper-icon-button/paper-icon-button.html" rel="import" />
+   <link href="app://happy-faces/bower_components/core-icon/core-icon.html" rel="import" />
+   <link href="app://happy-faces/bower_components/core-icons/core-icons.html" rel="import" />
+   <link href="app://happy-faces/bower_components/core-icons/editor-icons.html" rel="import" />
+   <link href="app://happy-faces/bower_components/paper-button/paper-button.html" rel="import" />
+   <link href="app://happy-faces/bower_components/paper-icon-button/paper-icon-button.html" rel="import" />
 
-    <link href="app://happy-faces/bower_components/paper-dialog/paper-dialog.html" rel="import" />
-    <link href="app://happy-faces/bower_components/paper-dialog/paper-dialog-transition.html" rel="import" />
-    <link href="app://happy-faces/bower_components/paper-progress/paper-progress.html" rel="import" />
+   <link href="app://happy-faces/bower_components/paper-dialog/paper-dialog.html" rel="import" />
+   <link href="app://happy-faces/bower_components/paper-dialog/paper-dialog-transition.html" rel="import" />
+   <link href="app://happy-faces/bower_components/paper-progress/paper-progress.html" rel="import" />
 
-    <link href="app://happy-faces/bower_components/paper-input/paper-input-decorator.html" rel="import" />
+   <link href="app://happy-faces/bower_components/paper-input/paper-input-decorator.html" rel="import" />
 
-    <link href="app://happy-faces/bower_components/paper-toggle-button/paper-toggle-button.html" rel="import" />
-    <link href="app://happy-faces/bower_components/core-label/core-label.html" rel="import" />
-    <link href="app://happy-faces/bower_components/paper-checkbox/paper-checkbox.html" rel="import" />
+   <link href="app://happy-faces/bower_components/paper-toggle-button/paper-toggle-button.html" rel="import" />
+   <link href="app://happy-faces/bower_components/core-label/core-label.html" rel="import" />
+   <link href="app://happy-faces/bower_components/paper-checkbox/paper-checkbox.html" rel="import" />
 
-    <link href="app://happy-faces/bower_components/paper-toast/paper-toast.html" rel="import" />
+   <link href="app://happy-faces/bower_components/paper-toast/paper-toast.html" rel="import" />
 
-    <link href="app://happy-faces/bower_components/sortable-table/sortable-table.html" rel="import" />
+   <link href="app://happy-faces/bower_components/sortable-table/sortable-table.html" rel="import" />
 
 
-    <link rel="stylesheet" href="app://happy-faces/css/title-xx.css" />
-    <link rel="stylesheet" href="app://happy-faces/bower_components/sortable-table/css/bootstrap.css">
+   <link rel="stylesheet" href="app://happy-faces/css/title-xx.css" />
+   <link rel="stylesheet" href="app://happy-faces/bower_components/sortable-table/css/bootstrap.css">
 </head>
 
 
 
 <body unresolved fullbleed layout vertical>
-    <core-header-panel flex>
-        <core-toolbar>
-            <input type="month" value="2014-12" id="report-month-field" />
-            <paper-icon-button icon="forward" title="Update report month" id="date-button"></paper-icon-button>
+   <core-header-panel flex>
+      <core-toolbar>
+         <input type="month" value="2014-12" id="report-month-field" />
+         <paper-icon-button icon="forward" title="Update report month" id="date-button"></paper-icon-button>
 
-            <div flex class="toolbar-flex">
-                <paper-button raised class="excel-button" id="excel-button">
-                    <core-icon icon="description"></core-icon>&nbsp;Create Excel Report
-                </paper-button>
-            </div>
+         <div flex class="toolbar-flex">
+            <paper-button raised class="excel-button" id="excel-button">
+               <core-icon icon="description"></core-icon>&nbsp;Create Excel Report
+            </paper-button>
+         </div>
 
-            <paper-icon-button icon="settings" title="Update application settings" id="config-button"></paper-icon-button>
-        </core-toolbar>
+         <paper-icon-button icon="settings" title="Update application settings" id="config-button"></paper-icon-button>
+      </core-toolbar>
 
-        <sortable-table class="bootstrap" id="child-grid" data="{{data}}" rowTemplate="template" disableColumnMove sortColumn="name">
-            <sortable-column name="name">Name</sortable-column>
-            <sortable-column name="age">Age</sortable-column>
-            <sortable-column name="period" formula="function (row) {return !row || (row.current && row.current.auth_range_end) || row.auth_range_end || row.alt_range_end}">Auth Period</sortable-column>
-            <sortable-column name="page" formula="function (row) {return row && row.claim_num*1000 + row.line_num}">Page</sortable-column>
-            <sortable-column name="line" formula="function (row) {return row && row.claim_num*1000 + row.line_num}">Line</sortable-column>
-            <sortable-column name="auth_hours">Auth H</sortable-column>
-            <sortable-column name="display_hours">Used H</sortable-column>
-            <sortable-column name="rem_hours">Rem H</sortable-column>
-            <sortable-column name="auth_days">Auth D</sortable-column>
-            <sortable-column name="display_days">Used D</sortable-column>
-            <sortable-column name="rem_days">Rem D</sortable-column>
+      <sortable-table class="bootstrap" id="child-grid" data="{{data}}" rowTemplate="template" disableColumnMove sortColumn="name">
+         <sortable-column name="name">Name</sortable-column>
+         <sortable-column name="age">Age</sortable-column>
+         <sortable-column name="period" formula="function (row) {return !row || (row.current && row.current.auth_range_end) || row.auth_range_end || row.alt_range_end}">Auth Period</sortable-column>
+         <sortable-column name="page" formula="function (row) {return row && row.claim_num*1000 + row.line_num}">Page</sortable-column>
+         <sortable-column name="line" formula="function (row) {return row && row.claim_num*1000 + row.line_num}">Line</sortable-column>
+         <sortable-column name="auth_hours">Auth H</sortable-column>
+         <sortable-column name="display_hours">Used H</sortable-column>
+         <sortable-column name="rem_hours">Rem H</sortable-column>
+         <sortable-column name="auth_days">Auth D</sortable-column>
+         <sortable-column name="display_days">Used D</sortable-column>
+         <sortable-column name="rem_days">Rem D</sortable-column>
 
-            <template id="template">
-                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}">{{record.row.name}}</td>
-                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: center">{{record.row.display.age}}</td>
-                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right" class="{{record.row.display.period_sign}}">{{record.row.display.auth_period}}</td>
-                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right">{{record.row.claim_num}}</td>
-                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right">{{record.row.line_num}}</td>
-                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right">{{record.row.display.auth_hours}}</td>
-                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right">{{record.row.display.total_hours}}</td>
-                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right" class="{{record.row.display.hours_sign}}">{{record.row.display.rem_hours}}</td>
-                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right">{{record.row.display.auth_days}}</td>
-                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right">{{record.row.display.total_days}}</td>
-                <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right" class="{{record.row.display.days_sign}}">{{record.row.display.rem_days}}</td>
-            </template>
-        </sortable-table>
-    </core-header-panel>
+         <template id="template">
+            <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}">{{record.row.name}}</td>
+            <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: center">{{record.row.display.age}}</td>
+            <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right" class="{{record.row.display.period_sign}}">{{record.row.display.auth_period}}</td>
+            <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right">{{record.row.claim_num}}</td>
+            <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right">{{record.row.line_num}}</td>
+            <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right">{{record.row.display.auth_hours}}</td>
+            <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right">{{record.row.display.total_hours}}</td>
+            <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right" class="{{record.row.display.hours_sign}}">{{record.row.display.rem_hours}}</td>
+            <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right">{{record.row.display.auth_days}}</td>
+            <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right">{{record.row.display.total_days}}</td>
+            <td title="Click on a row to edit the child's information" data-id="{{record.row.child_id}}" style="text-align: right" class="{{record.row.display.days_sign}}">{{record.row.display.rem_days}}</td>
+         </template>
+      </sortable-table>
+   </core-header-panel>
 
-    <paper-toast id="error-toast" text="Cannot save; there are invalid fields."></paper-toast>
+   <paper-toast id="error-toast" text="Cannot save; there are invalid fields."></paper-toast>
 
-    <!-- permanently hidden. we programatically click it when the user clicks the "generate excel" button -->
-    <input style="display: none" id="file" type="file">
+   <!-- permanently hidden. we programatically click it when the user clicks the "generate excel" button -->
+   <input style="display: none" id="file" type="file">
 
 
-    
-    <script>
-    window.addEventListener(
-        'polymer-ready', function () {window.polymer_ready = true}
-    );
+   
+   <script>
+   window.addEventListener('polymer-ready', function () {
+      window.polymer_ready = true;
+   });
 
-    function last_resort(error) {
-        try {
-            global.log.error(error);
-        } catch(_) {
-            console.error(error);
-        }
-    }
+   function last_resort(error) {
+      try {
+         global.log.error(error);
+      } catch(_) {
+         console.error(error);
+      }
+   }
 
-    try {
-        global.app = window.app = require('nw.gui').App;
-        global.common = window.common = require('./js/common');
-        global.title_xx = window.title_xx = require('./js/title-xx');
+   try {
+      global.app = window.app = require('nw.gui').App;
+      global.common = window.common = require('./js/common');
+      global.title_xx = window.title_xx = require('./js/title-xx');
 
-        title_xx.main();
-    } catch (error) {
-        last_resort(error);
-    }
+      title_xx.main();
+   } catch (error) {
+      last_resort(error);
+   }
 
-    process.on('uncaughtException', last_resort);
-    </script>
+   process.on('uncaughtException', last_resort);
+   </script>
 </body>
 </html>

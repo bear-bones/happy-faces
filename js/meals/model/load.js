@@ -92,12 +92,17 @@ function* read_ccm() {
         throw new meals.model_error('Error reading child information');
     }
     meals.model.data = children.map(function (child) {
-        return {
-            child_id : child.childkey,
+        var fields = {
+            child_id: child.childkey,
             name: child.last + ', ' + child.first + ' ' + (child.middle || ''),
-            dob: child.dob, age: get_age(child.dob),
-            txx: +(child.chfield1 === 'TXX'), classification: child.chfield2
+            dob: child.dob,
+            age: get_age(child.dob),
+            txx: +(child.chfield1 === 'TXX'),
+            classification: child.chfield2
         };
+        if (!fields.classification && child.ethnicity.startsWith("Food"))
+            fields.classification = child.ethnicity.split(' ').pop();
+        return fields;
     });
     meals.view.status_dialog.next('loaded ' + children.length + ' children.');
 

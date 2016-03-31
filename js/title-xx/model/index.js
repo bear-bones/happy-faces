@@ -6,38 +6,38 @@ function* init(report_date) {
     this.report_date = report_date;
 
     try {
-        yield common.mssql.connect();
+       yield common.mssql.connect();
     } catch (error) {
-        log.error(error);
-        log.debug(error.stack);
-        mssql_error = true;
+       log.error(error);
+       log.debug(error.stack);
+       mssql_error = true;
     }
 
     try {
-        yield common.websql.connect();
+       yield common.websql.connect();
     } catch (error) {
-        log.error(error);
-        log.debug(error.stack);
-        throw new model_error('Error connecting to reporting database');
+       log.error(error);
+       log.debug(error.stack);
+       throw new model_error('Error connecting to reporting database');
     }
 
     try {
-        yield title_xx.websql.init();
+       yield title_xx.websql.init();
     } catch (error) {
-        log.error(error);
-        log.debug(error.stack);
-        throw new model_error('Error setting up reporting database');
+       log.error(error);
+       log.debug(error.stack);
+       throw new model_error('Error setting up reporting database');
     }
 
     try {
-        title_xx.config = {};
-        var config = yield title_xx.websql.config.read();
-        Object.keys(config)
-            .forEach(function (key) {title_xx.config[key] = config[key]});
+       title_xx.config = {};
+       var config = yield title_xx.websql.config.read();
+       Object.keys(config)
+          .forEach(function (key) {title_xx.config[key] = config[key]});
     } catch (error) {
-        log.error(error);
-        log.debug(error.stack);
-        throw new model_error('Error loading app configuration');
+       log.error(error);
+       log.debug(error.stack);
+       throw new model_error('Error loading app configuration');
     }
 
     if (mssql_error) throw new model_error('Error connecting to ChildCare Manager database');
